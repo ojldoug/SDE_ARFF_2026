@@ -125,8 +125,9 @@ def simulate_sir_ssa_fixed_observations(
 
     # Convert normalized fractions to integer counts.
     #
-    # We construct I and R first, then use S = N-I-R so that the total
-    # population is exactly N despite integer rounding.
+    # Convert normalized fractions to integer counts using the
+    # largest-remainder method so that the counts sum exactly to N
+    # while staying as close as possible to the sampled fractions.
     expected_counts = initial_state * population_size
     counts = np.floor(expected_counts).astype(int)
 
