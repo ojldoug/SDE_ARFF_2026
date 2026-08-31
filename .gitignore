@@ -1,3 +1,7 @@
 
 # Large training data
 GPU/training_data/
+
+# Python generated files
+__pycache__/
+*.py[cod]
