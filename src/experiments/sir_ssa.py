@@ -127,9 +127,17 @@ def simulate_sir_ssa_fixed_observations(
     #
     # We construct I and R first, then use S = N-I-R so that the total
     # population is exactly N despite integer rounding.
-    I = int(np.floor(initial_state[1] * population_size))
-    R = int(np.floor(initial_state[2] * population_size))
-    S = population_size - I - R
+    expected_counts = initial_state * population_size
+    counts = np.floor(expected_counts).astype(int)
+
+    remainder = population_size - counts.sum()
+
+    if remainder > 0:
+        fractional_parts = expected_counts - counts
+        indices = np.argsort(fractional_parts)[::-1][:remainder]
+        counts[indices] += 1
+
+    S, I, R = counts
 
     if min(S, I, R) < 0:
         raise ValueError("Rounded initial counts are not admissible.")
