@@ -13,3 +13,8 @@ build/
 *.o
 *.so
 GPU/gillespie/gillespie_c.html
+
+# Reproducible generated datasets
+data/
+# Reproducible generated datasets
+data/
