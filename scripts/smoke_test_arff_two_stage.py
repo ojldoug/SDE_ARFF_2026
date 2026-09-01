@@ -40,7 +40,6 @@ def main():
 
     smoke_arff = replace(
         config.arff,
-        K=32,
         M_min=10,
         M_max=10,
         n_folds=5,
@@ -53,6 +52,7 @@ def main():
         x,
         r,
         h,
+        K=32,
         diff_type=definition.diff_type,
         config=smoke_arff,
         fold_seed=config.split.seed,

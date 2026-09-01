@@ -47,13 +47,15 @@ def _fit_regression(
     key,
     x,
     y,
+    *,
+    K: int,
     config: ARFFConfig,
 ):
     return fit_arff(
         key,
         x,
         y,
-        K=config.K,
+        K=K,
         n_iterations=config.M_max,
         lambda_reg=config.lambda_reg,
         gamma=config.gamma,
@@ -91,6 +93,7 @@ def cross_fitted_covariance_targets(
     r,
     h,
     *,
+    K: int,
     diff_type: str,
     config: ARFFConfig,
     fold_seed: int,
@@ -144,7 +147,8 @@ def cross_fitted_covariance_targets(
             key,
             x[fit_idx],
             drift_target,
-            config,
+            K=K,
+            config=config,
         )
 
         drift_holdout = np.asarray(
@@ -187,6 +191,7 @@ def fit_two_stage_arff(
     r,
     h,
     *,
+    K: int,
     diff_type: str,
     config: ARFFConfig,
     fold_seed: int,
@@ -203,6 +208,7 @@ def fit_two_stage_arff(
         x,
         r,
         h,
+        K=K,
         diff_type=diff_type,
         config=config,
         fold_seed=fold_seed,
@@ -215,7 +221,8 @@ def fit_two_stage_arff(
         key,
         x,
         drift_target,
-        config,
+        K=K,
+        config=config,
     )
 
     # Stage-2 covariance fit uses all training x paired with honest
@@ -224,7 +231,8 @@ def fit_two_stage_arff(
         key,
         x,
         crossfit.covariance_targets,
-        config,
+        K=K,
+        config=config,
     )
 
     return (

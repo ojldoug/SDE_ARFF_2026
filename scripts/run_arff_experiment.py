@@ -15,7 +15,10 @@ import numpy as np
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
-from src.arff.evaluation import gaussian_nll
+from src.arff.evaluation import (
+    gaussian_nll,
+    true_function_errors,
+)
 from src.arff.two_stage import fit_two_stage_arff
 from src.experiments.config import get_config
 from src.experiments.definitions import get_experiment
@@ -39,6 +42,11 @@ def main():
     config = get_config(name)
     definition = get_experiment(name)
 
+    if config.K is None:
+        raise ValueError(
+            f"No Fourier-feature count K has been established for {name}."
+        )
+
     data = np.load(
         REPO_ROOT / "data" / f"{name}.npz",
         allow_pickle=False,
@@ -61,7 +69,7 @@ def main():
     print(f"validation : {len(validation_idx)}")
     print(f"test       : {len(test_idx)}")
     print(f"folds      : {config.arff.n_folds}")
-    print(f"K          : {config.arff.K}")
+    print(f"K          : {config.K}")
     print(f"iterations : {config.arff.M_max}")
     print()
 
@@ -72,6 +80,7 @@ def main():
         x[train_idx],
         r[train_idx],
         h[train_idx],
+        K=config.K,
         diff_type=definition.diff_type,
         config=config.arff,
         fold_seed=config.split.seed,
@@ -95,6 +104,13 @@ def main():
             spd_epsilon=config.evaluation.spd_epsilon,
         )
 
+        drift_rmse, covariance_rmse = true_function_errors(
+            model,
+            x[idx],
+            true_drift=definition.drift,
+            true_diffusion_factor=definition.diffusion_factor,
+        )
+
         print(label)
         print(f"  NLL                    : {result.nll:.8e}")
         print(
@@ -108,6 +124,14 @@ def main():
         print(
             "  min projected eigenvalue: "
             f"{result.min_projected_eigenvalue:.8e}"
+        )
+        print(
+            "  drift RMSE              : "
+            f"{drift_rmse:.8e}"
+        )
+        print(
+            "  covariance RMSE         : "
+            f"{covariance_rmse:.8e}"
         )
         print()
 

@@ -107,3 +107,51 @@ def gaussian_nll(
             jnp.min(projected_eigenvalues)
         ),
     )
+
+
+def true_function_errors(
+    model: TwoStageARFFModel,
+    x,
+    *,
+    true_drift,
+    true_diffusion_factor,
+):
+    """
+    RMSE against the known drift and covariance functions.
+
+    Covariance error is evaluated on the raw learned covariance, before
+    SPD projection.
+    """
+    x = jnp.asarray(x)
+
+    learned_drift = predict(model.drift, x)
+    learned_covariance = raw_covariance(
+        model.covariance,
+        x,
+        model.diff_type,
+    )
+
+    drift_true = jnp.asarray(true_drift(x))
+    sigma_true = jnp.asarray(true_diffusion_factor(x))
+
+    covariance_true = (
+        sigma_true
+        @ jnp.swapaxes(sigma_true, -1, -2)
+    )
+
+    drift_rmse = jnp.sqrt(
+        jnp.mean(
+            (learned_drift - drift_true) ** 2
+        )
+    )
+
+    covariance_rmse = jnp.sqrt(
+        jnp.mean(
+            (learned_covariance - covariance_true) ** 2
+        )
+    )
+
+    return (
+        float(drift_rmse),
+        float(covariance_rmse),
+    )
