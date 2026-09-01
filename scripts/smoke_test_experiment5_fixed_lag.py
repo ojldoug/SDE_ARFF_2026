@@ -10,7 +10,9 @@ import numpy as np
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
-from src.experiments.sir_ssa import (  # noqa: E402
+from src.experiments.config import get_config
+from src.experiments.sir_ssa import (
+    generate_sir_data,
     sample_initial_simplex,
     simulate_sir_ssa_fixed_observations,
 )
@@ -106,6 +108,36 @@ def main():
     )
     print()
     print("All checks passed.")
+
+    from dataclasses import replace
+
+    config = get_config("ex5")
+
+    smoke_data = replace(
+        config.data,
+        n_trajectories=5,
+        trajectory_time=0.1,
+        target_samples=50,
+    )
+    smoke_config = replace(config, data=smoke_data)
+
+    x_data, r_data, step_sizes = generate_sir_data(smoke_config)
+
+    assert x_data.shape == (50, 2)
+    assert r_data.shape == (50, 2)
+    assert step_sizes.shape == (50, 1)
+
+    assert np.all(np.isfinite(x_data))
+    assert np.all(np.isfinite(r_data))
+    assert np.allclose(step_sizes, 1e-2)
+
+    print()
+    print("Config-level Experiment 5 wrapper")
+    print(f"x shape                   : {x_data.shape}")
+    print(f"r shape                   : {r_data.shape}")
+    print(f"h shape                   : {step_sizes.shape}")
+    print(f"unique h                  : {np.unique(step_sizes)}")
+    print("Wrapper checks passed.")
 
 
 if __name__ == "__main__":

@@ -232,3 +232,82 @@ def sample_initial_simplex(
     """
     raw = rng.uniform(0.0, 1.0, size=(n_trajectories, 3))
     return raw / raw.sum(axis=1, keepdims=True)
+
+
+def generate_sir_data(config):
+    """
+    Generate the final fixed-lag Experiment 5 dataset.
+
+    Each SSA trajectory is observed at the prescribed uniform times
+
+        0, h, 2h, ..., T,
+
+    and every consecutive observation pair is retained.
+
+    Returns
+    -------
+    x_data
+        Initial state of each transition in (S/N, R/N) coordinates.
+    r_data
+        State increment over one observation interval.
+    step_sizes
+        Exact observation lag for each transition.
+    """
+    data = config.data
+
+    if data.n_trajectories is None:
+        raise ValueError("Experiment 5 requires n_trajectories.")
+
+    if data.trajectory_time is None:
+        raise ValueError("Experiment 5 requires trajectory_time.")
+
+    if data.observation_lag is None:
+        raise ValueError("Experiment 5 requires observation_lag.")
+
+    rng = np.random.default_rng(data.seed)
+
+    observation_times = np.arange(
+        0.0,
+        data.trajectory_time + 0.5 * data.observation_lag,
+        data.observation_lag,
+    )
+
+    initial_states = sample_initial_simplex(
+        data.n_trajectories,
+        rng,
+    )
+
+    trajectories = []
+
+    for initial_state in initial_states:
+        trajectory = simulate_sir_ssa_fixed_observations(
+            initial_state,
+            observation_times,
+            population_size=1024,
+            k1=1.0,
+            k2=1.0,
+            k3=0.0,
+            rng=rng,
+        )
+        trajectories.append(trajectory)
+
+    trajectories = np.stack(trajectories)
+
+    x_data = trajectories[:, :-1, :].reshape(-1, 2)
+    y_data = trajectories[:, 1:, :].reshape(-1, 2)
+    r_data = y_data - x_data
+
+    step_sizes = np.full(
+        (len(x_data), 1),
+        data.observation_lag,
+        dtype=float,
+    )
+
+    if data.target_samples is not None:
+        if len(x_data) != data.target_samples:
+            raise RuntimeError(
+                f"Expected {data.target_samples} Experiment 5 samples, "
+                f"but generated {len(x_data)}."
+            )
+
+    return x_data, r_data, step_sizes
