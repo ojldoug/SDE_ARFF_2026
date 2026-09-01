@@ -36,8 +36,17 @@ def main():
     assert np.all(np.isfinite(r))
     assert np.all(np.isfinite(h))
 
-    expected_h = 0.5 * smoke_data.fine_step**2
-    assert np.allclose(h, expected_h)
+    expected_h = 0.5 * smoke_data.grid_step**2
+
+    assert np.isclose(
+        smoke_data.observation_lag,
+        expected_h,
+    )
+
+    assert np.allclose(
+        h,
+        smoke_data.observation_lag,
+    )
 
     print("Experiment 6 wave smoke test")
     print("----------------------------")

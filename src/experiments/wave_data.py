@@ -162,13 +162,28 @@ def generate_wave_data(config):
     """Generate Experiment 6 learning data."""
     data = config.data
 
-    if data.fine_step is None:
-        raise ValueError("Experiment 6 requires fine_step.")
+    if data.grid_step is None:
+        raise ValueError("Experiment 6 requires grid_step.")
 
     if data.trajectory_time is None:
         raise ValueError("Experiment 6 requires trajectory_time.")
 
-    dt = data.fine_step
+    dt = data.grid_step
+    effective_h = 0.5 * dt**2
+
+    if data.observation_lag is None:
+        raise ValueError(
+            "Experiment 6 requires observation_lag."
+        )
+
+    if not np.isclose(
+        data.observation_lag,
+        effective_h,
+    ):
+        raise ValueError(
+            "Experiment 6 observation_lag must equal "
+            "0.5 * grid_step**2."
+        )
 
     space_size = 1.0
     time_size = data.trajectory_time
@@ -207,10 +222,9 @@ def generate_wave_data(config):
 
     r_data = u_next - u_n
 
-    h_eff = 0.5 * dt**2
     step_sizes = np.full(
         (len(x_data), 1),
-        h_eff,
+        data.observation_lag,
     )
 
     if data.target_samples is not None and len(x_data) < data.target_samples:
@@ -219,9 +233,13 @@ def generate_wave_data(config):
             f"fewer than requested {data.target_samples}."
         )
 
-    # The legacy grid produces far more than 100k candidate points.
-    # Select a deterministic subset for the final benchmark.
-    if data.target_samples is not None:
+    # Optionally select a deterministic subset. For the final Experiment 6
+    # configuration, target_samples equals the full number of generated
+    # interior learning points, so all samples are retained.
+    if (
+        data.target_samples is not None
+        and data.target_samples < len(x_data)
+    ):
         rng = np.random.default_rng(data.seed)
         indices = rng.choice(
             len(x_data),

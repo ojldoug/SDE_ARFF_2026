@@ -17,9 +17,10 @@ class DataConfig:
     seed: int
     n_trajectories: Optional[int] = None
     trajectory_time: Optional[float] = None
-    fine_step: Optional[float] = None
     observation_lag: Optional[float] = None
+    em_substeps: Optional[int] = None
     target_samples: Optional[int] = None
+    grid_step: Optional[float] = None
 
 
 @dataclass(frozen=True)
@@ -85,9 +86,9 @@ CONFIGS = {
         data=DataConfig(
             seed=0,
             n_trajectories=10_000,
-            trajectory_time=1e-4,
-            fine_step=1e-6,
-            observation_lag=1e-4,
+            trajectory_time=1e-2,
+            observation_lag=1e-2,
+            em_substeps=1000,
             target_samples=10_000,
         ),
     ),
@@ -98,22 +99,22 @@ CONFIGS = {
         data=DataConfig(
             seed=0,
             n_trajectories=10_000,
-            trajectory_time=1e-4,
-            fine_step=1e-6,
-            observation_lag=1e-4,
+            trajectory_time=1e-2,
+            observation_lag=1e-2,
+            em_substeps=1000,
             target_samples=10_000,
         ),
     ),
 
     "ex3": ExperimentConfig(
         name="ex3",
-        K=2**11,
+        K=2**10,
         data=DataConfig(
             seed=0,
             n_trajectories=100_000,
-            trajectory_time=1e-4,
-            fine_step=1e-6,
-            observation_lag=1e-4,
+            trajectory_time=1e-2,
+            observation_lag=1e-2,
+            em_substeps=1000,
             target_samples=100_000,
         ),
     ),
@@ -124,9 +125,9 @@ CONFIGS = {
         data=DataConfig(
             seed=0,
             n_trajectories=10_000,
-            trajectory_time=1e-4,
-            fine_step=1e-6,
-            observation_lag=1e-4,
+            trajectory_time=1e-2,
+            observation_lag=1e-2,
+            em_substeps=1000,
             target_samples=10_000,
         ),
     ),
@@ -139,7 +140,7 @@ CONFIGS = {
             n_trajectories=250,
             trajectory_time=4.0,
             observation_lag=1e-2,
-            target_samples=100_000,
+            target_samples=None,
         ),
     ),
 
@@ -148,34 +149,35 @@ CONFIGS = {
         K=2**9,
         data=DataConfig(
             seed=1,
-            fine_step=1e-3,
             trajectory_time=2.0,
-            target_samples=100_000,
+            grid_step=1e-3,
+            observation_lag=5e-7,
+            target_samples=995_004,
         ),
     ),
 
     "ex7": ExperimentConfig(
         name="ex7",
-        K=2**10,
+        K=2**9,
         data=DataConfig(
             seed=0,
             n_trajectories=100_000,
-            trajectory_time=1e-4,
-            fine_step=1e-6,
-            observation_lag=1e-4,
+            trajectory_time=1e-3,
+            observation_lag=1e-3,
+            em_substeps=1000,
             target_samples=100_000,
         ),
     ),
 
     "ex8": ExperimentConfig(
         name="ex8",
-        K=None,
+        K=2**9,
         data=DataConfig(
             seed=0,
             n_trajectories=100_000,
             trajectory_time=1e-4,
-            fine_step=1e-6,
             observation_lag=1e-4,
+            em_substeps=1000,
             target_samples=100_000,
         ),
     ),
