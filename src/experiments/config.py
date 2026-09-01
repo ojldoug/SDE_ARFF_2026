@@ -40,7 +40,7 @@ class ARFFConfig:
     delta: float = 0.2
     resampling: bool = False
     metropolis_test: bool = True
-    internal_validation_fraction: float = 0.1
+    n_folds: int = 5
 
 
 @dataclass(frozen=True)
