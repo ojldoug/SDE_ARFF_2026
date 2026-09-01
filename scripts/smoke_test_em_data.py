@@ -13,7 +13,10 @@ sys.path.insert(0, str(REPO_ROOT))
 
 from src.experiments.config import get_config
 from src.experiments.definitions import get_experiment
-from src.experiments.em_data import generate_standard_em_data
+from src.experiments.em_data import (
+    generate_standard_em_data,
+    generate_langevin_em_data,
+)
 
 
 TEST_EXPERIMENTS = ["ex1", "ex2", "ex3", "ex7", "ex8"]
@@ -61,6 +64,40 @@ def main():
         print()
 
     print("All standard EM smoke tests passed.")
+
+    name = "ex4"
+    definition = get_experiment(name)
+    config = get_config(name)
+
+    smoke_data = replace(
+        config.data,
+        n_trajectories=128,
+        target_samples=128,
+    )
+    smoke_config = replace(config, data=smoke_data)
+
+    x, r, h = generate_langevin_em_data(
+        definition,
+        smoke_config,
+    )
+
+    assert x.shape == (128, 2)
+    assert r.shape == (128, 1)
+    assert h.shape == (128, 1)
+
+    assert np.all(np.isfinite(x))
+    assert np.all(np.isfinite(r))
+    assert np.all(np.isfinite(h))
+    assert np.allclose(h, smoke_config.data.observation_lag)
+
+    print(name)
+    print(f"  x shape      : {x.shape}")
+    print(f"  r shape      : {r.shape}")
+    print(f"  h shape      : {h.shape}")
+    print(f"  h            : {h[0,0]:.8e}")
+    print(f"  mean |r|     : {np.mean(np.abs(r)):.8e}")
+    print(f"  max  |r|     : {np.max(np.abs(r)):.8e}")
+    print()
 
 
 if __name__ == "__main__":
