@@ -1,7 +1,15 @@
-
 # Large training data
 GPU/training_data/
 
 # Python generated files
 __pycache__/
 *.py[cod]
+
+# Temporary audit output
+audit_output/
+
+# Native/Cython build artifacts
+build/
+*.o
+*.so
+GPU/gillespie/gillespie_c.html
