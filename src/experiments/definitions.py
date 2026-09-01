@@ -186,10 +186,13 @@ def ex5_diffusion_factor(x):
 # Experiment 6: stochastic wave effective forcing
 # Input coordinates are (t, x).
 #
-# IMPORTANT:
-# The factor 1/2 inherited by the effective diffusion is retained here
-# provisionally and will be checked against the discretization derivation
-# before final experiments are frozen.
+# The staggered-grid update uses noise with variance 2*h**2.
+# After defining
+#
+#     h_eff = h**2 / 2
+#
+# and averaging the neighboring time levels, the resulting EM-type
+# noise term has diffusion factor g(x)/2.
 # ---------------------------------------------------------------------
 
 def ex6_drift(x):
