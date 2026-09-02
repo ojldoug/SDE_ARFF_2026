@@ -123,8 +123,6 @@ def simulate_sir_ssa_fixed_observations(
     if population_size <= 0:
         raise ValueError("population_size must be positive.")
 
-    # Convert normalized fractions to integer counts.
-    #
     # Convert normalized fractions to integer counts using the
     # largest-remainder method so that the counts sum exactly to N
     # while staying as close as possible to the sampled fractions.
@@ -227,11 +225,12 @@ def sample_initial_simplex(
     rng: np.random.Generator,
 ) -> np.ndarray:
     """
-    Sample initial (S, I, R) fractions uniformly by normalizing three
-    independent U(0,1) variables, matching the legacy experiment setup.
+    Sample initial (S, I, R) fractions uniformly from the two-simplex.
     """
-    raw = rng.uniform(0.0, 1.0, size=(n_trajectories, 3))
-    return raw / raw.sum(axis=1, keepdims=True)
+    return rng.dirichlet(
+        np.ones(3),
+        size=n_trajectories,
+    )
 
 
 def generate_sir_data(config):
@@ -240,9 +239,11 @@ def generate_sir_data(config):
 
     Each SSA trajectory is observed at the prescribed uniform times
 
-        0, h, 2h, ..., T,
+        0, h, 2h, ..., T.
 
-    and every consecutive observation pair is retained.
+    Consecutive fixed-lag pairs are retained while the infected population
+    at the start of the interval is positive. The transition into extinction
+    is retained, but subsequent absorbing-state pairs are discarded.
 
     Returns
     -------
@@ -277,7 +278,8 @@ def generate_sir_data(config):
         rng,
     )
 
-    trajectories = []
+    x_parts = []
+    r_parts = []
 
     for initial_state in initial_states:
         trajectory = simulate_sir_ssa_fixed_observations(
@@ -289,25 +291,41 @@ def generate_sir_data(config):
             k3=0.0,
             rng=rng,
         )
-        trajectories.append(trajectory)
 
-    trajectories = np.stack(trajectories)
+        x_path = trajectory[:-1]
+        y_path = trajectory[1:]
 
-    x_data = trajectories[:, :-1, :].reshape(-1, 2)
-    y_data = trajectories[:, 1:, :].reshape(-1, 2)
-    r_data = y_data - x_data
+        # I = 1 - S - R.
+        #
+        # Retain transitions whose starting state has I > 0. This keeps
+        # the final transition into extinction, while removing repeated
+        # absorbing-state observations after extinction.
+        infected_start = (
+            1.0
+            - x_path[:, 0]
+            - x_path[:, 1]
+        )
+
+        keep = infected_start > 0.0
+
+        if np.any(keep):
+            x_parts.append(x_path[keep])
+            r_parts.append(
+                y_path[keep] - x_path[keep]
+            )
+
+    if not x_parts:
+        raise RuntimeError(
+            "Experiment 5 generated no usable fixed-lag transitions."
+        )
+
+    x_data = np.vstack(x_parts)
+    r_data = np.vstack(r_parts)
 
     step_sizes = np.full(
         (len(x_data), 1),
         data.observation_lag,
         dtype=float,
     )
-
-    if data.target_samples is not None:
-        if len(x_data) != data.target_samples:
-            raise RuntimeError(
-                f"Expected {data.target_samples} Experiment 5 samples, "
-                f"but generated {len(x_data)}."
-            )
 
     return x_data, r_data, step_sizes

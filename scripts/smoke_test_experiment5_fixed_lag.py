@@ -2,6 +2,8 @@
 """Smoke test for the reproducible fixed-lag Experiment 5 generator."""
 
 from pathlib import Path
+
+from dataclasses import replace
 import sys
 
 import numpy as np
@@ -109,7 +111,23 @@ def main():
     print()
     print("All checks passed.")
 
-    from dataclasses import replace
+    # With k3 = 0, an extinct state is absorbing.
+    extinct_initial = np.array([0.8, 0.0, 0.2])
+
+    extinct_path = simulate_sir_ssa_fixed_observations(
+        extinct_initial,
+        np.array([0.0, 0.01, 0.02, 0.03]),
+        population_size=N,
+        k1=K1,
+        k2=K2,
+        k3=K3,
+        rng=np.random.default_rng(123),
+    )
+
+    assert np.allclose(
+        extinct_path,
+        extinct_path[0],
+    )
 
     config = get_config("ex5")
 
@@ -117,15 +135,32 @@ def main():
         config.data,
         n_trajectories=5,
         trajectory_time=0.1,
-        target_samples=50,
+        target_samples=None,
     )
     smoke_config = replace(config, data=smoke_data)
 
     x_data, r_data, step_sizes = generate_sir_data(smoke_config)
 
-    assert x_data.shape == (50, 2)
-    assert r_data.shape == (50, 2)
-    assert step_sizes.shape == (50, 1)
+    assert x_data.ndim == 2
+    assert r_data.ndim == 2
+    assert step_sizes.ndim == 2
+
+    assert x_data.shape[1] == 2
+    assert r_data.shape[1] == 2
+    assert step_sizes.shape[1] == 1
+
+    infected_start = (
+        1.0
+        - x_data[:, 0]
+        - x_data[:, 1]
+    )
+
+    assert np.all(infected_start > 0.0)
+
+    assert len(x_data) == len(r_data)
+    assert len(x_data) == len(step_sizes)
+
+    assert 0 < len(x_data) <= 50
 
     assert np.all(np.isfinite(x_data))
     assert np.all(np.isfinite(r_data))
