@@ -15,7 +15,10 @@ from src.adam.fourier import (
     gaussian_nll,
     initialize_model,
 )
-from src.adam.training import fit_adam_fourier
+from src.adam.training import (
+    fit_adam_fourier,
+    make_compiled_adam_functions,
+)
 
 
 def main():
@@ -75,6 +78,14 @@ def main():
         )
     )
 
+    (
+        optimizer,
+        compiled_train_step,
+        compiled_nll,
+    ) = make_compiled_adam_functions(
+        learning_rate=1e-3,
+    )
+
     key, result = fit_adam_fourier(
         key,
         model,
@@ -86,7 +97,9 @@ def main():
         h_validation,
         epochs=5,
         batch_size=32,
-        learning_rate=1e-3,
+        optimizer=optimizer,
+        compiled_train_step=compiled_train_step,
+        compiled_nll=compiled_nll,
     )
 
     assert result.training_nll.shape == (5,)

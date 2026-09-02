@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import optax
 import jax
 import jax.numpy as jnp
 import numpy as np
@@ -17,7 +18,6 @@ from src.adam.fourier import (
     AdamFourierModel,
     gaussian_nll,
     make_optimizer,
-    train_step,
 )
 
 
@@ -30,9 +30,64 @@ class TrainingResult:
     validation_nll: np.ndarray
 
 
+def make_compiled_adam_functions(
+    learning_rate: float,
+):
+    """
+    Construct the optimizer and JIT-compiled Adam update/NLL functions.
+    """
+    optimizer = make_optimizer(
+        learning_rate
+    )
+
+    @jax.jit
+    def compiled_train_step(
+        model,
+        opt_state,
+        x_batch,
+        r_batch,
+        h_batch,
+    ):
+        loss, gradients = jax.value_and_grad(
+            gaussian_nll
+        )(
+            model,
+            x_batch,
+            r_batch,
+            h_batch,
+        )
+
+        updates, new_opt_state = optimizer.update(
+            gradients,
+            opt_state,
+            model,
+        )
+
+        new_model = optax.apply_updates(
+            model,
+            updates,
+        )
+
+        return (
+            new_model,
+            new_opt_state,
+            loss,
+        )
+
+    compiled_nll = jax.jit(
+        gaussian_nll
+    )
+
+    return (
+        optimizer,
+        compiled_train_step,
+        compiled_nll,
+    )
+
+
 def fit_adam_fourier(
     key,
-    initial_model: AdamFourierModel,
+    initial_model,
     x_train,
     r_train,
     h_train,
@@ -42,7 +97,9 @@ def fit_adam_fourier(
     *,
     epochs: int,
     batch_size: int,
-    learning_rate: float,
+    optimizer,
+    compiled_train_step,
+    compiled_nll,
 ):
     """
     Train an Adam Fourier model and select the checkpoint with the
@@ -83,8 +140,43 @@ def fit_adam_fourier(
             "Validation arrays have inconsistent sample counts."
         )
 
-    optimizer = make_optimizer(learning_rate)
     opt_state = optimizer.init(initial_model)
+
+    @jax.jit
+    def compiled_train_step(
+        model,
+        opt_state,
+        x_batch,
+        r_batch,
+        h_batch,
+    ):
+        loss, gradients = jax.value_and_grad(
+            gaussian_nll
+        )(
+            model,
+            x_batch,
+            r_batch,
+            h_batch,
+        )
+
+        updates, new_opt_state = optimizer.update(
+            gradients,
+            opt_state,
+            model,
+        )
+
+        new_model = optax.apply_updates(
+            model,
+            updates,
+        )
+
+        return (
+            new_model,
+            new_opt_state,
+            loss,
+        )
+
+    compiled_nll = jax.jit(gaussian_nll)
 
     model = initial_model
 
@@ -124,9 +216,8 @@ def fit_adam_fourier(
                 start:start + batch_size
             ]
 
-            model, opt_state, batch_loss = train_step(
+            model, opt_state, batch_loss = compiled_train_step(
                 model,
-                optimizer,
                 opt_state,
                 x_train[batch_idx],
                 r_train[batch_idx],
@@ -147,7 +238,7 @@ def fit_adam_fourier(
         )
 
         validation_nll = float(
-            gaussian_nll(
+            compiled_nll(
                 model,
                 x_validation,
                 r_validation,
