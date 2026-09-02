@@ -60,7 +60,7 @@ class EvaluationConfig:
 @dataclass(frozen=True)
 class ExperimentConfig:
     name: str
-    K: Optional[int]
+    fourier_frequencies: Optional[int]
     data: DataConfig
     split: SplitConfig = SplitConfig()
     arff: ARFFConfig = ARFFConfig()
@@ -81,7 +81,7 @@ CONFIGS = {
 
     "ex1": ExperimentConfig(
         name="ex1",
-        K=2**8,
+        fourier_frequencies=2**8,
         data=DataConfig(
             seed=0,
             n_trajectories=10_000,
@@ -94,7 +94,7 @@ CONFIGS = {
 
     "ex2": ExperimentConfig(
         name="ex2",
-        K=2**7,
+        fourier_frequencies=2**7,
         data=DataConfig(
             seed=0,
             n_trajectories=10_000,
@@ -107,7 +107,7 @@ CONFIGS = {
 
     "ex3": ExperimentConfig(
         name="ex3",
-        K=2**10,
+        fourier_frequencies=2**10,
         data=DataConfig(
             seed=0,
             n_trajectories=100_000,
@@ -120,7 +120,7 @@ CONFIGS = {
 
     "ex4": ExperimentConfig(
         name="ex4",
-        K=2**7,
+        fourier_frequencies=2**7,
         data=DataConfig(
             seed=0,
             n_trajectories=10_000,
@@ -133,7 +133,7 @@ CONFIGS = {
 
     "ex5": ExperimentConfig(
         name="ex5",
-        K=2**8,
+        fourier_frequencies=2**8,
         data=DataConfig(
             seed=1,
             n_trajectories=250,
@@ -145,7 +145,7 @@ CONFIGS = {
 
     "ex6": ExperimentConfig(
         name="ex6",
-        K=2**9,
+        fourier_frequencies=2**9,
         data=DataConfig(
             seed=1,
             trajectory_time=2.0,
@@ -157,7 +157,7 @@ CONFIGS = {
 
     "ex7": ExperimentConfig(
         name="ex7",
-        K=2**9,
+        fourier_frequencies=2**9,
         data=DataConfig(
             seed=0,
             n_trajectories=100_000,
@@ -170,7 +170,7 @@ CONFIGS = {
 
     "ex8": ExperimentConfig(
         name="ex8",
-        K=2**9,
+        fourier_frequencies=2**9,
         data=DataConfig(
             seed=0,
             n_trajectories=100_000,

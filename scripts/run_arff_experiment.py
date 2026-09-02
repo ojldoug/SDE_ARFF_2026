@@ -42,7 +42,7 @@ def main():
     config = get_config(name)
     definition = get_experiment(name)
 
-    if config.K is None:
+    if config.fourier_frequencies is None:
         raise ValueError(
             f"No Fourier-feature count K has been established for {name}."
         )
@@ -68,7 +68,9 @@ def main():
     print(f"validation : {len(validation_idx)}")
     print(f"test       : {len(test_idx)}")
     print(f"folds      : {config.arff.n_folds}")
-    print(f"K          : {config.K}")
+    print(
+        f"frequencies: {config.fourier_frequencies}"
+    )
     print(f"iterations : {config.arff.M_max}")
     print()
 
@@ -79,7 +81,7 @@ def main():
         x[train_idx],
         r[train_idx],
         h[train_idx],
-        K=config.K,
+        K=config.fourier_frequencies,
         diff_type=definition.diff_type,
         config=config.arff,
         fold_seed=config.split.seed,

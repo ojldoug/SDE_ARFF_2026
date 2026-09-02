@@ -21,7 +21,7 @@ from src.experiments.model_size import (
 def main():
     print(
         f"{'Exp':<5}"
-        f"{'K':>8}"
+        f"{'Freq.':>8}"
         f"{'FF params':>14}"
         f"{'tanh W':>10}"
         f"{'tanh params':>14}"
@@ -35,7 +35,7 @@ def main():
         config = get_config(name)
         definition = get_experiment(name)
 
-        if config.K is None:
+        if config.fourier_frequencies is None:
             raise ValueError(
                 f"No Fourier frequency count defined for {name}."
             )
@@ -52,7 +52,7 @@ def main():
             input_dimension=input_dimension,
             drift_dimension=drift_dimension,
             covariance_dimension=covariance_dimension,
-            n_frequencies=config.K,
+            n_frequencies=config.fourier_frequencies,
         )
 
         width = matching_shallow_tanh_width(
@@ -76,7 +76,7 @@ def main():
 
         print(
             f"{name:<5}"
-            f"{config.K:>8}"
+            f"{config.fourier_frequencies:>8}"
             f"{ff.total_parameters:>14}"
             f"{width:>10}"
             f"{tanh.total_parameters:>14}"
