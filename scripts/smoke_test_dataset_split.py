@@ -3,7 +3,7 @@
 
 from pathlib import Path
 import sys
-
+from tempfile import TemporaryDirectory
 import numpy as np
 
 
@@ -11,7 +11,9 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
 from src.experiments.config import SplitConfig
+
 from src.experiments.dataset import (
+    load_dataset,
     make_split_indices,
     validate_split_indices,
 )
@@ -50,6 +52,43 @@ def main():
     assert len(train_idx) == 802
     assert len(validation_idx) == 100
     assert len(test_idx) == 101
+
+    # Test the canonical loader on a temporary dataset.
+    x = np.zeros((n, 2))
+    r = np.ones((n, 2))
+    h = np.full((n, 1), 0.01)
+
+    with TemporaryDirectory() as tmpdir:
+        path = Path(tmpdir) / "test.npz"
+
+        np.savez(
+            path,
+            x_data=x,
+            r_data=r,
+            step_sizes=h,
+            train_idx=train_idx,
+            validation_idx=validation_idx,
+            test_idx=test_idx,
+        )
+
+        dataset = load_dataset(path)
+
+        assert dataset.x.shape == (n, 2)
+        assert dataset.r.shape == (n, 2)
+        assert dataset.h.shape == (n, 1)
+
+        assert np.array_equal(
+            dataset.train_idx,
+            train_idx,
+        )
+        assert np.array_equal(
+            dataset.validation_idx,
+            validation_idx,
+        )
+        assert np.array_equal(
+            dataset.test_idx,
+            test_idx,
+        )
 
     print("Canonical split smoke test")
     print("--------------------------")

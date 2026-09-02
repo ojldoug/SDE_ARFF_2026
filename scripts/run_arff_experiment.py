@@ -9,7 +9,6 @@ import sys
 import time
 
 import jax
-import numpy as np
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -22,6 +21,7 @@ from src.arff.evaluation import (
 from src.arff.two_stage import fit_two_stage_arff
 from src.experiments.config import get_config
 from src.experiments.definitions import get_experiment
+from src.experiments.dataset import load_dataset
 
 
 def main():
@@ -47,18 +47,17 @@ def main():
             f"No Fourier-feature count K has been established for {name}."
         )
 
-    data = np.load(
-        REPO_ROOT / "data" / f"{name}.npz",
-        allow_pickle=False,
+    data = load_dataset(
+        REPO_ROOT / "data" / f"{name}.npz"
     )
 
-    x = data["x_data"]
-    r = data["r_data"]
-    h = data["step_sizes"]
+    x = data.x
+    r = data.r
+    h = data.h
 
-    train_idx = data["train_idx"]
-    validation_idx = data["validation_idx"]
-    test_idx = data["test_idx"]
+    train_idx = data.train_idx
+    validation_idx = data.validation_idx
+    test_idx = data.test_idx
 
     key = jax.random.PRNGKey(args.seed)
 
