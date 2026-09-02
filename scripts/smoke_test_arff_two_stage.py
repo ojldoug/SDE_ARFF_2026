@@ -21,22 +21,28 @@ from src.arff.two_stage import fit_two_stage_arff
 from src.experiments.config import get_config
 from src.experiments.definitions import get_experiment
 
+from src.experiments.em_data import generate_standard_em_data
+
 
 def main():
-    data = np.load(
-        REPO_ROOT / "data" / "ex1.npz",
-        allow_pickle=False,
-    )
 
     definition = get_experiment("ex1")
     config = get_config("ex1")
 
-    # Tiny training subset and cheap ARFF settings for plumbing test.
-    idx = data["train_idx"][:500]
+    smoke_data = replace(
+        config.data,
+        n_trajectories=256,
+        target_samples=256,
+    )
+    smoke_config = replace(
+        config,
+        data=smoke_data,
+    )
 
-    x = data["x_data"][idx]
-    r = data["r_data"][idx]
-    h = data["step_sizes"][idx]
+    x, r, h = generate_standard_em_data(
+        definition,
+        smoke_config,
+    )
 
     smoke_arff = replace(
         config.arff,
@@ -58,16 +64,21 @@ def main():
         fold_seed=config.split.seed,
     )
 
-    assert crossfit.covariance_targets.shape == (500, 2)
-    assert crossfit.fold_id.shape == (500,)
+    assert crossfit.covariance_targets.shape == (
+        len(x),
+        definition.n_dimensions,
+    )
+    assert crossfit.fold_id.shape == (len(x),)
 
     counts = np.bincount(
         crossfit.fold_id,
         minlength=smoke_arff.n_folds,
     )
 
-    assert counts.sum() == 500
-    assert np.all(counts == 100)
+    assert counts.sum() == len(x)
+
+    # np.array_split distributes samples as evenly as possible.
+    assert counts.max() - counts.min() <= 1
 
     drift = np.asarray(predict(model.drift, x))
     covariance = np.asarray(
@@ -78,8 +89,16 @@ def main():
         )
     )
 
-    assert drift.shape == (500, 2)
-    assert covariance.shape == (500, 2, 2)
+    assert drift.shape == (
+        len(x),
+        definition.n_dimensions,
+    )
+
+    assert covariance.shape == (
+        len(x),
+        definition.n_dimensions,
+        definition.n_dimensions,
+    )
 
     assert np.all(np.isfinite(drift))
     assert np.all(np.isfinite(covariance))
