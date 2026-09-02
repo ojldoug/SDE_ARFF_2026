@@ -48,7 +48,6 @@ class AdamConfig:
     epochs: int = 300
     learning_rate: float = 1e-4
     batch_size: int = 2**8
-    shallow_width: int = 2**10
 
 
 @dataclass(frozen=True)
