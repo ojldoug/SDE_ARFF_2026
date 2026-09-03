@@ -116,10 +116,14 @@ def initialize_fourier_params(
     input_dimension: int,
     output_dimension: int,
     n_frequencies: int,
+    omega_scale: float = 1.0,
 ) -> FourierParams:
     key_omega, key_amp = jax.random.split(key)
 
-    omega = 1e-2 * jax.random.normal(
+    # Trainable Fourier frequencies are initialized from N(0, I).
+    # A validation-only initialization study selected unit scale as the
+    # common convention for the Adam Fourier baseline.
+    omega = omega_scale * jax.random.normal(
         key_omega,
         shape=(
             input_dimension,
@@ -148,6 +152,7 @@ def initialize_model(
     output_dimension: int,
     n_frequencies: int,
     diff_type: str,
+    omega_scale: float = 1.0,
 ) -> AdamFourierModel:
     key_drift, key_covariance = jax.random.split(key)
 
@@ -163,6 +168,7 @@ def initialize_model(
         input_dimension=input_dimension,
         output_dimension=output_dimension,
         n_frequencies=n_frequencies,
+        omega_scale=omega_scale,
     )
 
     covariance = initialize_fourier_params(
@@ -170,6 +176,7 @@ def initialize_model(
         input_dimension=input_dimension,
         output_dimension=covariance_dimension,
         n_frequencies=n_frequencies,
+        omega_scale=omega_scale,
     )
 
     return AdamFourierModel(
