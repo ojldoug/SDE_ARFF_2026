@@ -25,9 +25,21 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 
-from src.arff.covariance import covariance_targets
-from src.arff.regression import ARFFModel, fit_arff, predict
-from src.experiments.config import ARFFConfig
+from src.arff.covariance import (
+    covariance_targets,
+)
+from src.arff.regression import (
+    ARFFModel,
+    fit_arff,
+    make_compiled_adaptation_step,
+    predict,
+)
+from src.experiments.config import (
+    ARFFConfig,
+)
+
+
+Array = jax.Array
 
 
 @dataclass(frozen=True)
@@ -39,7 +51,7 @@ class TwoStageARFFModel:
 
 @dataclass(frozen=True)
 class CrossFitResult:
-    covariance_targets: np.ndarray
+    covariance_targets: Array
     fold_id: np.ndarray
 
 
@@ -50,7 +62,11 @@ def _fit_regression(
     *,
     K: int,
     config: ARFFConfig,
+    compiled_adaptation_step,
 ):
+    """
+    Fit one ARFF regression using a shared compiled adaptation kernel.
+    """
     return fit_arff(
         key,
         x,
@@ -61,7 +77,12 @@ def _fit_regression(
         gamma=config.gamma,
         delta=config.delta,
         resampling=config.resampling,
-        metropolis_test=config.metropolis_test,
+        metropolis_test=(
+            config.metropolis_test
+        ),
+        compiled_adaptation_step=(
+            compiled_adaptation_step
+        ),
     )
 
 
@@ -74,17 +95,29 @@ def make_folds(
     Deterministically partition training-set positions into folds.
     """
     if n_folds < 2:
-        raise ValueError("Cross-fitting requires at least two folds.")
+        raise ValueError(
+            "Cross-fitting requires at least "
+            "two folds."
+        )
 
     if n_folds > n_samples:
         raise ValueError(
-            "Number of folds cannot exceed number of samples."
+            "Number of folds cannot exceed "
+            "number of samples."
         )
 
-    rng = np.random.default_rng(seed)
-    permutation = rng.permutation(n_samples)
+    rng = np.random.default_rng(
+        seed
+    )
 
-    return np.array_split(permutation, n_folds)
+    permutation = rng.permutation(
+        n_samples
+    )
+
+    return np.array_split(
+        permutation,
+        n_folds,
+    )
 
 
 def cross_fitted_covariance_targets(
@@ -97,21 +130,31 @@ def cross_fitted_covariance_targets(
     diff_type: str,
     config: ARFFConfig,
     fold_seed: int,
+    compiled_adaptation_step,
 ):
     """
     Construct covariance targets using out-of-fold drift predictions.
 
     Every training observation receives a drift prediction from a model
     fitted without that observation.
+
+    Numerical arrays remain on the JAX device throughout cross-fitting.
+    Only the small fold-index bookkeeping is maintained as NumPy arrays.
     """
-    x = np.asarray(x)
-    r = np.asarray(r)
-    h = np.asarray(h)
+    x = jnp.asarray(x)
+    r = jnp.asarray(r)
+    h = jnp.asarray(h)
 
     n = len(x)
 
-    if len(r) != n or len(h) != n:
-        raise ValueError("x, r, and h must have equal sample counts.")
+    if (
+        len(r) != n
+        or len(h) != n
+    ):
+        raise ValueError(
+            "x, r, and h must have equal "
+            "sample counts."
+        )
 
     folds = make_folds(
         n,
@@ -120,63 +163,131 @@ def cross_fitted_covariance_targets(
     )
 
     if diff_type == "diagonal":
-        target_dimension = r.shape[1]
+        target_dimension = (
+            r.shape[1]
+        )
+
     else:
         d = r.shape[1]
-        target_dimension = d * (d + 1) // 2
 
-    targets = np.empty(
-        (n, target_dimension),
+        target_dimension = (
+            d
+            * (d + 1)
+            // 2
+        )
+
+    targets = jnp.zeros(
+        (
+            n,
+            target_dimension,
+        ),
         dtype=x.dtype,
     )
-    fold_id = np.empty(n, dtype=np.int32)
 
-    all_indices = np.arange(n)
+    fold_id = np.empty(
+        n,
+        dtype=np.int32,
+    )
 
-    for k, holdout_idx in enumerate(folds):
-        train_mask = np.ones(n, dtype=bool)
-        train_mask[holdout_idx] = False
-        fit_idx = all_indices[train_mask]
+    all_indices = np.arange(
+        n
+    )
+
+    for k, holdout_idx in enumerate(
+        folds
+    ):
+        train_mask = np.ones(
+            n,
+            dtype=bool,
+        )
+
+        train_mask[
+            holdout_idx
+        ] = False
+
+        fit_idx = all_indices[
+            train_mask
+        ]
+
+        # Index arrays are small host-side bookkeeping. The gathered
+        # numerical arrays themselves remain JAX device arrays.
+        x_fit = x[fit_idx]
+        r_fit = r[fit_idx]
+        h_fit = h[fit_idx]
 
         drift_target = (
-            r[fit_idx]
-            / h[fit_idx]
+            r_fit
+            / h_fit
         )
 
-        key, drift_fold = _fit_regression(
-            key,
-            x[fit_idx],
-            drift_target,
-            K=K,
-            config=config,
-        )
-
-        drift_holdout = np.asarray(
-            predict(
-                drift_fold,
-                jnp.asarray(x[holdout_idx]),
+        key, drift_fold = (
+            _fit_regression(
+                key,
+                x_fit,
+                drift_target,
+                K=K,
+                config=config,
+                compiled_adaptation_step=(
+                    compiled_adaptation_step
+                ),
             )
         )
 
-        residual = (
-            r[holdout_idx]
-            - h[holdout_idx] * drift_holdout
+        x_holdout = x[
+            holdout_idx
+        ]
+
+        r_holdout = r[
+            holdout_idx
+        ]
+
+        h_holdout = h[
+            holdout_idx
+        ]
+
+        drift_holdout = predict(
+            drift_fold,
+            x_holdout,
         )
 
-        fold_targets = np.asarray(
+        residual = (
+            r_holdout
+            - h_holdout
+            * drift_holdout
+        )
+
+        fold_targets = (
             covariance_targets(
-                jnp.asarray(residual),
-                jnp.asarray(h[holdout_idx]),
+                residual,
+                h_holdout,
                 diff_type,
             )
         )
 
-        targets[holdout_idx] = fold_targets
-        fold_id[holdout_idx] = k
+        targets = targets.at[
+            holdout_idx
+        ].set(
+            fold_targets
+        )
 
-    if not np.all(np.isfinite(targets)):
+        fold_id[
+            holdout_idx
+        ] = k
+
+    targets_finite = bool(
+        jax.device_get(
+            jnp.all(
+                jnp.isfinite(
+                    targets
+                )
+            )
+        )
+    )
+
+    if not targets_finite:
         raise RuntimeError(
-            "Cross-fitted covariance targets contain non-finite values."
+            "Cross-fitted covariance targets "
+            "contain non-finite values."
         )
 
     return key, CrossFitResult(
@@ -195,44 +306,85 @@ def fit_two_stage_arff(
     diff_type: str,
     config: ARFFConfig,
     fold_seed: int,
+    compiled_adaptation_step=None,
 ):
     """
     Fit final drift and covariance ARFF models on one training set.
-    """
-    x = np.asarray(x)
-    r = np.asarray(r)
-    h = np.asarray(h)
 
-    key, crossfit = cross_fitted_covariance_targets(
-        key,
-        x,
-        r,
-        h,
-        K=K,
-        diff_type=diff_type,
-        config=config,
-        fold_seed=fold_seed,
+    One compiled ARFF adaptation kernel is reused across all cross-fit
+    drift regressions and the final drift/covariance regressions. JAX
+    automatically caches separate executables when distinct sample
+    shapes occur.
+    """
+    x = jnp.asarray(x)
+    r = jnp.asarray(r)
+    h = jnp.asarray(h)
+
+    if compiled_adaptation_step is None:
+        compiled_adaptation_step = (
+            make_compiled_adaptation_step(
+                delta=config.delta,
+                lambda_reg=(
+                    config.lambda_reg
+                ),
+                gamma=config.gamma,
+                resampling=(
+                    config.resampling
+                ),
+                metropolis_test=(
+                    config.metropolis_test
+                ),
+            )
+        )
+
+    key, crossfit = (
+        cross_fitted_covariance_targets(
+            key,
+            x,
+            r,
+            h,
+            K=K,
+            diff_type=diff_type,
+            config=config,
+            fold_seed=fold_seed,
+            compiled_adaptation_step=(
+                compiled_adaptation_step
+            ),
+        )
     )
 
     # Final drift uses all training observations.
-    drift_target = r / h
+    drift_target = (
+        r
+        / h
+    )
 
-    key, drift_model = _fit_regression(
-        key,
-        x,
-        drift_target,
-        K=K,
-        config=config,
+    key, drift_model = (
+        _fit_regression(
+            key,
+            x,
+            drift_target,
+            K=K,
+            config=config,
+            compiled_adaptation_step=(
+                compiled_adaptation_step
+            ),
+        )
     )
 
     # Stage-2 covariance fit uses all training x paired with honest
     # out-of-fold covariance targets.
-    key, covariance_model = _fit_regression(
-        key,
-        x,
-        crossfit.covariance_targets,
-        K=K,
-        config=config,
+    key, covariance_model = (
+        _fit_regression(
+            key,
+            x,
+            crossfit.covariance_targets,
+            K=K,
+            config=config,
+            compiled_adaptation_step=(
+                compiled_adaptation_step
+            ),
+        )
     )
 
     return (
