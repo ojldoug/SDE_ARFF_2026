@@ -38,8 +38,8 @@ class ARFFConfig:
     lambda_reg: float = 1e-3
     gamma: float = 1.0
     delta: float = 0.2
-    resampling: bool = False
-    metropolis_test: bool = True
+    resampling: bool = True
+    metropolis_test: bool = False
     n_folds: int = 5
 
 
@@ -75,10 +75,6 @@ COMMON_EVALUATION = EvaluationConfig()
 
 
 CONFIGS = {
-    # The final numerical values for ex1--ex4 and ex7 are filled below
-    # from the intended manuscript sample counts rather than undocumented
-    # historical notebook states.
-
     "ex1": ExperimentConfig(
         name="ex1",
         fourier_frequencies=2**8,
@@ -89,6 +85,10 @@ CONFIGS = {
             observation_lag=1e-2,
             em_substeps=1000,
             target_samples=10_000,
+        ),
+        arff=ARFFConfig(
+            M_min=25,
+            M_max=25,
         ),
     ),
 
@@ -103,6 +103,10 @@ CONFIGS = {
             em_substeps=1000,
             target_samples=10_000,
         ),
+        arff=ARFFConfig(
+            M_min=25,
+            M_max=25,
+        ),
     ),
 
     "ex3": ExperimentConfig(
@@ -115,6 +119,13 @@ CONFIGS = {
             observation_lag=1e-2,
             em_substeps=1000,
             target_samples=100_000,
+        ),
+        arff=ARFFConfig(
+            M_min=50,
+            M_max=50,
+        ),
+        evaluation=EvaluationConfig(
+            spd_epsilon=1e-2,
         ),
     ),
 
@@ -129,6 +140,10 @@ CONFIGS = {
             em_substeps=1000,
             target_samples=10_000,
         ),
+        arff=ARFFConfig(
+            M_min=50,
+            M_max=50,
+        ),
     ),
 
     "ex5": ExperimentConfig(
@@ -141,6 +156,10 @@ CONFIGS = {
             observation_lag=1e-2,
             target_samples=None,
         ),
+        arff=ARFFConfig(
+            M_min=50,
+            M_max=50,
+        ),
     ),
 
     "ex6": ExperimentConfig(
@@ -152,6 +171,10 @@ CONFIGS = {
             grid_step=1e-3,
             observation_lag=5e-7,
             target_samples=995_004,
+        ),
+        arff=ARFFConfig(
+            M_min=200,
+            M_max=200,
         ),
     ),
 
@@ -166,6 +189,10 @@ CONFIGS = {
             em_substeps=1000,
             target_samples=100_000,
         ),
+        arff=ARFFConfig(
+            M_min=25,
+            M_max=25,
+        ),
     ),
 
     "ex8": ExperimentConfig(
@@ -179,6 +206,13 @@ CONFIGS = {
             em_substeps=1000,
             target_samples=100_000,
         ),
+        arff=ARFFConfig(
+            M_min=25,
+            M_max=25,
+        ),
+        evaluation=EvaluationConfig(
+            spd_epsilon=1e-3,
+        ),
     ),
 }
 
@@ -187,4 +221,6 @@ def get_config(name: str) -> ExperimentConfig:
     try:
         return CONFIGS[name]
     except KeyError as exc:
-        raise ValueError(f"Unknown experiment: {name}") from exc
+        raise ValueError(
+            f"Unknown experiment: {name}"
+        ) from exc
