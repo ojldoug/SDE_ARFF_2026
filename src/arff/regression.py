@@ -86,20 +86,34 @@ def fit_amplitudes(
 ) -> Array:
     """
     Ridge-regression amplitudes for fixed Fourier frequencies.
+
+    This solves the normal equations corresponding to
+
+        mean_j |Phi(x_j) beta - y_j|^2
+        + lambda_reg |beta|^2.
     """
     features = fourier_features(
         omega,
         x,
     )
 
-    gram = (
-        features.T
-        @ features
+    # The ARFF feature matrices can become strongly correlated after
+    # resampling. On GPU, JAX's default float32 matrix-multiplication
+    # precision can be insufficient for the resulting normal equations.
+    #
+    # Request full float32 accumulation precision explicitly. This avoids
+    # the severe coefficient instability observed with the default GPU
+    # matmul precision while retaining float32 storage and computation.
+    gram = jnp.matmul(
+        features.T,
+        features,
+        precision=jax.lax.Precision.HIGHEST,
     )
 
-    rhs = (
-        features.T
-        @ y
+    rhs = jnp.matmul(
+        features.T,
+        y,
+        precision=jax.lax.Precision.HIGHEST,
     )
 
     regularized_gram = (
@@ -118,6 +132,29 @@ def fit_amplitudes(
     )
 
 
+def frequency_amplitude_norm(
+    amp: Array,
+    K: int,
+) -> Array:
+    """
+    Return one amplitude magnitude per Fourier frequency.
+
+    The cosine and sine amplitudes associated with the same frequency
+    are combined. For vector-valued regression outputs, the norm also
+    combines all output components.
+    """
+    amp_by_frequency = amp.reshape(
+        2,
+        K,
+        -1,
+    )
+
+    return jnp.linalg.norm(
+        amp_by_frequency,
+        axis=(0, 2),
+    )
+
+
 def adaptation_step(
     key: Array,
     model: ARFFModel,
@@ -132,38 +169,147 @@ def adaptation_step(
 ):
     """
     Perform one ARFF frequency-adaptation step.
+
+    The ordering follows the adaptive-resampling algorithm:
+
+        1. random-walk mutation,
+        2. least-squares amplitude fit,
+        3. optional Metropolis accept/reject,
+        4. amplitude-weighted resampling,
+        5. final amplitude refit.
+
+    In particular, when resampling=True and metropolis_test=False,
+    the iteration is
+
+        random walk -> least squares -> resampling -> least squares.
+
+    Thus the model returned by an iteration is based on the resampled
+    frequency population, rather than on an unfiltered random-walk
+    proposal.
     """
-    omega = model.omega
-    amp = model.amp
+    omega_old = model.omega
+    amp_old = model.amp
 
-    # One importance weight per Fourier frequency. The cosine and sine
-    # amplitudes corresponding to the same omega are combined.
-    K = omega.shape[1]
-
-    amp_by_frequency = amp.reshape(
-        2,
-        K,
-        -1,
-    )
-
-    amp_norm = jnp.linalg.norm(
-        amp_by_frequency,
-        axis=(0, 2),
-    )
+    K = omega_old.shape[1]
 
     tiny = jnp.finfo(
-        amp_norm.dtype
+        amp_old.dtype
     ).tiny
 
-    amp_norm_safe = jnp.maximum(
-        amp_norm,
-        tiny,
+    # ------------------------------------------------------------
+    # 1. Random-walk mutation.
+    # ------------------------------------------------------------
+    key, subkey = jax.random.split(
+        key
     )
 
+    proposal = (
+        omega_old
+        + delta
+        * jax.random.normal(
+            subkey,
+            omega_old.shape,
+        )
+    )
+
+    # ------------------------------------------------------------
+    # 2. Fit amplitudes at the proposed frequencies.
+    # ------------------------------------------------------------
+    proposal_amp = fit_amplitudes(
+        x,
+        y,
+        proposal,
+        lambda_reg,
+    )
+
+    # ------------------------------------------------------------
+    # 3. Optional Metropolis correction.
+    #
+    # The current paper experiments are expected to use
+    #
+    #     metropolis_test=False,
+    #
+    # but this branch is retained for completeness.
+    # ------------------------------------------------------------
+    if metropolis_test:
+        old_norm = frequency_amplitude_norm(
+            amp_old,
+            K,
+        )
+
+        proposal_norm = frequency_amplitude_norm(
+            proposal_amp,
+            K,
+        )
+
+        old_norm_safe = jnp.maximum(
+            old_norm,
+            tiny,
+        )
+
+        proposal_norm_safe = jnp.maximum(
+            proposal_norm,
+            tiny,
+        )
+
+        ratio = (
+            proposal_norm_safe
+            / old_norm_safe
+        ) ** gamma
+
+        key, subkey = jax.random.split(
+            key
+        )
+
+        accept = (
+            ratio
+            >= jax.random.uniform(
+                subkey,
+                shape=(K,),
+            )
+        )
+
+        omega = jnp.where(
+            accept[None, :],
+            proposal,
+            omega_old,
+        )
+
+        # Because different frequencies can be accepted independently,
+        # amplitudes must be refitted for the resulting mixed population.
+        amp = fit_amplitudes(
+            x,
+            y,
+            omega,
+            lambda_reg,
+        )
+
+    else:
+        omega = proposal
+        amp = proposal_amp
+
+    # ------------------------------------------------------------
+    # 4. Amplitude-weighted resampling.
+    #
+    # Resampling is performed AFTER mutation and amplitude fitting,
+    # matching the adaptive-resampling algorithm.
+    # ------------------------------------------------------------
     if resampling:
+        amp_norm = frequency_amplitude_norm(
+            amp,
+            K,
+        )
+
+        amp_norm_safe = jnp.maximum(
+            amp_norm,
+            tiny,
+        )
+
         pmf = (
             amp_norm_safe
-            / jnp.sum(amp_norm_safe)
+            / jnp.sum(
+                amp_norm_safe
+            )
         )
 
         key, subkey = jax.random.split(
@@ -183,100 +329,18 @@ def adaptation_step(
             selected,
         ]
 
-        # Refit after resampling before using amplitudes in the
-        # Metropolis step.
+        # --------------------------------------------------------
+        # 5. Refit amplitudes on the selected frequency population.
+        #
+        # This is important: the model returned by the iteration is
+        # the resampled model, not the unfiltered proposal model.
+        # --------------------------------------------------------
         amp = fit_amplitudes(
             x,
             y,
             omega,
             lambda_reg,
         )
-
-        amp_by_frequency = amp.reshape(
-            2,
-            K,
-            -1,
-        )
-
-        amp_norm = jnp.linalg.norm(
-            amp_by_frequency,
-            axis=(0, 2),
-        )
-
-        amp_norm_safe = jnp.maximum(
-            amp_norm,
-            tiny,
-        )
-
-    key, subkey = jax.random.split(
-        key
-    )
-
-    proposal = (
-        omega
-        + delta
-        * jax.random.normal(
-            subkey,
-            omega.shape,
-        )
-    )
-
-    if metropolis_test:
-        proposal_amp = fit_amplitudes(
-            x,
-            y,
-            proposal,
-            lambda_reg,
-        )
-
-        proposal_by_frequency = (
-            proposal_amp.reshape(
-                2,
-                K,
-                -1,
-            )
-        )
-
-        proposal_norm = jnp.linalg.norm(
-            proposal_by_frequency,
-            axis=(0, 2),
-        )
-
-        ratio = (
-            jnp.maximum(
-                proposal_norm,
-                tiny,
-            )
-            / amp_norm_safe
-        ) ** gamma
-
-        key, subkey = jax.random.split(
-            key
-        )
-
-        accept = (
-            ratio
-            >= jax.random.uniform(
-                subkey,
-                shape=(K,),
-            )
-        )
-
-        omega = jnp.where(
-            accept[None, :],
-            proposal,
-            omega,
-        )
-
-    else:
-        omega = proposal
-
-    amp = fit_amplitudes(
-        x,
-        y,
-        omega,
-        lambda_reg,
-    )
 
     return (
         key,
@@ -346,6 +410,10 @@ def fit_arff(
     No train/validation split is performed here. The caller decides
     which observations constitute the training data.
 
+    Frequencies are initialized at zero. Each adaptation iteration
+    performs random-walk mutation followed by amplitude fitting and,
+    when enabled, amplitude-weighted resampling.
+
     By default the repeated adaptation step is JIT-compiled once and
     reused across all iterations. A preconstructed compiled step may be
     supplied by the caller when explicit compilation warm-up or timing
@@ -413,7 +481,9 @@ def fit_arff(
             )
         )
 
-    for _ in range(n_iterations):
+    for _ in range(
+        n_iterations
+    ):
         key, model = (
             compiled_adaptation_step(
                 key,
