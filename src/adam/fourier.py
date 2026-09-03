@@ -120,9 +120,8 @@ def initialize_fourier_params(
 ) -> FourierParams:
     key_omega, key_amp = jax.random.split(key)
 
-    # Trainable Fourier frequencies are initialized from N(0, I).
-    # A validation-only initialization study selected unit scale as the
-    # common convention for the Adam Fourier baseline.
+    # Trainable Fourier frequencies are initialized independently
+    # from the standard normal distribution.
     omega = omega_scale * jax.random.normal(
         key_omega,
         shape=(
