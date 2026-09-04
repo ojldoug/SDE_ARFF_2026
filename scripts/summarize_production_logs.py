@@ -1,35 +1,50 @@
 #!/usr/bin/env python3
 """
-Summarize production experiment logs written by the canonical runners.
+Summarize canonical production experiment logs for Adam or ARFF.
 
-This parser is intended for logs such as
+The script auto-detects the method from the log contents.
 
-    results/production/adam_ex6/seed_0.txt
-    ...
-    results/production/adam_ex6/seed_29.txt
+Typical use
+-----------
 
-It extracts, when present:
+Adam:
+
+    python scripts/summarize_production_logs.py \
+        results/production/adam_ex6
+
+ARFF:
+
+    python scripts/summarize_production_logs.py \
+        results/production/arff_ex6
+
+The script prints per-seed values followed by aggregate mean, sample
+standard deviation, minimum, and maximum.
+
+For Adam it extracts:
 
     algorithm time
     first-call/JIT time
     end-to-end time
     best epoch
     best validation NLL
-    train / validation / test NLL
-    train / validation / test drift RMSE
-    train / validation / test covariance RMSE
-    train / validation / test minimum covariance eigenvalue
+    train / validation / test:
+        NLL
+        drift RMSE
+        covariance RMSE
+        minimum covariance eigenvalue
 
-The script prints:
+For ARFF it extracts:
 
-1. one row per seed;
-2. aggregate mean, standard deviation, minimum, and maximum.
-
-Typical use
------------
-
-    python scripts/summarize_production_logs.py \
-        results/production/adam_ex6
+    algorithm time
+    first-call/JIT time
+    end-to-end time
+    train / validation / test:
+        NLL
+        raw SPD violation rate
+        minimum raw eigenvalue
+        minimum projected eigenvalue
+        drift RMSE
+        covariance RMSE
 """
 
 from __future__ import annotations
@@ -54,7 +69,7 @@ FLOAT_RE = (
 )
 
 
-PATTERNS = {
+COMMON_PATTERNS = {
     "algorithm_time": re.compile(
         rf"algorithm time\s*:\s*({FLOAT_RE})\s*s"
     ),
@@ -64,6 +79,10 @@ PATTERNS = {
     "end_to_end_time": re.compile(
         rf"end-to-end time\s*:\s*({FLOAT_RE})\s*s"
     ),
+}
+
+
+ADAM_PATTERNS = {
     "best_epoch": re.compile(
         r"best epoch\s*:\s*(\d+)"
     ),
@@ -73,7 +92,7 @@ PATTERNS = {
 }
 
 
-METRIC_PATTERNS = {
+ADAM_METRIC_PATTERNS = {
     "nll": re.compile(
         rf"NLL\s*:\s*({FLOAT_RE})"
     ),
@@ -85,6 +104,28 @@ METRIC_PATTERNS = {
     ),
     "min_covariance_eig": re.compile(
         rf"min covariance eig\s*:\s*({FLOAT_RE})"
+    ),
+}
+
+
+ARFF_METRIC_PATTERNS = {
+    "nll": re.compile(
+        rf"NLL\s*:\s*({FLOAT_RE})"
+    ),
+    "spd_violation_rate": re.compile(
+        rf"raw SPD violation rate\s*:\s*({FLOAT_RE})"
+    ),
+    "min_raw_eigenvalue": re.compile(
+        rf"min raw eigenvalue\s*:\s*({FLOAT_RE})"
+    ),
+    "min_projected_eigenvalue": re.compile(
+        rf"min projected eigenvalue\s*:\s*({FLOAT_RE})"
+    ),
+    "drift_rmse": re.compile(
+        rf"drift RMSE\s*:\s*({FLOAT_RE})"
+    ),
+    "covariance_rmse": re.compile(
+        rf"covariance RMSE\s*:\s*({FLOAT_RE})"
     ),
 }
 
@@ -144,6 +185,20 @@ def parse_int(
     )
 
 
+def detect_method(
+    text: str,
+) -> str:
+    if "best validation NLL" in text:
+        return "adam"
+
+    if "raw SPD violation rate" in text:
+        return "arff"
+
+    raise RuntimeError(
+        "Could not determine whether log is Adam or ARFF."
+    )
+
+
 def split_blocks(
     text,
 ):
@@ -182,49 +237,73 @@ def split_blocks(
 def parse_log(
     path: Path,
 ):
-    text = path.read_text()
+    text = path.read_text(
+        encoding="utf-8",
+        errors="replace",
+    )
+
+    method = detect_method(
+        text
+    )
 
     seed = seed_from_path(
         path
     )
 
     result = {
+        "method": method,
         "seed": (
             seed
             if seed is not None
             else np.nan
         ),
         "algorithm_time": parse_float(
-            PATTERNS[
+            COMMON_PATTERNS[
                 "algorithm_time"
             ],
             text,
         ),
         "jit_time": parse_float(
-            PATTERNS[
+            COMMON_PATTERNS[
                 "jit_time"
             ],
             text,
         ),
         "end_to_end_time": parse_float(
-            PATTERNS[
+            COMMON_PATTERNS[
                 "end_to_end_time"
             ],
             text,
         ),
-        "best_epoch": parse_int(
-            PATTERNS[
+    }
+
+    if method == "adam":
+        result[
+            "best_epoch"
+        ] = parse_int(
+            ADAM_PATTERNS[
                 "best_epoch"
             ],
             text,
-        ),
-        "best_validation_nll": parse_float(
-            PATTERNS[
+        )
+
+        result[
+            "best_validation_nll"
+        ] = parse_float(
+            ADAM_PATTERNS[
                 "best_validation_nll"
             ],
             text,
-        ),
-    }
+        )
+
+        metric_patterns = (
+            ADAM_METRIC_PATTERNS
+        )
+
+    else:
+        metric_patterns = (
+            ARFF_METRIC_PATTERNS
+        )
 
     blocks = split_blocks(
         text
@@ -238,7 +317,7 @@ def parse_log(
         for (
             metric_name,
             pattern,
-        ) in METRIC_PATTERNS.items():
+        ) in metric_patterns.items():
             result[
                 f"{split}_{metric_name}"
             ] = parse_float(
@@ -249,95 +328,16 @@ def parse_log(
     return result
 
 
-def format_value(
-    value,
-):
-    if isinstance(
-        value,
-        (
-            int,
-            np.integer,
-        ),
-    ):
-        return str(
-            value
-        )
-
-    if not np.isfinite(
-        value
-    ):
-        return "nan"
-
-    return (
-        f"{value:.8e}"
-    )
-
-
-def print_runs(
-    results,
-):
-    columns = [
-        "seed",
-        "algorithm_time",
-        "best_epoch",
-        "best_validation_nll",
-        "validation_nll",
-        "test_nll",
-        "validation_drift_rmse",
-        "validation_covariance_rmse",
-    ]
-
-    print(
-        "Per-seed results"
-    )
-
-    print(
-        "=" * 130
-    )
-
-    header = (
-        f"{'seed':>4}  "
-        f"{'alg[s]':>11}  "
-        f"{'epoch':>6}  "
-        f"{'best val NLL':>15}  "
-        f"{'val NLL':>15}  "
-        f"{'test NLL':>15}  "
-        f"{'val drift':>15}  "
-        f"{'val cov':>15}"
-    )
-
-    print(
-        header
-    )
-
-    print(
-        "-" * 130
-    )
-
-    for result in results:
-        print(
-            f"{int(result['seed']):4d}  "
-            f"{result['algorithm_time']:11.3f}  "
-            f"{int(result['best_epoch']):6d}  "
-            f"{result['best_validation_nll']:15.8e}  "
-            f"{result['validation_nll']:15.8e}  "
-            f"{result['test_nll']:15.8e}  "
-            f"{result['validation_drift_rmse']:15.8e}  "
-            f"{result['validation_covariance_rmse']:15.8e}"
-        )
-
-    print()
-
-
 def finite_values(
     results,
     key,
 ):
     values = np.asarray(
         [
-            result[
-                key
-            ]
+            result.get(
+                key,
+                np.nan,
+            )
             for result in results
         ],
         dtype=float,
@@ -370,14 +370,16 @@ def summary_statistics(
                 values
             )
         ),
-        "std": float(
-            np.std(
-                values,
-                ddof=1,
+        "std": (
+            float(
+                np.std(
+                    values,
+                    ddof=1,
+                )
             )
-        )
-        if len(values) > 1
-        else 0.0,
+            if len(values) > 1
+            else 0.0
+        ),
         "min": float(
             np.min(
                 values
@@ -396,7 +398,250 @@ def summary_statistics(
     }
 
 
-def print_summary(
+def validate_results(
+    results,
+):
+    if not results:
+        raise RuntimeError(
+            "No production logs were found."
+        )
+
+    methods = {
+        result[
+            "method"
+        ]
+        for result in results
+    }
+
+    if len(
+        methods
+    ) != 1:
+        raise RuntimeError(
+            "Mixed Adam and ARFF logs detected."
+        )
+
+    seeds = [
+        result[
+            "seed"
+        ]
+        for result in results
+    ]
+
+    if any(
+        not np.isfinite(
+            seed
+        )
+        for seed in seeds
+    ):
+        raise RuntimeError(
+            "Could not infer a seed from "
+            "one or more filenames."
+        )
+
+    seeds = [
+        int(seed)
+        for seed in seeds
+    ]
+
+    if len(
+        set(
+            seeds
+        )
+    ) != len(
+        seeds
+    ):
+        raise RuntimeError(
+            "Duplicate seed logs detected."
+        )
+
+    method = results[
+        0
+    ][
+        "method"
+    ]
+
+    if method == "adam":
+        required = (
+            "algorithm_time",
+            "jit_time",
+            "end_to_end_time",
+            "best_epoch",
+            "best_validation_nll",
+            "validation_nll",
+            "test_nll",
+            "validation_drift_rmse",
+            "validation_covariance_rmse",
+        )
+
+    else:
+        required = (
+            "algorithm_time",
+            "jit_time",
+            "end_to_end_time",
+            "validation_nll",
+            "test_nll",
+            "validation_drift_rmse",
+            "validation_covariance_rmse",
+            "validation_spd_violation_rate",
+            "test_spd_violation_rate",
+            "validation_min_raw_eigenvalue",
+            "test_min_raw_eigenvalue",
+            "validation_min_projected_eigenvalue",
+            "test_min_projected_eigenvalue",
+        )
+
+    for result in results:
+        for key in required:
+            value = result.get(
+                key,
+                np.nan,
+            )
+
+            if not np.isfinite(
+                value
+            ):
+                raise RuntimeError(
+                    "Incomplete production log: "
+                    f"seed {int(result['seed'])} "
+                    f"is missing {key}."
+                )
+
+
+def print_adam_runs(
+    results,
+):
+    print(
+        "Per-seed results"
+    )
+
+    print(
+        "=" * 130
+    )
+
+    print(
+        f"{'seed':>4}  "
+        f"{'alg[s]':>11}  "
+        f"{'epoch':>6}  "
+        f"{'best val NLL':>15}  "
+        f"{'val NLL':>15}  "
+        f"{'test NLL':>15}  "
+        f"{'val drift':>15}  "
+        f"{'val cov':>15}"
+    )
+
+    print(
+        "-" * 130
+    )
+
+    for result in results:
+        print(
+            f"{int(result['seed']):4d}  "
+            f"{result['algorithm_time']:11.3f}  "
+            f"{int(result['best_epoch']):6d}  "
+            f"{result['best_validation_nll']:15.8e}  "
+            f"{result['validation_nll']:15.8e}  "
+            f"{result['test_nll']:15.8e}  "
+            f"{result['validation_drift_rmse']:15.8e}  "
+            f"{result['validation_covariance_rmse']:15.8e}"
+        )
+
+    print()
+
+
+def print_arff_runs(
+    results,
+):
+    print(
+        "Per-seed results"
+    )
+
+    print(
+        "=" * 150
+    )
+
+    print(
+        f"{'seed':>4}  "
+        f"{'alg[s]':>11}  "
+        f"{'JIT[s]':>10}  "
+        f"{'val NLL':>15}  "
+        f"{'test NLL':>15}  "
+        f"{'val drift':>15}  "
+        f"{'val cov':>15}  "
+        f"{'val SPD':>10}  "
+        f"{'test SPD':>10}"
+    )
+
+    print(
+        "-" * 150
+    )
+
+    for result in results:
+        print(
+            f"{int(result['seed']):4d}  "
+            f"{result['algorithm_time']:11.3f}  "
+            f"{result['jit_time']:10.3f}  "
+            f"{result['validation_nll']:15.8e}  "
+            f"{result['test_nll']:15.8e}  "
+            f"{result['validation_drift_rmse']:15.8e}  "
+            f"{result['validation_covariance_rmse']:15.8e}  "
+            f"{result['validation_spd_violation_rate']:10.6f}  "
+            f"{result['test_spd_violation_rate']:10.6f}"
+        )
+
+    print()
+
+
+def print_summary_table(
+    results,
+    metrics,
+):
+    print(
+        "Aggregate summary"
+    )
+
+    print(
+        "=" * 112
+    )
+
+    print(
+        f"{'metric':<42}"
+        f"{'n':>5}"
+        f"{'mean':>18}"
+        f"{'std':>18}"
+        f"{'min':>18}"
+        f"{'max':>18}"
+    )
+
+    print(
+        "-" * 112
+    )
+
+    for (
+        label,
+        key,
+    ) in metrics:
+        values = finite_values(
+            results,
+            key,
+        )
+
+        stats = summary_statistics(
+            values
+        )
+
+        print(
+            f"{label:<42}"
+            f"{stats['n']:5d}"
+            f"{stats['mean']:18.8e}"
+            f"{stats['std']:18.8e}"
+            f"{stats['min']:18.8e}"
+            f"{stats['max']:18.8e}"
+        )
+
+    print()
+
+
+def print_adam_summary(
     results,
 ):
     metrics = [
@@ -454,114 +699,82 @@ def print_summary(
         ),
     ]
 
-    print(
-        "Aggregate summary"
+    print_summary_table(
+        results,
+        metrics,
     )
 
-    print(
-        "=" * 112
-    )
 
-    print(
-        f"{'metric':<38}"
-        f"{'n':>5}"
-        f"{'mean':>18}"
-        f"{'std':>18}"
-        f"{'min':>18}"
-        f"{'max':>18}"
-    )
-
-    print(
-        "-" * 112
-    )
-
-    for (
-        label,
-        key,
-    ) in metrics:
-        values = finite_values(
-            results,
-            key,
-        )
-
-        stats = summary_statistics(
-            values
-        )
-
-        print(
-            f"{label:<38}"
-            f"{stats['n']:5d}"
-            f"{stats['mean']:18.8e}"
-            f"{stats['std']:18.8e}"
-            f"{stats['min']:18.8e}"
-            f"{stats['max']:18.8e}"
-        )
-
-    print()
-
-
-def validate_results(
+def print_arff_summary(
     results,
 ):
-    if not results:
-        raise RuntimeError(
-            "No production logs were found."
-        )
-
-    seeds = [
-        result[
-            "seed"
-        ]
-        for result in results
+    metrics = [
+        (
+            "algorithm time [s]",
+            "algorithm_time",
+        ),
+        (
+            "first-call/JIT time [s]",
+            "jit_time",
+        ),
+        (
+            "end-to-end time [s]",
+            "end_to_end_time",
+        ),
+        (
+            "validation NLL",
+            "validation_nll",
+        ),
+        (
+            "test NLL",
+            "test_nll",
+        ),
+        (
+            "validation drift RMSE",
+            "validation_drift_rmse",
+        ),
+        (
+            "test drift RMSE",
+            "test_drift_rmse",
+        ),
+        (
+            "validation covariance RMSE",
+            "validation_covariance_rmse",
+        ),
+        (
+            "test covariance RMSE",
+            "test_covariance_rmse",
+        ),
+        (
+            "validation raw SPD violation rate",
+            "validation_spd_violation_rate",
+        ),
+        (
+            "test raw SPD violation rate",
+            "test_spd_violation_rate",
+        ),
+        (
+            "validation min raw eigenvalue",
+            "validation_min_raw_eigenvalue",
+        ),
+        (
+            "test min raw eigenvalue",
+            "test_min_raw_eigenvalue",
+        ),
+        (
+            "validation min projected eigenvalue",
+            "validation_min_projected_eigenvalue",
+        ),
+        (
+            "test min projected eigenvalue",
+            "test_min_projected_eigenvalue",
+        ),
     ]
 
-    if any(
-        not np.isfinite(
-            seed
-        )
-        for seed in seeds
-    ):
-        raise RuntimeError(
-            "Could not infer a seed from "
-            "one or more filenames."
-        )
-
-    seeds = [
-        int(seed)
-        for seed in seeds
-    ]
-
-    if len(
-        set(
-            seeds
-        )
-    ) != len(
-        seeds
-    ):
-        raise RuntimeError(
-            "Duplicate seed logs detected."
-        )
-
-    required = (
-        "algorithm_time",
-        "best_epoch",
-        "best_validation_nll",
-        "validation_nll",
-        "test_nll",
+    print_summary_table(
+        results,
+        metrics,
     )
-
-    for result in results:
-        for key in required:
-            if not np.isfinite(
-                result[
-                    key
-                ]
-            ):
-                raise RuntimeError(
-                    "Incomplete production log: "
-                    f"seed {int(result['seed'])} "
-                    f"is missing {key}."
-                )
 
 
 def parse_args():
@@ -621,9 +834,20 @@ def main():
         results
     )
 
+    method = results[
+        0
+    ][
+        "method"
+    ]
+
     print(
         f"log directory : "
         f"{log_directory}"
+    )
+
+    print(
+        f"method        : "
+        f"{method}"
     )
 
     print(
@@ -640,13 +864,23 @@ def main():
 
     print()
 
-    print_runs(
-        results
-    )
+    if method == "adam":
+        print_adam_runs(
+            results
+        )
 
-    print_summary(
-        results
-    )
+        print_adam_summary(
+            results
+        )
+
+    else:
+        print_arff_runs(
+            results
+        )
+
+        print_arff_summary(
+            results
+        )
 
 
 if __name__ == "__main__":
