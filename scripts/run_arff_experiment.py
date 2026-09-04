@@ -140,6 +140,168 @@ def run_two_stage_synchronized(
     return result
 
 
+def save_artifact(
+    path: Path,
+    *,
+    experiment: str,
+    seed: int,
+    diff_type: str,
+    model,
+    timing,
+    config,
+):
+    """
+    Save the final two-stage ARFF model and its reproducibility metadata.
+
+    ARFF contributes one final loss/time point per run to the canonical
+    paper comparison, so no artificial per-iteration history is stored.
+
+    Artifact serialization is performed outside benchmark timing.
+    """
+    path = path.expanduser().resolve()
+
+    path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
+    )
+
+    drift_omega = np.asarray(
+        jax.device_get(
+            model.drift.omega
+        )
+    )
+
+    drift_amp = np.asarray(
+        jax.device_get(
+            model.drift.amp
+        )
+    )
+
+    covariance_omega = np.asarray(
+        jax.device_get(
+            model.covariance.omega
+        )
+    )
+
+    covariance_amp = np.asarray(
+        jax.device_get(
+            model.covariance.amp
+        )
+    )
+
+    arrays = (
+        drift_omega,
+        drift_amp,
+        covariance_omega,
+        covariance_amp,
+    )
+
+    if not all(
+        np.all(np.isfinite(array))
+        for array in arrays
+    ):
+        raise RuntimeError(
+            "ARFF model artifact contains "
+            "non-finite parameters."
+        )
+
+    if drift_omega.shape[1] != (
+        config.fourier_frequencies
+    ):
+        raise RuntimeError(
+            "Unexpected ARFF drift frequency count."
+        )
+
+    if covariance_omega.shape[1] != (
+        config.fourier_frequencies
+    ):
+        raise RuntimeError(
+            "Unexpected ARFF covariance frequency count."
+        )
+
+    np.savez_compressed(
+        path,
+        artifact_version=np.asarray(
+            1,
+            dtype=np.int64,
+        ),
+        method=np.asarray(
+            "arff"
+        ),
+        experiment=np.asarray(
+            experiment
+        ),
+        seed=np.asarray(
+            seed,
+            dtype=np.int64,
+        ),
+        diff_type=np.asarray(
+            diff_type
+        ),
+        fourier_frequencies=np.asarray(
+            config.fourier_frequencies,
+            dtype=np.int64,
+        ),
+        iterations=np.asarray(
+            config.arff.M_max,
+            dtype=np.int64,
+        ),
+        n_folds=np.asarray(
+            config.arff.n_folds,
+            dtype=np.int64,
+        ),
+        fold_seed=np.asarray(
+            config.split.seed,
+            dtype=np.int64,
+        ),
+        lambda_reg=np.asarray(
+            config.arff.lambda_reg,
+            dtype=np.float64,
+        ),
+        gamma=np.asarray(
+            config.arff.gamma,
+            dtype=np.float64,
+        ),
+        delta=np.asarray(
+            config.arff.delta,
+            dtype=np.float64,
+        ),
+        resampling=np.asarray(
+            config.arff.resampling,
+            dtype=np.bool_,
+        ),
+        metropolis_test=np.asarray(
+            config.arff.metropolis_test,
+            dtype=np.bool_,
+        ),
+        spd_epsilon=np.asarray(
+            config.evaluation.spd_epsilon,
+            dtype=np.float64,
+        ),
+        algorithm_time=np.asarray(
+            timing.algorithm_seconds,
+            dtype=np.float64,
+        ),
+        compilation_time=np.asarray(
+            timing.compilation_seconds,
+            dtype=np.float64,
+        ),
+        end_to_end_time=np.asarray(
+            timing.end_to_end_seconds,
+            dtype=np.float64,
+        ),
+        drift_omega=drift_omega,
+        drift_amp=drift_amp,
+        covariance_omega=covariance_omega,
+        covariance_amp=covariance_amp,
+    )
+
+    print(
+        "artifact   : "
+        f"{path}"
+    )
+
+
 def main():
     parser = argparse.ArgumentParser()
 
@@ -155,6 +317,18 @@ def main():
         "--seed",
         type=int,
         default=0,
+    )
+
+    parser.add_argument(
+        "--artifact-path",
+        type=Path,
+        default=None,
+        help=(
+            "Optional .npz path for the final "
+            "two-stage ARFF model and metadata. "
+            "Artifact writing is outside benchmark "
+            "training time."
+        ),
     )
 
     args = parser.parse_args()
@@ -202,9 +376,6 @@ def main():
     # ------------------------------------------------------------
     # Move the complete ARFF training set to the device before any
     # compilation or algorithm timing begins.
-    #
-    # Dataset loading, split indexing, and host-to-device transfer are
-    # therefore not counted as method training time.
     # ------------------------------------------------------------
 
     x_train = jnp.asarray(
@@ -264,10 +435,6 @@ def main():
 
     # ------------------------------------------------------------
     # Construct one compiled adaptation kernel.
-    #
-    # The same function object is reused for every fold fit, final
-    # drift fit, and final covariance fit. JAX compiles separate
-    # executables only when array shapes differ.
     # ------------------------------------------------------------
 
     compiled_adaptation_step = (
@@ -288,13 +455,6 @@ def main():
 
     # ------------------------------------------------------------
     # Determine every regression shape used by the actual procedure.
-    #
-    # Cross-fitting can produce two neighboring training-set sizes
-    # when N is not divisible by the number of folds.
-    #
-    # Output dimension also matters for JIT compilation: the final
-    # covariance regression may have a different number of outputs
-    # from the drift regression.
     # ------------------------------------------------------------
 
     folds = make_folds(
@@ -333,7 +493,6 @@ def main():
             )
         )
 
-    # Final drift fit.
     warm_shapes.add(
         (
             len(x_train),
@@ -341,7 +500,6 @@ def main():
         )
     )
 
-    # Final covariance fit.
     warm_shapes.add(
         (
             len(x_train),
@@ -355,13 +513,6 @@ def main():
 
     # ------------------------------------------------------------
     # First-call/JIT warm-up.
-    #
-    # Every distinct regression shape is exercised once with a
-    # one-iteration fit. The result and advanced PRNG key are discarded.
-    #
-    # We intentionally use the original benchmark key independently for
-    # every warm-up so warm-up cannot alter the stochastic state of the
-    # real training run.
     # ------------------------------------------------------------
 
     first_call_overhead = 0.0
@@ -412,13 +563,6 @@ def main():
 
     # ------------------------------------------------------------
     # Real two-stage ARFF training.
-    #
-    # Start from the untouched PRNG key. Compilation warm-up above
-    # therefore has no effect on frequencies, resampling, or Metropolis
-    # decisions in this fitted model.
-    #
-    # Cross-fitting is included in algorithm time because it is part of
-    # the corrected two-stage estimator.
     # ------------------------------------------------------------
 
     (
@@ -551,6 +695,25 @@ def main():
         )
 
         print()
+
+    # ------------------------------------------------------------
+    # Optional archival artifact.
+    #
+    # Saving occurs strictly after benchmark timing and evaluation.
+    # ------------------------------------------------------------
+
+    if args.artifact_path is not None:
+        save_artifact(
+            args.artifact_path,
+            experiment=name,
+            seed=args.seed,
+            diff_type=(
+                definition.diff_type
+            ),
+            model=model,
+            timing=timing,
+            config=config,
+        )
 
 
 if __name__ == "__main__":

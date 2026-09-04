@@ -51,6 +51,13 @@ class AdamConfig:
 
 
 @dataclass(frozen=True)
+class AdamMLPConfig:
+    epochs: int = 300
+    learning_rate: float = 1e-3
+    batch_size: int = 2**8
+
+
+@dataclass(frozen=True)
 class EvaluationConfig:
     n_runs: int = 30
     spd_epsilon: float = 1e-6
@@ -65,12 +72,14 @@ class ExperimentConfig:
     split: SplitConfig = SplitConfig()
     arff: ARFFConfig = ARFFConfig()
     adam: AdamConfig = AdamConfig()
+    adam_mlp: AdamMLPConfig = AdamMLPConfig()
     evaluation: EvaluationConfig = EvaluationConfig()
 
 
 COMMON_SPLIT = SplitConfig()
 COMMON_ARFF = ARFFConfig()
 COMMON_ADAM = AdamConfig()
+COMMON_ADAM_MLP = AdamMLPConfig()
 COMMON_EVALUATION = EvaluationConfig()
 
 

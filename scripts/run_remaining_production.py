@@ -2,26 +2,30 @@
 """
 Run all remaining production batches sequentially.
 
-This weekend runner executes the remaining ARFF/Adam experiment batches
-one at a time on a single CUDA device.
+This weekend runner executes the remaining ARFF, Adam Fourier, and
+capacity-matched Adam MLP experiment batches one at a time on a single
+CUDA device.
 
-Completed seed logs are respected through --resume, so the script can be
-restarted safely after interruption.
+Completed seed log/artifact pairs are respected through --resume, so
+the script can be restarted safely after interruption.
 
 The script stops immediately if any batch fails.
 
 Current intended order:
-    ex1: ARFF, Adam
-    ex2: ARFF, Adam
-    ex4: ARFF, Adam
-    ex5: ARFF, Adam
-    ex7: ARFF, Adam
-    ex8: ARFF, Adam
-    ex3: ARFF, Adam
+    ex1: ARFF, Adam, MLP
+    ex2: ARFF, Adam, MLP
+    ex4: ARFF, Adam, MLP
+    ex5: ARFF, Adam, MLP
+    ex7: ARFF, Adam, MLP
+    ex8: ARFF, Adam, MLP
+    ex3: ARFF, Adam, MLP
+    ex6: MLP
 
-ex6 is omitted because:
-    Adam ex6 is already complete.
-    ARFF ex6 is currently running separately.
+ARFF/Adam batches that are already complete are retained in the list
+because run_production_batch.py --resume will skip their completed
+seeds safely.
+
+MLP ex6 is placed last because Experiment 6 has the largest dataset.
 """
 
 from __future__ import annotations
@@ -38,18 +42,33 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 BATCHES = (
     ("arff", "ex1"),
     ("adam", "ex1"),
+    ("mlp", "ex1"),
+
     ("arff", "ex2"),
     ("adam", "ex2"),
+    ("mlp", "ex2"),
+
     ("arff", "ex4"),
     ("adam", "ex4"),
+    ("mlp", "ex4"),
+
     ("arff", "ex5"),
     ("adam", "ex5"),
+    ("mlp", "ex5"),
+
     ("arff", "ex7"),
     ("adam", "ex7"),
+    ("mlp", "ex7"),
+
     ("arff", "ex8"),
     ("adam", "ex8"),
+    ("mlp", "ex8"),
+
     ("arff", "ex3"),
     ("adam", "ex3"),
+    ("mlp", "ex3"),
+
+    ("mlp", "ex6"),
 )
 
 

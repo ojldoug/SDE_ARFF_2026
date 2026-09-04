@@ -1,46 +1,18 @@
 #!/usr/bin/env python3
 """
-Run one canonical production batch for ARFF or Adam.
+Run one canonical production batch for ARFF, Adam Fourier, or Adam MLP.
 
-The script executes independent seeds sequentially, using the canonical
-experiment runners:
+Each seed produces two archival outputs:
 
-    scripts/run_arff_experiment.py
-    scripts/run_adam_fourier_experiment.py
+    seed_N.txt
+    seed_N_artifacts.npz
 
-Production logs are written to
+A seed is considered complete only when both outputs pass basic
+integrity checks.
 
-    results/production/{method}_{experiment}/seed_{seed}.txt
-
-Features
---------
-- Uses EvaluationConfig.n_runs by default.
-- Runs seeds sequentially.
-- Stops immediately if a seed fails.
-- Refuses to overwrite nonempty existing logs by default.
-- Can resume an interrupted batch by skipping completed logs.
-- Records batch metadata and nvidia-smi snapshots.
-- Uses one explicitly selected CUDA device.
-- Does not duplicate training logic.
-- Waits for the GPU machine to be idle before starting each seed.
-
-Examples
---------
-
-    python scripts/run_production_batch.py \
-        arff ex2 \
-        --device 0
-
-    python scripts/run_production_batch.py \
-        adam ex7 \
-        --device 0
-
-Resume an interrupted batch:
-
-    python scripts/run_production_batch.py \
-        arff ex2 \
-        --device 0 \
-        --resume
+The runner executes seeds sequentially on one selected CUDA device,
+waits for the whole GPU machine to be idle before starting a new seed,
+and stops immediately on failure.
 """
 
 from __future__ import annotations
@@ -53,6 +25,8 @@ import subprocess
 import sys
 import time
 
+import numpy as np
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
@@ -63,6 +37,7 @@ from src.experiments.config import get_config
 METHODS = (
     "arff",
     "adam",
+    "mlp",
 )
 
 EXPERIMENTS = tuple(
@@ -96,15 +71,19 @@ def runner_path(
             / "run_adam_fourier_experiment.py"
         )
 
+    if method == "mlp":
+        return (
+            REPO_ROOT
+            / "scripts"
+            / "run_adam_mlp_experiment.py"
+        )
+
     raise ValueError(
         f"Unknown method: {method}"
     )
 
 
 def run_nvidia_smi():
-    """
-    Return a complete human-readable nvidia-smi snapshot.
-    """
     try:
         completed = subprocess.run(
             [
@@ -119,7 +98,8 @@ def run_nvidia_smi():
     except FileNotFoundError as exc:
         raise RuntimeError(
             "nvidia-smi was not found. "
-            "Production timing requires an NVIDIA GPU machine."
+            "Production timing requires an "
+            "NVIDIA GPU machine."
         ) from exc
 
     output = (
@@ -135,15 +115,7 @@ def run_nvidia_smi():
 
 def gpu_compute_processes():
     """
-    Return currently active NVIDIA compute processes.
-
-    Each returned line contains fields reported by nvidia-smi:
-
-        pid, process_name, used_gpu_memory
-
-    The query covers all GPUs on the machine. Therefore a production
-    seed is started only when no existing NVIDIA compute process is
-    present on any GPU.
+    Return active NVIDIA compute processes on the machine.
     """
     try:
         completed = subprocess.run(
@@ -240,11 +212,7 @@ def wait_for_machine_idle(
     Wait until no NVIDIA compute process is present anywhere on the
     machine.
 
-    The check occurs only between production seeds. Polling therefore
-    does not contribute to the measured algorithm time of a seed.
-
-    If another user occupies a GPU, the production batch waits rather
-    than starting a potentially contaminated timing run.
+    This check occurs only between production seeds.
     """
     waiting = False
 
@@ -327,12 +295,13 @@ def log_is_complete(
         errors="replace",
     )
 
-    if method == "adam":
+    if method in ("adam", "mlp"):
         required = (
             "algorithm time",
             "validation",
             "test",
             "best validation NLL",
+            "artifact",
         )
 
     else:
@@ -341,11 +310,341 @@ def log_is_complete(
             "validation",
             "test",
             "raw SPD violation rate",
+            "artifact",
         )
 
     return all(
         token in text
         for token in required
+    )
+
+
+def artifact_is_complete(
+    path: Path,
+    *,
+    method: str,
+    experiment: str,
+    seed: int,
+) -> bool:
+    """
+    Perform cheap integrity checks on one production artifact.
+
+    This does not rerun model evaluation. Full model round-trip tests
+    belong to the reproducibility tests, not the production scheduler.
+    """
+    if not path.is_file():
+        return False
+
+    if path.stat().st_size == 0:
+        return False
+
+    try:
+        with np.load(
+            path,
+            allow_pickle=False,
+        ) as data:
+            if method == "adam":
+                expected_method = (
+                    "adam_fourier"
+                )
+
+                required = (
+                    "artifact_version",
+                    "method",
+                    "experiment",
+                    "seed",
+                    "diff_type",
+                    "fourier_frequencies",
+                    "epochs",
+                    "best_epoch",
+                    "best_validation_nll",
+                    "training_nll",
+                    "validation_nll",
+                    "cumulative_time",
+                    "algorithm_time",
+                    "drift_omega",
+                    "drift_amp",
+                    "covariance_omega",
+                    "covariance_amp",
+                )
+
+            elif method == "mlp":
+                expected_method = (
+                    "adam_mlp"
+                )
+
+                required = (
+                    "artifact_version",
+                    "method",
+                    "experiment",
+                    "seed",
+                    "diff_type",
+                    "hidden_width",
+                    "hidden_layers",
+                    "mlp_parameter_count",
+                    "fourier_parameter_count",
+                    "epochs",
+                    "batch_size",
+                    "learning_rate",
+                    "best_epoch",
+                    "best_validation_nll",
+                    "training_nll",
+                    "validation_nll",
+                    "cumulative_time",
+                    "algorithm_time",
+                    "drift_weight_0",
+                    "drift_bias_0",
+                    "covariance_weight_0",
+                    "covariance_bias_0",
+                )
+
+            else:
+                expected_method = (
+                    "arff"
+                )
+
+                required = (
+                    "artifact_version",
+                    "method",
+                    "experiment",
+                    "seed",
+                    "diff_type",
+                    "fourier_frequencies",
+                    "iterations",
+                    "n_folds",
+                    "fold_seed",
+                    "resampling",
+                    "metropolis_test",
+                    "spd_epsilon",
+                    "algorithm_time",
+                    "drift_omega",
+                    "drift_amp",
+                    "covariance_omega",
+                    "covariance_amp",
+                )
+
+            if not all(
+                key in data.files
+                for key in required
+            ):
+                return False
+
+            if (
+                data["method"].item()
+                != expected_method
+            ):
+                return False
+
+            if (
+                data["experiment"].item()
+                != experiment
+            ):
+                return False
+
+            if (
+                int(
+                    data["seed"].item()
+                )
+                != seed
+            ):
+                return False
+
+            if method == "mlp":
+                parameter_keys = [
+                    key
+                    for key in data.files
+                    if (
+                        key.startswith(
+                            "drift_weight_"
+                        )
+                        or key.startswith(
+                            "drift_bias_"
+                        )
+                        or key.startswith(
+                            "covariance_weight_"
+                        )
+                        or key.startswith(
+                            "covariance_bias_"
+                        )
+                    )
+                ]
+
+                if not parameter_keys:
+                    return False
+
+            else:
+                parameter_keys = (
+                    "drift_omega",
+                    "drift_amp",
+                    "covariance_omega",
+                    "covariance_amp",
+                )
+
+            for key in parameter_keys:
+                array = np.asarray(
+                    data[key]
+                )
+
+                if array.size == 0:
+                    return False
+
+                if not np.all(
+                    np.isfinite(
+                        array
+                    )
+                ):
+                    return False
+
+            algorithm_time = float(
+                data[
+                    "algorithm_time"
+                ].item()
+            )
+
+            if (
+                not np.isfinite(
+                    algorithm_time
+                )
+                or algorithm_time <= 0.0
+            ):
+                return False
+
+            if method in ("adam", "mlp"):
+                training_nll = np.asarray(
+                    data[
+                        "training_nll"
+                    ]
+                )
+
+                validation_nll = np.asarray(
+                    data[
+                        "validation_nll"
+                    ]
+                )
+
+                cumulative_time = np.asarray(
+                    data[
+                        "cumulative_time"
+                    ]
+                )
+
+                if (
+                    training_nll.ndim != 1
+                    or validation_nll.ndim != 1
+                    or cumulative_time.ndim != 1
+                ):
+                    return False
+
+                if not (
+                    len(training_nll)
+                    == len(validation_nll)
+                    == len(cumulative_time)
+                ):
+                    return False
+
+                if len(
+                    training_nll
+                ) == 0:
+                    return False
+
+                if not np.all(
+                    np.isfinite(
+                        training_nll
+                    )
+                ):
+                    return False
+
+                if not np.all(
+                    np.isfinite(
+                        validation_nll
+                    )
+                ):
+                    return False
+
+                if not np.all(
+                    np.isfinite(
+                        cumulative_time
+                    )
+                ):
+                    return False
+
+                if not np.all(
+                    np.diff(
+                        cumulative_time
+                    )
+                    >= 0.0
+                ):
+                    return False
+
+                best_epoch = int(
+                    data[
+                        "best_epoch"
+                    ].item()
+                )
+
+                if not (
+                    0
+                    <= best_epoch
+                    < len(validation_nll)
+                ):
+                    return False
+
+                if (
+                    int(
+                        np.argmin(
+                            validation_nll
+                        )
+                    )
+                    != best_epoch
+                ):
+                    return False
+
+                stored_best = float(
+                    data[
+                        "best_validation_nll"
+                    ].item()
+                )
+
+                if not np.isclose(
+                    validation_nll[
+                        best_epoch
+                    ],
+                    stored_best,
+                    rtol=1e-7,
+                    atol=1e-7,
+                ):
+                    return False
+
+    except (
+        OSError,
+        ValueError,
+        KeyError,
+        EOFError,
+    ):
+        return False
+
+    return True
+
+
+def seed_is_complete(
+    *,
+    log_path: Path,
+    artifact_path: Path,
+    method: str,
+    experiment: str,
+    seed: int,
+) -> bool:
+    return (
+        log_is_complete(
+            log_path,
+            method,
+        )
+        and artifact_is_complete(
+            artifact_path,
+            method=method,
+            experiment=experiment,
+            seed=seed,
+        )
     )
 
 
@@ -356,6 +655,7 @@ def run_seed(
     seed: int,
     device: int,
     output_path: Path,
+    artifact_path: Path,
     metadata_path: Path,
 ):
     command = [
@@ -369,6 +669,10 @@ def run_seed(
         "--seed",
         str(
             seed
+        ),
+        "--artifact-path",
+        str(
+            artifact_path
         ),
     ]
 
@@ -421,6 +725,11 @@ def run_seed(
     print(
         "=" * 80
     )
+
+    # Remove a stale artifact before starting. This ensures a failed
+    # run can never leave an older artifact paired with a new log.
+    if artifact_path.exists():
+        artifact_path.unlink()
 
     with output_path.open(
         "w",
@@ -482,15 +791,18 @@ def run_seed(
             f"{returncode}."
         )
 
-    if not log_is_complete(
-        output_path,
-        method,
+    if not seed_is_complete(
+        log_path=output_path,
+        artifact_path=artifact_path,
+        method=method,
+        experiment=experiment,
+        seed=seed,
     ):
         raise RuntimeError(
             f"{method} {experiment} "
-            f"seed {seed} returned "
-            "success but the output log "
-            "does not look complete."
+            f"seed {seed} returned success "
+            "but its production log/artifact "
+            "pair is incomplete or invalid."
         )
 
     print(
@@ -543,9 +855,9 @@ def parse_args():
         "--resume",
         action="store_true",
         help=(
-            "Skip logs that already appear "
-            "complete. Incomplete logs are "
-            "replaced."
+            "Skip seeds whose log and artifact "
+            "both pass integrity checks. "
+            "Incomplete seed outputs are replaced."
         ),
     )
 
@@ -663,14 +975,23 @@ def main():
             / f"seed_{seed}.txt"
         )
 
-        if output_path.exists():
-            complete = (
-                log_is_complete(
-                    output_path,
-                    args.method,
-                )
-            )
+        artifact_path = (
+            output_directory
+            / f"seed_{seed}_artifacts.npz"
+        )
 
+        complete = seed_is_complete(
+            log_path=output_path,
+            artifact_path=artifact_path,
+            method=args.method,
+            experiment=args.experiment,
+            seed=seed,
+        )
+
+        if (
+            output_path.exists()
+            or artifact_path.exists()
+        ):
             if args.resume:
                 if complete:
                     print(
@@ -690,10 +1011,11 @@ def main():
             else:
                 raise FileExistsError(
                     "Refusing to overwrite "
-                    f"{output_path}. "
+                    f"seed {seed} outputs in "
+                    f"{output_directory}. "
                     "Use --resume to skip "
-                    "completed runs and "
-                    "replace incomplete ones."
+                    "complete seeds and replace "
+                    "incomplete ones."
                 )
 
         wait_for_machine_idle(
@@ -712,6 +1034,9 @@ def main():
             device=args.device,
             output_path=(
                 output_path
+            ),
+            artifact_path=(
+                artifact_path
             ),
             metadata_path=(
                 metadata_path
