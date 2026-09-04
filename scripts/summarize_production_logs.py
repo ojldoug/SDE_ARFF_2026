@@ -600,20 +600,20 @@ def print_summary_table(
     )
 
     print(
-        "=" * 112
+        "=" * 126
     )
 
     print(
         f"{'metric':<42}"
-        f"{'n':>5}"
-        f"{'mean':>18}"
-        f"{'std':>18}"
-        f"{'min':>18}"
-        f"{'max':>18}"
+        f"{'n':>6}"
+        f"{'mean':>20}"
+        f"{'std':>20}"
+        f"{'min':>20}"
+        f"{'max':>20}"
     )
 
     print(
-        "-" * 112
+        "-" * 126
     )
 
     for (
@@ -631,11 +631,11 @@ def print_summary_table(
 
         print(
             f"{label:<42}"
-            f"{stats['n']:5d}"
-            f"{stats['mean']:18.8e}"
-            f"{stats['std']:18.8e}"
-            f"{stats['min']:18.8e}"
-            f"{stats['max']:18.8e}"
+            f"{stats['n']:6d}"
+            f"{stats['mean']:20.8e}"
+            f"{stats['std']:20.8e}"
+            f"{stats['min']:20.8e}"
+            f"{stats['max']:20.8e}"
         )
 
     print()
