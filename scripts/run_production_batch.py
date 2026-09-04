@@ -22,6 +22,7 @@ Features
 - Records batch metadata and nvidia-smi snapshots.
 - Uses one explicitly selected CUDA device.
 - Does not duplicate training logic.
+- Waits for the GPU machine to be idle before starting each seed.
 
 Examples
 --------
@@ -50,6 +51,7 @@ from pathlib import Path
 import os
 import subprocess
 import sys
+import time
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -100,6 +102,9 @@ def runner_path(
 
 
 def run_nvidia_smi():
+    """
+    Return a complete human-readable nvidia-smi snapshot.
+    """
     try:
         completed = subprocess.run(
             [
@@ -111,21 +116,68 @@ def run_nvidia_smi():
             check=False,
         )
 
-        output = (
-            completed.stdout
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "nvidia-smi was not found. "
+            "Production timing requires an NVIDIA GPU machine."
+        ) from exc
+
+    output = (
+        completed.stdout
+        + completed.stderr
+    )
+
+    return (
+        completed.returncode,
+        output,
+    )
+
+
+def gpu_compute_processes():
+    """
+    Return currently active NVIDIA compute processes.
+
+    Each returned line contains fields reported by nvidia-smi:
+
+        pid, process_name, used_gpu_memory
+
+    The query covers all GPUs on the machine. Therefore a production
+    seed is started only when no existing NVIDIA compute process is
+    present on any GPU.
+    """
+    try:
+        completed = subprocess.run(
+            [
+                "nvidia-smi",
+                "--query-compute-apps="
+                "pid,process_name,used_gpu_memory",
+                "--format=csv,noheader,nounits",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+
+    except FileNotFoundError as exc:
+        raise RuntimeError(
+            "nvidia-smi was not found while "
+            "checking machine occupancy."
+        ) from exc
+
+    if completed.returncode != 0:
+        raise RuntimeError(
+            "nvidia-smi failed while checking "
+            "whether the machine is idle:\n"
+            + completed.stdout
             + completed.stderr
         )
 
-        return (
-            completed.returncode,
-            output,
-        )
-
-    except FileNotFoundError:
-        return (
-            127,
-            "nvidia-smi not found\n",
-        )
+    return [
+        line.strip()
+        for line in completed.stdout.splitlines()
+        if line.strip()
+    ]
 
 
 def write_text(
@@ -177,6 +229,87 @@ def log_machine_snapshot(
         metadata_path,
         text,
     )
+
+
+def wait_for_machine_idle(
+    metadata_path: Path,
+    *,
+    poll_seconds: int = 300,
+):
+    """
+    Wait until no NVIDIA compute process is present anywhere on the
+    machine.
+
+    The check occurs only between production seeds. Polling therefore
+    does not contribute to the measured algorithm time of a seed.
+
+    If another user occupies a GPU, the production batch waits rather
+    than starting a potentially contaminated timing run.
+    """
+    waiting = False
+
+    while True:
+        processes = (
+            gpu_compute_processes()
+        )
+
+        if not processes:
+            if waiting:
+                message = (
+                    "\n"
+                    + "=" * 80
+                    + "\n"
+                    + "GPU MACHINE IDLE — RESUMING\n"
+                    + f"time: {timestamp()}\n"
+                    + "=" * 80
+                    + "\n"
+                )
+
+                print(
+                    message,
+                    end="",
+                    flush=True,
+                )
+
+                write_text(
+                    metadata_path,
+                    message,
+                )
+
+            return
+
+        if not waiting:
+            message = (
+                "\n"
+                + "=" * 80
+                + "\n"
+                + "GPU MACHINE BUSY — WAITING\n"
+                + f"time: {timestamp()}\n"
+                + f"poll interval: {poll_seconds} s\n"
+                + "=" * 80
+                + "\n"
+                + "\n".join(
+                    processes
+                )
+                + "\n"
+            )
+
+            print(
+                message,
+                end="",
+                flush=True,
+            )
+
+            write_text(
+                metadata_path,
+                message,
+            )
+
+            waiting = True
+
+        time.sleep(
+            poll_seconds
+        )
 
 
 def log_is_complete(
@@ -416,6 +549,17 @@ def parse_args():
         ),
     )
 
+    parser.add_argument(
+        "--idle-poll-seconds",
+        type=int,
+        default=300,
+        help=(
+            "Seconds between GPU-idle checks "
+            "when another compute process is "
+            "using the machine. Default: 300."
+        ),
+    )
+
     return parser.parse_args()
 
 
@@ -431,6 +575,11 @@ def main():
         raise ValueError(
             "--start-seed must be "
             "non-negative."
+        )
+
+    if args.idle_poll_seconds <= 0:
+        raise ValueError(
+            "--idle-poll-seconds must be positive."
         )
 
     config = get_config(
@@ -495,6 +644,10 @@ def main():
             + f"last seed: {last_seed}\n"
             + f"n runs: {n_runs}\n"
             + f"resume: {args.resume}\n"
+            + (
+                "idle poll seconds: "
+                f"{args.idle_poll_seconds}\n"
+            )
             + f"batch start: {timestamp()}\n"
             + "#" * 80
             + "\n"
@@ -542,6 +695,13 @@ def main():
                     "completed runs and "
                     "replace incomplete ones."
                 )
+
+        wait_for_machine_idle(
+            metadata_path,
+            poll_seconds=(
+                args.idle_poll_seconds
+            ),
+        )
 
         run_seed(
             method=args.method,
