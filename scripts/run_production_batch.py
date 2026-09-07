@@ -475,22 +475,54 @@ def artifact_is_complete(
                     "epochs_per_regression",
                     "batch_size",
                     "learning_rate",
+                    "git_commit",
+                    "git_dirty",
+                    "hostname",
+                    "python_version",
+                    "numpy_version",
+                    "jax_version",
+                    "jax_backend",
+                    "n_train",
+                    "n_validation",
+                    "n_test",
                     "algorithm_time",
                     "compilation_time",
                     "end_to_end_time",
+                    "internal_algorithm_time",
+                    "fold_algorithm_times",
+                    "crossfit_algorithm_time",
+                    "final_drift_start_offset",
+                    "final_drift_algorithm_time",
+                    "final_drift_end_offset",
                     "final_drift_best_epoch",
                     "final_drift_best_validation_mse",
                     "final_drift_training_mse",
                     "final_drift_validation_mse",
                     "final_drift_cumulative_time",
+                    "final_drift_global_cumulative_time",
+                    "covariance_start_offset",
+                    "covariance_algorithm_time",
+                    "covariance_end_offset",
                     "covariance_best_epoch",
                     "covariance_best_validation_nll",
                     "covariance_training_nll",
                     "covariance_validation_nll",
                     "covariance_cumulative_time",
+                    "covariance_global_cumulative_time",
                     "fold_best_epochs",
                     "fold_best_validation_mse",
                     "fold_id",
+                    "train_nll",
+                    "train_drift_rmse",
+                    "train_covariance_rmse",
+                    "validation_nll",
+                    "validation_drift_rmse",
+                    "validation_covariance_rmse",
+                    "test_nll",
+                    "test_drift_rmse",
+                    "test_covariance_rmse",
+                    "test_min_covariance_eig",
+                    "test_max_covariance_eig",
                     "drift_omega",
                     "drift_amp",
                     "covariance_omega",
@@ -583,6 +615,14 @@ def artifact_is_complete(
                 != seed
             ):
                 return False
+
+            if method == "adam_split":
+                if int(
+                    data[
+                        "artifact_version"
+                    ].item()
+                ) < 4:
+                    return False
 
             # ------------------------------------------------------
             # Parameter integrity.
@@ -679,6 +719,233 @@ def artifact_is_complete(
                     + compilation_time,
                     rtol=1e-7,
                     atol=1e-6,
+                ):
+                    return False
+
+            # ------------------------------------------------------
+            # Archival split-Adam timing integrity.
+            # ------------------------------------------------------
+
+            if method == "adam_split":
+                fold_times = np.asarray(
+                    data[
+                        "fold_algorithm_times"
+                    ],
+                    dtype=np.float64,
+                )
+
+                if (
+                    fold_times.ndim != 1
+                    or len(fold_times) != 5
+                    or not np.all(
+                        np.isfinite(
+                            fold_times
+                        )
+                    )
+                    or not np.all(
+                        fold_times > 0.0
+                    )
+                ):
+                    return False
+
+                crossfit_time = float(
+                    data[
+                        "crossfit_algorithm_time"
+                    ].item()
+                )
+
+                final_drift_start = float(
+                    data[
+                        "final_drift_start_offset"
+                    ].item()
+                )
+
+                final_drift_time = float(
+                    data[
+                        "final_drift_algorithm_time"
+                    ].item()
+                )
+
+                final_drift_end = float(
+                    data[
+                        "final_drift_end_offset"
+                    ].item()
+                )
+
+                covariance_start = float(
+                    data[
+                        "covariance_start_offset"
+                    ].item()
+                )
+
+                covariance_time_value = float(
+                    data[
+                        "covariance_algorithm_time"
+                    ].item()
+                )
+
+                covariance_end = float(
+                    data[
+                        "covariance_end_offset"
+                    ].item()
+                )
+
+                internal_time = float(
+                    data[
+                        "internal_algorithm_time"
+                    ].item()
+                )
+
+                scalar_times = np.asarray(
+                    [
+                        crossfit_time,
+                        final_drift_start,
+                        final_drift_time,
+                        final_drift_end,
+                        covariance_start,
+                        covariance_time_value,
+                        covariance_end,
+                        internal_time,
+                    ],
+                    dtype=np.float64,
+                )
+
+                if not np.all(
+                    np.isfinite(
+                        scalar_times
+                    )
+                ):
+                    return False
+
+                if not (
+                    0.0
+                    < crossfit_time
+                    <= final_drift_start
+                    < covariance_start
+                    < internal_time
+                ):
+                    return False
+
+                if not (
+                    final_drift_time > 0.0
+                    and covariance_time_value > 0.0
+                ):
+                    return False
+
+                if not np.isclose(
+                    final_drift_end,
+                    final_drift_start
+                    + final_drift_time,
+                    rtol=1e-7,
+                    atol=1e-6,
+                ):
+                    return False
+
+                if not np.isclose(
+                    covariance_end,
+                    covariance_start
+                    + covariance_time_value,
+                    rtol=1e-7,
+                    atol=1e-6,
+                ):
+                    return False
+
+                # Internal and external algorithm clocks surround
+                # essentially the same fit. Allow a small scheduler /
+                # Python bookkeeping difference without weakening the
+                # integrity check.
+                if not np.isclose(
+                    internal_time,
+                    algorithm_time,
+                    rtol=1e-3,
+                    atol=0.05,
+                ):
+                    return False
+
+                drift_global_time = np.asarray(
+                    data[
+                        "final_drift_global_cumulative_time"
+                    ],
+                    dtype=np.float64,
+                )
+
+                covariance_global_time = np.asarray(
+                    data[
+                        "covariance_global_cumulative_time"
+                    ],
+                    dtype=np.float64,
+                )
+
+                for global_time in (
+                    drift_global_time,
+                    covariance_global_time,
+                ):
+                    if (
+                        global_time.ndim != 1
+                        or len(global_time) == 0
+                        or not np.all(
+                            np.isfinite(
+                                global_time
+                            )
+                        )
+                        or not np.all(
+                            np.diff(
+                                global_time
+                            )
+                            >= 0.0
+                        )
+                    ):
+                        return False
+
+                if (
+                    drift_global_time[0]
+                    < final_drift_start
+                    or drift_global_time[-1]
+                    > internal_time
+                ):
+                    return False
+
+                if (
+                    covariance_global_time[0]
+                    < covariance_start
+                    or covariance_global_time[-1]
+                    > internal_time
+                ):
+                    return False
+
+                endpoint_keys = (
+                    "train_nll",
+                    "train_drift_rmse",
+                    "train_covariance_rmse",
+                    "validation_nll",
+                    "validation_drift_rmse",
+                    "validation_covariance_rmse",
+                    "test_nll",
+                    "test_drift_rmse",
+                    "test_covariance_rmse",
+                    "test_min_covariance_eig",
+                    "test_max_covariance_eig",
+                )
+
+                for key in endpoint_keys:
+                    value = float(
+                        data[
+                            key
+                        ].item()
+                    )
+
+                    if not np.isfinite(
+                        value
+                    ):
+                        return False
+
+                if (
+                    float(
+                        data[
+                            "test_min_covariance_eig"
+                        ].item()
+                    )
+                    <= 0.0
                 ):
                     return False
 

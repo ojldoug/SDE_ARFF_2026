@@ -4,28 +4,21 @@ Run one canonical split Fourier-Adam SDE experiment.
 
 Compilation timing is separated from algorithm timing.
 
-Before real training starts, the runner executes the drift and
-covariance JIT functions once for every distinct minibatch shape that
-the split procedure can encounter, and once on the canonical validation
-shape.
+The artifact is deliberately archival-quality. It stores the final
+model, endpoint metrics, optimization histories, cross-fit diagnostics,
+stage timings, and metadata needed for later plotting and analysis.
 
-Real split training then starts from fresh model initializations and
-fresh Adam optimizer states.
-
-Reported algorithm time therefore excludes one-time JAX/XLA compilation
-but includes all work required by the split procedure:
-
-    five cross-fit drift regressions,
-    one final all-training drift regression,
-    one covariance-likelihood regression,
-    construction of out-of-fold residuals,
-    and validation-based checkpoint selection.
+Expensive diagnostic work is not inserted into training. Final
+evaluation and artifact serialization occur only after algorithm timing
+has stopped.
 """
 
 from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import platform
+import subprocess
 import sys
 
 import jax
@@ -78,15 +71,30 @@ from src.experiments.timing import (
 # ------------------------------------------------------------------
 
 
-def true_function_errors(
+def evaluate_split(
     model,
     x,
+    r,
+    h,
     *,
     true_drift,
     true_diffusion_factor,
 ):
+    """
+    Evaluate one fitted model.
+
+    This is called only after algorithm timing has stopped.
+    """
     x = np.asarray(
         x
+    )
+
+    r = np.asarray(
+        r
+    )
+
+    h = np.asarray(
+        h
     )
 
     learned_drift = np.asarray(
@@ -124,32 +132,66 @@ def true_function_errors(
         )
     )
 
-    drift_rmse = np.sqrt(
-        np.mean(
-            (
-                learned_drift
-                - drift_truth
-            ) ** 2
+    nll = float(
+        gaussian_nll(
+            model,
+            x,
+            r,
+            h,
         )
     )
 
-    covariance_rmse = np.sqrt(
-        np.mean(
-            (
-                learned_covariance
-                - covariance_truth
-            ) ** 2
+    drift_rmse = float(
+        np.sqrt(
+            np.mean(
+                (
+                    learned_drift
+                    - drift_truth
+                ) ** 2
+            )
         )
     )
 
-    return (
-        float(
-            drift_rmse
-        ),
-        float(
+    covariance_rmse = float(
+        np.sqrt(
+            np.mean(
+                (
+                    learned_covariance
+                    - covariance_truth
+                ) ** 2
+            )
+        )
+    )
+
+    eigenvalues = np.linalg.eigvalsh(
+        learned_covariance
+    )
+
+    min_covariance_eig = float(
+        np.min(
+            eigenvalues
+        )
+    )
+
+    max_covariance_eig = float(
+        np.max(
+            eigenvalues
+        )
+    )
+
+    return {
+        "nll": nll,
+        "drift_rmse": drift_rmse,
+        "covariance_rmse": (
             covariance_rmse
         ),
-    )
+        "min_covariance_eig": (
+            min_covariance_eig
+        ),
+        "max_covariance_eig": (
+            max_covariance_eig
+        ),
+    }
 
 
 # ------------------------------------------------------------------
@@ -164,10 +206,6 @@ def required_drift_batch_sizes(
     fold_seed: int,
     batch_size: int,
 ):
-    """
-    Return every distinct minibatch size encountered by cross-fit and
-    final drift training.
-    """
     folds = make_folds(
         n_train,
         n_folds,
@@ -189,16 +227,14 @@ def required_drift_batch_sizes(
         ]
     )
 
-    batch_sizes = set()
+    sizes = set()
 
     for n_samples in training_sizes:
-        full = min(
-            batch_size,
-            n_samples,
-        )
-
-        batch_sizes.add(
-            full
+        sizes.add(
+            min(
+                batch_size,
+                n_samples,
+            )
         )
 
         remainder = (
@@ -207,12 +243,12 @@ def required_drift_batch_sizes(
         )
 
         if remainder > 0:
-            batch_sizes.add(
+            sizes.add(
                 remainder
             )
 
     return sorted(
-        batch_sizes
+        sizes
     )
 
 
@@ -221,9 +257,6 @@ def required_covariance_batch_sizes(
     n_train: int,
     batch_size: int,
 ):
-    """
-    Stage-2 covariance training uses the complete canonical train set.
-    """
     sizes = {
         min(
             batch_size,
@@ -286,18 +319,14 @@ def prepare_compiled_functions(
     diff_type: str,
     n_folds: int,
     fold_seed: int,
-    epochs: int,
     batch_size: int,
     learning_rate: float,
 ):
     """
-    Compile every distinct update/loss executable needed by the split
-    procedure.
+    Compile every distinct executable shape needed by real training.
 
-    The warm-up model and optimizer states are discarded afterward.
+    Warm-up models and optimizer states are discarded afterward.
     """
-    del epochs
-
     (
         warmup_key,
         initialization_key,
@@ -446,9 +475,6 @@ def prepare_compiled_functions(
 
     # --------------------------------------------------------------
     # Covariance update shapes.
-    #
-    # Zero residuals are sufficient for compilation and avoid using a
-    # noisy warm-up target. Warm-up states are discarded.
     # --------------------------------------------------------------
 
     covariance_sizes = (
@@ -542,6 +568,56 @@ def prepare_compiled_functions(
 
 
 # ------------------------------------------------------------------
+# Cheap reproducibility metadata
+# ------------------------------------------------------------------
+
+
+def git_metadata():
+    try:
+        commit = subprocess.run(
+            [
+                "git",
+                "rev-parse",
+                "HEAD",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=True,
+        ).stdout.strip()
+
+        status = subprocess.run(
+            [
+                "git",
+                "status",
+                "--porcelain",
+            ],
+            cwd=REPO_ROOT,
+            text=True,
+            capture_output=True,
+            check=True,
+        ).stdout
+
+        dirty = bool(
+            status.strip()
+        )
+
+        return (
+            commit,
+            dirty,
+        )
+
+    except (
+        OSError,
+        subprocess.SubprocessError,
+    ):
+        return (
+            "unknown",
+            True,
+        )
+
+
+# ------------------------------------------------------------------
 # Artifact
 # ------------------------------------------------------------------
 
@@ -555,6 +631,12 @@ def save_artifact(
     result,
     timing,
     config,
+    train_metrics,
+    validation_metrics,
+    test_metrics,
+    n_train: int,
+    n_validation: int,
+    n_test: int,
 ):
     path = (
         path
@@ -575,11 +657,48 @@ def save_artifact(
         result.covariance_training
     )
 
+    crossfit = (
+        result.crossfit
+    )
+
+    final_drift_local_time = (
+        np.asarray(
+            drift_training.cumulative_time,
+            dtype=np.float64,
+        )
+    )
+
+    covariance_local_time = (
+        np.asarray(
+            covariance_training.cumulative_time,
+            dtype=np.float64,
+        )
+    )
+
+    final_drift_global_time = (
+        result.final_drift_start_offset
+        + final_drift_local_time
+    )
+
+    covariance_global_time = (
+        result.covariance_start_offset
+        + covariance_local_time
+    )
+
+    (
+        git_commit,
+        git_dirty,
+    ) = git_metadata()
+
     np.savez_compressed(
         path,
 
+        # ----------------------------------------------------------
+        # Identity and schema
+        # ----------------------------------------------------------
+
         artifact_version=np.asarray(
-            3,
+            4,
             dtype=np.int64,
         ),
 
@@ -599,6 +718,61 @@ def save_artifact(
         diff_type=np.asarray(
             diff_type
         ),
+
+        # ----------------------------------------------------------
+        # Environment / provenance
+        # ----------------------------------------------------------
+
+        git_commit=np.asarray(
+            git_commit
+        ),
+
+        git_dirty=np.asarray(
+            git_dirty
+        ),
+
+        hostname=np.asarray(
+            platform.node()
+        ),
+
+        python_version=np.asarray(
+            platform.python_version()
+        ),
+
+        numpy_version=np.asarray(
+            np.__version__
+        ),
+
+        jax_version=np.asarray(
+            jax.__version__
+        ),
+
+        jax_backend=np.asarray(
+            jax.default_backend()
+        ),
+
+        # ----------------------------------------------------------
+        # Dataset sizes
+        # ----------------------------------------------------------
+
+        n_train=np.asarray(
+            n_train,
+            dtype=np.int64,
+        ),
+
+        n_validation=np.asarray(
+            n_validation,
+            dtype=np.int64,
+        ),
+
+        n_test=np.asarray(
+            n_test,
+            dtype=np.int64,
+        ),
+
+        # ----------------------------------------------------------
+        # Hyperparameters
+        # ----------------------------------------------------------
 
         fourier_frequencies=np.asarray(
             config.fourier_frequencies,
@@ -630,6 +804,10 @@ def save_artifact(
             dtype=np.float64,
         ),
 
+        # ----------------------------------------------------------
+        # Top-level timing
+        # ----------------------------------------------------------
+
         algorithm_time=np.asarray(
             timing.algorithm_seconds,
             dtype=np.float64,
@@ -642,6 +820,63 @@ def save_artifact(
 
         end_to_end_time=np.asarray(
             timing.end_to_end_seconds,
+            dtype=np.float64,
+        ),
+
+        internal_algorithm_time=np.asarray(
+            result.internal_algorithm_time,
+            dtype=np.float64,
+        ),
+
+        # ----------------------------------------------------------
+        # Cross-fit timing / diagnostics
+        # ----------------------------------------------------------
+
+        fold_algorithm_times=np.asarray(
+            crossfit.fold_algorithm_times,
+            dtype=np.float64,
+        ),
+
+        crossfit_algorithm_time=np.asarray(
+            crossfit.crossfit_algorithm_time,
+            dtype=np.float64,
+        ),
+
+        fold_best_epochs=np.asarray(
+            crossfit.fold_best_epochs,
+            dtype=np.int64,
+        ),
+
+        fold_best_validation_mse=np.asarray(
+            crossfit
+            .fold_best_validation_losses,
+            dtype=np.float64,
+        ),
+
+        fold_id=np.asarray(
+            crossfit.fold_id,
+            dtype=np.int32,
+        ),
+
+        # ----------------------------------------------------------
+        # Final drift stage
+        # ----------------------------------------------------------
+
+        final_drift_start_offset=np.asarray(
+            result.final_drift_start_offset,
+            dtype=np.float64,
+        ),
+
+        final_drift_algorithm_time=np.asarray(
+            result.final_drift_algorithm_time,
+            dtype=np.float64,
+        ),
+
+        final_drift_end_offset=np.asarray(
+            (
+                result.final_drift_start_offset
+                + result.final_drift_algorithm_time
+            ),
             dtype=np.float64,
         ),
 
@@ -668,8 +903,33 @@ def save_artifact(
             dtype=np.float64,
         ),
 
-        final_drift_cumulative_time=np.asarray(
-            drift_training.cumulative_time,
+        final_drift_cumulative_time=(
+            final_drift_local_time
+        ),
+
+        final_drift_global_cumulative_time=(
+            final_drift_global_time
+        ),
+
+        # ----------------------------------------------------------
+        # Covariance stage
+        # ----------------------------------------------------------
+
+        covariance_start_offset=np.asarray(
+            result.covariance_start_offset,
+            dtype=np.float64,
+        ),
+
+        covariance_algorithm_time=np.asarray(
+            result.covariance_algorithm_time,
+            dtype=np.float64,
+        ),
+
+        covariance_end_offset=np.asarray(
+            (
+                result.covariance_start_offset
+                + result.covariance_algorithm_time
+            ),
             dtype=np.float64,
         ),
 
@@ -696,29 +956,134 @@ def save_artifact(
             dtype=np.float64,
         ),
 
-        covariance_cumulative_time=np.asarray(
-            covariance_training.cumulative_time,
+        covariance_cumulative_time=(
+            covariance_local_time
+        ),
+
+        covariance_global_cumulative_time=(
+            covariance_global_time
+        ),
+
+        # ----------------------------------------------------------
+        # Endpoint train metrics
+        # ----------------------------------------------------------
+
+        train_nll=np.asarray(
+            train_metrics[
+                "nll"
+            ],
             dtype=np.float64,
         ),
 
-        fold_best_epochs=np.asarray(
-            result
-            .crossfit
-            .fold_best_epochs,
-            dtype=np.int64,
-        ),
-
-        fold_best_validation_mse=np.asarray(
-            result
-            .crossfit
-            .fold_best_validation_losses,
+        train_drift_rmse=np.asarray(
+            train_metrics[
+                "drift_rmse"
+            ],
             dtype=np.float64,
         ),
 
-        fold_id=np.asarray(
-            result.crossfit.fold_id,
-            dtype=np.int32,
+        train_covariance_rmse=np.asarray(
+            train_metrics[
+                "covariance_rmse"
+            ],
+            dtype=np.float64,
         ),
+
+        train_min_covariance_eig=np.asarray(
+            train_metrics[
+                "min_covariance_eig"
+            ],
+            dtype=np.float64,
+        ),
+
+        train_max_covariance_eig=np.asarray(
+            train_metrics[
+                "max_covariance_eig"
+            ],
+            dtype=np.float64,
+        ),
+
+        # ----------------------------------------------------------
+        # Endpoint validation metrics
+        # ----------------------------------------------------------
+
+        validation_nll=np.asarray(
+            validation_metrics[
+                "nll"
+            ],
+            dtype=np.float64,
+        ),
+
+        validation_drift_rmse=np.asarray(
+            validation_metrics[
+                "drift_rmse"
+            ],
+            dtype=np.float64,
+        ),
+
+        validation_covariance_rmse=np.asarray(
+            validation_metrics[
+                "covariance_rmse"
+            ],
+            dtype=np.float64,
+        ),
+
+        validation_min_covariance_eig=np.asarray(
+            validation_metrics[
+                "min_covariance_eig"
+            ],
+            dtype=np.float64,
+        ),
+
+        validation_max_covariance_eig=np.asarray(
+            validation_metrics[
+                "max_covariance_eig"
+            ],
+            dtype=np.float64,
+        ),
+
+        # ----------------------------------------------------------
+        # Endpoint test metrics
+        # ----------------------------------------------------------
+
+        test_nll=np.asarray(
+            test_metrics[
+                "nll"
+            ],
+            dtype=np.float64,
+        ),
+
+        test_drift_rmse=np.asarray(
+            test_metrics[
+                "drift_rmse"
+            ],
+            dtype=np.float64,
+        ),
+
+        test_covariance_rmse=np.asarray(
+            test_metrics[
+                "covariance_rmse"
+            ],
+            dtype=np.float64,
+        ),
+
+        test_min_covariance_eig=np.asarray(
+            test_metrics[
+                "min_covariance_eig"
+            ],
+            dtype=np.float64,
+        ),
+
+        test_max_covariance_eig=np.asarray(
+            test_metrics[
+                "max_covariance_eig"
+            ],
+            dtype=np.float64,
+        ),
+
+        # ----------------------------------------------------------
+        # Complete final model parameters
+        # ----------------------------------------------------------
 
         drift_omega=np.asarray(
             jax.device_get(
@@ -827,11 +1192,6 @@ def main():
         data.test_idx
     )
 
-    # --------------------------------------------------------------
-    # Transfer canonical train/validation arrays before either
-    # compilation timing or algorithm timing.
-    # --------------------------------------------------------------
-
     x_train = jnp.asarray(
         data.x[
             train_idx
@@ -938,8 +1298,7 @@ def main():
     print()
 
     # --------------------------------------------------------------
-    # Compile every required executable with a completely independent
-    # warm-up key.
+    # JIT warm-up.
     # --------------------------------------------------------------
 
     print(
@@ -984,9 +1343,6 @@ def main():
         fold_seed=(
             config.split.seed
         ),
-        epochs=(
-            config.adam.epochs
-        ),
         batch_size=(
             config.adam.batch_size
         ),
@@ -1003,8 +1359,7 @@ def main():
     print()
 
     # --------------------------------------------------------------
-    # Real training starts from the requested seed and from fresh Adam
-    # states. All required JIT shapes have already been compiled.
+    # Real split training.
     # --------------------------------------------------------------
 
     key = jax.random.PRNGKey(
@@ -1087,6 +1442,11 @@ def main():
     )
 
     print(
+        "internal algorithm   : "
+        f"{result.internal_algorithm_time:.3f} s"
+    )
+
+    print(
         "first-call/JIT time  : "
         f"{timing.compilation_seconds:.3f} s"
     )
@@ -1094,6 +1454,36 @@ def main():
     print(
         "end-to-end time      : "
         f"{timing.end_to_end_seconds:.3f} s"
+    )
+
+    print(
+        "cross-fit time       : "
+        f"{result.crossfit.crossfit_algorithm_time:.3f} s"
+    )
+
+    print(
+        "fold times           : "
+        f"{result.crossfit.fold_algorithm_times.tolist()}"
+    )
+
+    print(
+        "final drift start    : "
+        f"{result.final_drift_start_offset:.3f} s"
+    )
+
+    print(
+        "final drift time     : "
+        f"{result.final_drift_algorithm_time:.3f} s"
+    )
+
+    print(
+        "covariance start     : "
+        f"{result.covariance_start_offset:.3f} s"
+    )
+
+    print(
+        "covariance time      : "
+        f"{result.covariance_algorithm_time:.3f} s"
     )
 
     print(
@@ -1124,8 +1514,10 @@ def main():
     print()
 
     # --------------------------------------------------------------
-    # Final evaluation. Test is first used here.
+    # Final evaluation occurs after benchmark timing has stopped.
     # --------------------------------------------------------------
+
+    metrics = {}
 
     for label, idx in [
         (
@@ -1141,27 +1533,15 @@ def main():
             test_idx,
         ),
     ]:
-        nll = float(
-            gaussian_nll(
-                model,
-                data.x[
-                    idx
-                ],
-                data.r[
-                    idx
-                ],
-                data.h[
-                    idx
-                ],
-            )
-        )
-
-        (
-            drift_rmse,
-            covariance_rmse,
-        ) = true_function_errors(
+        values = evaluate_split(
             model,
             data.x[
+                idx
+            ],
+            data.r[
+                idx
+            ],
+            data.h[
                 idx
             ],
             true_drift=(
@@ -1173,22 +1553,9 @@ def main():
             ),
         )
 
-        covariance = np.asarray(
-            predict_covariance(
-                model,
-                data.x[
-                    idx
-                ],
-            )
-        )
-
-        min_eigenvalue = float(
-            np.min(
-                np.linalg.eigvalsh(
-                    covariance
-                )
-            )
-        )
+        metrics[
+            label
+        ] = values
 
         print(
             label
@@ -1196,22 +1563,27 @@ def main():
 
         print(
             "  NLL                : "
-            f"{nll:.8e}"
+            f"{values['nll']:.8e}"
         )
 
         print(
             "  drift RMSE         : "
-            f"{drift_rmse:.8e}"
+            f"{values['drift_rmse']:.8e}"
         )
 
         print(
             "  covariance RMSE    : "
-            f"{covariance_rmse:.8e}"
+            f"{values['covariance_rmse']:.8e}"
         )
 
         print(
             "  min covariance eig : "
-            f"{min_eigenvalue:.8e}"
+            f"{values['min_covariance_eig']:.8e}"
+        )
+
+        print(
+            "  max covariance eig : "
+            f"{values['max_covariance_eig']:.8e}"
         )
 
         print()
@@ -1230,6 +1602,30 @@ def main():
             result=result,
             timing=timing,
             config=config,
+            train_metrics=(
+                metrics[
+                    "train"
+                ]
+            ),
+            validation_metrics=(
+                metrics[
+                    "validation"
+                ]
+            ),
+            test_metrics=(
+                metrics[
+                    "test"
+                ]
+            ),
+            n_train=len(
+                train_idx
+            ),
+            n_validation=len(
+                validation_idx
+            ),
+            n_test=len(
+                test_idx
+            ),
         )
 
 

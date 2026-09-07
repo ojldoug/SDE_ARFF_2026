@@ -31,15 +31,15 @@ covariance parameters with
 
 Finally, refit the drift model on all canonical training observations.
 
-The optimizer and JIT-compiled update/loss functions are supplied by
-the runner. This allows the runner to compile all required array shapes
-before benchmark timing starts, matching the timing convention used by
-the existing Adam baselines.
+All JIT-compiled functions are supplied by the runner after warm-up.
+The timing information stored here therefore describes actual algorithm
+work, excluding one-time JAX/XLA compilation.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
+import time
 
 import jax
 import jax.numpy as jnp
@@ -65,9 +65,15 @@ from src.arff.two_stage import (
 Array = jax.Array
 
 
-# ------------------------------------------------------------------
-# Covariance-only model used during stage 2
-# ------------------------------------------------------------------
+def _block_until_ready(tree) -> None:
+    for leaf in jax.tree_util.tree_leaves(
+        tree
+    ):
+        if hasattr(
+            leaf,
+            "block_until_ready",
+        ):
+            leaf.block_until_ready()
 
 
 @dataclass(frozen=True)
@@ -115,29 +121,43 @@ jax.tree_util.register_pytree_node_class(
 )
 
 
-# ------------------------------------------------------------------
-# Results
-# ------------------------------------------------------------------
-
-
 @dataclass(frozen=True)
 class CrossFitAdamResult:
     residuals: Array
+
     fold_id: np.ndarray
     fold_best_epochs: np.ndarray
     fold_best_validation_losses: np.ndarray
+
+    # Complete wall-clock cost of each fold after JIT warm-up.
+    fold_algorithm_times: np.ndarray
+
+    # Complete cross-fitting wall-clock cost, including fold setup,
+    # predictions, and residual assembly.
+    crossfit_algorithm_time: float
 
 
 @dataclass(frozen=True)
 class SplitFourierTrainingResult:
     model: AdamFourierModel
+
     final_drift_training: TrainingResult
     covariance_training: TrainingResult
     crossfit: CrossFitAdamResult
 
+    # Offsets are measured from the beginning of the complete split
+    # algorithm call.
+    final_drift_start_offset: float
+    final_drift_algorithm_time: float
+
+    covariance_start_offset: float
+    covariance_algorithm_time: float
+
+    internal_algorithm_time: float
+
 
 # ------------------------------------------------------------------
-# Stage-1 drift objective
+# Stage 1: drift objective
 # ------------------------------------------------------------------
 
 
@@ -147,14 +167,6 @@ def drift_mse(
     target: Array,
     h: Array,
 ) -> Array:
-    """
-    MSE for the increment-rate drift target r / h.
-
-    h is accepted because the generic Adam trainer requires every loss
-    to have signature
-
-        loss(model, x, target, h).
-    """
     del h
 
     prediction = predict_fourier(
@@ -182,7 +194,8 @@ def covariance_factor_from_split_model(
     """
     Return L such that Sigma = L L^T.
 
-    This is exactly the SPD construction used by joint Fourier Adam.
+    This matches the SPD covariance construction used by joint
+    Fourier Adam.
     """
     raw = predict_fourier(
         model.covariance,
@@ -290,7 +303,7 @@ def covariance_from_split_model(
 
 
 # ------------------------------------------------------------------
-# Stage-2 covariance likelihood
+# Stage 2: covariance-only Gaussian likelihood
 # ------------------------------------------------------------------
 
 
@@ -305,7 +318,7 @@ def covariance_gaussian_nll(
 
     residual_n = r_n - h_n f_hat(x_n).
 
-    During this stage only covariance parameters are trainable.
+    Only covariance parameters are trainable during this stage.
     """
     x = jnp.asarray(
         x
@@ -394,7 +407,7 @@ def covariance_gaussian_nll(
 
 
 # ------------------------------------------------------------------
-# Generic regression helper
+# Generic Adam regression helper
 # ------------------------------------------------------------------
 
 
@@ -414,12 +427,6 @@ def _fit_one_regression(
     compiled_train_step,
     compiled_loss,
 ):
-    """
-    Run one Adam regression using functions compiled by the runner.
-
-    fit_adam creates a fresh optimizer state for every regression, so
-    warm-up state and previous fold states cannot leak into real fits.
-    """
     return fit_adam(
         key,
         initial_model,
@@ -466,12 +473,6 @@ def cross_fitted_residuals_adam(
     drift_compiled_train_step,
     drift_compiled_loss,
 ):
-    """
-    Construct honest out-of-fold residuals.
-
-    The canonical validation set is used only for checkpoint selection
-    of the fold-specific drift regressions.
-    """
     x_train = jnp.asarray(
         x_train
     )
@@ -494,6 +495,10 @@ def cross_fitted_residuals_adam(
 
     h_validation = jnp.asarray(
         h_validation
+    )
+
+    crossfit_start = (
+        time.perf_counter()
     )
 
     n = len(
@@ -528,6 +533,11 @@ def cross_fitted_residuals_adam(
         )
     )
 
+    fold_algorithm_times = np.empty(
+        n_folds,
+        dtype=np.float64,
+    )
+
     all_indices = np.arange(
         n
     )
@@ -540,6 +550,10 @@ def cross_fitted_residuals_adam(
     for fold_number, holdout_idx in enumerate(
         folds
     ):
+        fold_start = (
+            time.perf_counter()
+        )
+
         train_mask = np.ones(
             n,
             dtype=bool,
@@ -613,18 +627,6 @@ def cross_fitted_residuals_adam(
             ),
         )
 
-        fold_best_epochs[
-            fold_number
-        ] = (
-            training.best_epoch
-        )
-
-        fold_best_validation_losses[
-            fold_number
-        ] = (
-            training.best_validation_nll
-        )
-
         drift_holdout = (
             predict_fourier(
                 training.model,
@@ -650,9 +652,36 @@ def cross_fitted_residuals_adam(
             fold_residual
         )
 
+        _block_until_ready(
+            residuals
+        )
+
         fold_id[
             holdout_idx
         ] = fold_number
+
+        fold_best_epochs[
+            fold_number
+        ] = (
+            training.best_epoch
+        )
+
+        fold_best_validation_losses[
+            fold_number
+        ] = (
+            training.best_validation_nll
+        )
+
+        fold_algorithm_times[
+            fold_number
+        ] = (
+            time.perf_counter()
+            - fold_start
+        )
+
+    _block_until_ready(
+        residuals
+    )
 
     finite = bool(
         jax.device_get(
@@ -670,6 +699,11 @@ def cross_fitted_residuals_adam(
             "non-finite values."
         )
 
+    crossfit_algorithm_time = (
+        time.perf_counter()
+        - crossfit_start
+    )
+
     return (
         key,
         CrossFitAdamResult(
@@ -680,6 +714,12 @@ def cross_fitted_residuals_adam(
             ),
             fold_best_validation_losses=(
                 fold_best_validation_losses
+            ),
+            fold_algorithm_times=(
+                fold_algorithm_times
+            ),
+            crossfit_algorithm_time=float(
+                crossfit_algorithm_time
             ),
         ),
     )
@@ -717,9 +757,13 @@ def fit_split_fourier_adam(
     """
     Fit the complete split Fourier-Adam estimator.
 
-    All JIT functions supplied here must already have been warmed for
-    the array shapes that this procedure will encounter.
+    Stage offsets use a common algorithm clock beginning at entry to
+    this function.
     """
+    algorithm_start = (
+        time.perf_counter()
+    )
+
     x_train = jnp.asarray(
         x_train
     )
@@ -743,10 +787,6 @@ def fit_split_fourier_adam(
     h_validation = jnp.asarray(
         h_validation
     )
-
-    # --------------------------------------------------------------
-    # Canonical initialization for the final drift and covariance.
-    # --------------------------------------------------------------
 
     (
         key,
@@ -772,7 +812,7 @@ def fit_split_fourier_adam(
     )
 
     # --------------------------------------------------------------
-    # Honest cross-fitted residuals.
+    # Cross-fitted drift residuals.
     # --------------------------------------------------------------
 
     (
@@ -811,8 +851,17 @@ def fit_split_fourier_adam(
     )
 
     # --------------------------------------------------------------
-    # Final all-training drift fit.
+    # Final all-training drift.
     # --------------------------------------------------------------
+
+    final_drift_start_offset = (
+        time.perf_counter()
+        - algorithm_start
+    )
+
+    final_drift_start = (
+        time.perf_counter()
+    )
 
     drift_train_target = (
         r_train
@@ -853,8 +902,17 @@ def fit_split_fourier_adam(
         final_drift_training.model
     )
 
+    _block_until_ready(
+        final_drift
+    )
+
+    final_drift_algorithm_time = (
+        time.perf_counter()
+        - final_drift_start
+    )
+
     # --------------------------------------------------------------
-    # Freeze validation residuals for covariance checkpoint selection.
+    # Fixed validation residuals for covariance checkpoint selection.
     # --------------------------------------------------------------
 
     validation_drift = (
@@ -870,9 +928,22 @@ def fit_split_fourier_adam(
         * validation_drift
     )
 
+    _block_until_ready(
+        validation_residual
+    )
+
     # --------------------------------------------------------------
-    # Covariance-only Gaussian likelihood.
+    # Covariance likelihood stage.
     # --------------------------------------------------------------
+
+    covariance_start_offset = (
+        time.perf_counter()
+        - algorithm_start
+    )
+
+    covariance_start = (
+        time.perf_counter()
+    )
 
     covariance_initial_model = (
         CovarianceFourierModel(
@@ -912,6 +983,15 @@ def fit_split_fourier_adam(
         ),
     )
 
+    _block_until_ready(
+        covariance_training.model
+    )
+
+    covariance_algorithm_time = (
+        time.perf_counter()
+        - covariance_start
+    )
+
     final_model = AdamFourierModel(
         drift=final_drift,
         covariance=(
@@ -923,7 +1003,7 @@ def fit_split_fourier_adam(
     )
 
     # --------------------------------------------------------------
-    # Cheap representation sanity check.
+    # Representation consistency check.
     # --------------------------------------------------------------
 
     n_check = min(
@@ -975,6 +1055,15 @@ def fit_split_fourier_adam(
             "failed consistency check."
         )
 
+    _block_until_ready(
+        final_model
+    )
+
+    internal_algorithm_time = (
+        time.perf_counter()
+        - algorithm_start
+    )
+
     return (
         key,
         SplitFourierTrainingResult(
@@ -986,5 +1075,20 @@ def fit_split_fourier_adam(
                 covariance_training
             ),
             crossfit=crossfit,
+            final_drift_start_offset=float(
+                final_drift_start_offset
+            ),
+            final_drift_algorithm_time=float(
+                final_drift_algorithm_time
+            ),
+            covariance_start_offset=float(
+                covariance_start_offset
+            ),
+            covariance_algorithm_time=float(
+                covariance_algorithm_time
+            ),
+            internal_algorithm_time=float(
+                internal_algorithm_time
+            ),
         ),
     )
