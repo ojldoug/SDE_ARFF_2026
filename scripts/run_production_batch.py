@@ -1,14 +1,21 @@
 #!/usr/bin/env python3
 """
-Run one canonical production batch for ARFF, Adam Fourier, or Adam MLP.
+Run one canonical production batch.
+
+Supported methods:
+
+    arff
+    adam
+    adam_split
+    mlp
 
 Each seed produces two archival outputs:
 
     seed_N.txt
     seed_N_artifacts.npz
 
-A seed is considered complete only when both outputs pass basic
-integrity checks.
+A seed is considered complete only when both outputs pass integrity
+checks.
 
 The runner executes seeds sequentially on one selected CUDA device,
 waits for the whole GPU machine to be idle before starting a new seed,
@@ -29,28 +36,41 @@ import numpy as np
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO_ROOT))
+sys.path.insert(
+    0,
+    str(REPO_ROOT),
+)
 
-from src.experiments.config import get_config
+from src.experiments.config import (
+    get_config,
+)
 
 
 METHODS = (
     "arff",
     "adam",
+    "adam_split",
     "mlp",
 )
 
 EXPERIMENTS = tuple(
     f"ex{i}"
-    for i in range(1, 9)
+    for i in range(
+        1,
+        9,
+    )
 )
 
 
 def timestamp():
-    return datetime.now(
-        timezone.utc
-    ).astimezone().isoformat(
-        timespec="seconds"
+    return (
+        datetime.now(
+            timezone.utc
+        )
+        .astimezone()
+        .isoformat(
+            timespec="seconds"
+        )
     )
 
 
@@ -69,6 +89,13 @@ def runner_path(
             REPO_ROOT
             / "scripts"
             / "run_adam_fourier_experiment.py"
+        )
+
+    if method == "adam_split":
+        return (
+            REPO_ROOT
+            / "scripts"
+            / "run_adam_split_fourier_experiment.py"
         )
 
     if method == "mlp":
@@ -190,7 +217,10 @@ def log_machine_snapshot(
         + "\n"
         + f"{label}\n"
         + f"time: {timestamp()}\n"
-        + f"nvidia-smi return code: {returncode}\n"
+        + (
+            "nvidia-smi return code: "
+            f"{returncode}\n"
+        )
         + "=" * 80
         + "\n"
         + output
@@ -212,7 +242,7 @@ def wait_for_machine_idle(
     Wait until no NVIDIA compute process is present anywhere on the
     machine.
 
-    This check occurs only between production seeds.
+    This occurs only between production seeds.
     """
     waiting = False
 
@@ -253,7 +283,10 @@ def wait_for_machine_idle(
                 + "\n"
                 + "GPU MACHINE BUSY — WAITING\n"
                 + f"time: {timestamp()}\n"
-                + f"poll interval: {poll_seconds} s\n"
+                + (
+                    "poll interval: "
+                    f"{poll_seconds} s\n"
+                )
                 + "=" * 80
                 + "\n"
                 + "\n".join(
@@ -295,12 +328,26 @@ def log_is_complete(
         errors="replace",
     )
 
-    if method in ("adam", "mlp"):
+    if method in (
+        "adam",
+        "mlp",
+    ):
         required = (
             "algorithm time",
             "validation",
             "test",
             "best validation NLL",
+            "artifact",
+        )
+
+    elif method == "adam_split":
+        required = (
+            "algorithm time",
+            "first-call/JIT time",
+            "final drift best validation MSE",
+            "covariance best validation NLL",
+            "validation",
+            "test",
             "artifact",
         )
 
@@ -319,6 +366,44 @@ def log_is_complete(
     )
 
 
+def _finite_array(
+    data,
+    key: str,
+) -> bool:
+    array = np.asarray(
+        data[
+            key
+        ]
+    )
+
+    return (
+        array.size > 0
+        and np.all(
+            np.isfinite(
+                array
+            )
+        )
+    )
+
+
+def _valid_history(
+    values,
+) -> bool:
+    values = np.asarray(
+        values
+    )
+
+    return (
+        values.ndim == 1
+        and len(values) > 0
+        and np.all(
+            np.isfinite(
+                values
+            )
+        )
+    )
+
+
 def artifact_is_complete(
     path: Path,
     *,
@@ -329,8 +414,8 @@ def artifact_is_complete(
     """
     Perform cheap integrity checks on one production artifact.
 
-    This does not rerun model evaluation. Full model round-trip tests
-    belong to the reproducibility tests, not the production scheduler.
+    Full model round-trip tests belong to the reproducibility tests,
+    not the production scheduler.
     """
     if not path.is_file():
         return False
@@ -343,6 +428,11 @@ def artifact_is_complete(
             path,
             allow_pickle=False,
         ) as data:
+
+            # ------------------------------------------------------
+            # Method-specific schemas.
+            # ------------------------------------------------------
+
             if method == "adam":
                 expected_method = (
                     "adam_fourier"
@@ -362,6 +452,45 @@ def artifact_is_complete(
                     "validation_nll",
                     "cumulative_time",
                     "algorithm_time",
+                    "drift_omega",
+                    "drift_amp",
+                    "covariance_omega",
+                    "covariance_amp",
+                )
+
+            elif method == "adam_split":
+                expected_method = (
+                    "adam_split_fourier"
+                )
+
+                required = (
+                    "artifact_version",
+                    "method",
+                    "experiment",
+                    "seed",
+                    "diff_type",
+                    "fourier_frequencies",
+                    "n_folds",
+                    "fold_seed",
+                    "epochs_per_regression",
+                    "batch_size",
+                    "learning_rate",
+                    "algorithm_time",
+                    "compilation_time",
+                    "end_to_end_time",
+                    "final_drift_best_epoch",
+                    "final_drift_best_validation_mse",
+                    "final_drift_training_mse",
+                    "final_drift_validation_mse",
+                    "final_drift_cumulative_time",
+                    "covariance_best_epoch",
+                    "covariance_best_validation_nll",
+                    "covariance_training_nll",
+                    "covariance_validation_nll",
+                    "covariance_cumulative_time",
+                    "fold_best_epochs",
+                    "fold_best_validation_mse",
+                    "fold_id",
                     "drift_omega",
                     "drift_amp",
                     "covariance_omega",
@@ -430,24 +559,34 @@ def artifact_is_complete(
                 return False
 
             if (
-                data["method"].item()
+                data[
+                    "method"
+                ].item()
                 != expected_method
             ):
                 return False
 
             if (
-                data["experiment"].item()
+                data[
+                    "experiment"
+                ].item()
                 != experiment
             ):
                 return False
 
             if (
                 int(
-                    data["seed"].item()
+                    data[
+                        "seed"
+                    ].item()
                 )
                 != seed
             ):
                 return False
+
+            # ------------------------------------------------------
+            # Parameter integrity.
+            # ------------------------------------------------------
 
             if method == "mlp":
                 parameter_keys = [
@@ -481,19 +620,15 @@ def artifact_is_complete(
                 )
 
             for key in parameter_keys:
-                array = np.asarray(
-                    data[key]
-                )
-
-                if array.size == 0:
-                    return False
-
-                if not np.all(
-                    np.isfinite(
-                        array
-                    )
+                if not _finite_array(
+                    data,
+                    key,
                 ):
                     return False
+
+            # ------------------------------------------------------
+            # Timing integrity.
+            # ------------------------------------------------------
 
             algorithm_time = float(
                 data[
@@ -509,68 +644,93 @@ def artifact_is_complete(
             ):
                 return False
 
-            if method in ("adam", "mlp"):
-                training_nll = np.asarray(
+            if method == "adam_split":
+                compilation_time = float(
+                    data[
+                        "compilation_time"
+                    ].item()
+                )
+
+                end_to_end_time = float(
+                    data[
+                        "end_to_end_time"
+                    ].item()
+                )
+
+                if (
+                    not np.isfinite(
+                        compilation_time
+                    )
+                    or compilation_time < 0.0
+                ):
+                    return False
+
+                if (
+                    not np.isfinite(
+                        end_to_end_time
+                    )
+                    or end_to_end_time <= 0.0
+                ):
+                    return False
+
+                if not np.isclose(
+                    end_to_end_time,
+                    algorithm_time
+                    + compilation_time,
+                    rtol=1e-7,
+                    atol=1e-6,
+                ):
+                    return False
+
+            # ------------------------------------------------------
+            # Joint Adam / MLP histories.
+            # ------------------------------------------------------
+
+            if method in (
+                "adam",
+                "mlp",
+            ):
+                training = np.asarray(
                     data[
                         "training_nll"
                     ]
                 )
 
-                validation_nll = np.asarray(
+                validation = np.asarray(
                     data[
                         "validation_nll"
                     ]
                 )
 
-                cumulative_time = np.asarray(
+                cumulative = np.asarray(
                     data[
                         "cumulative_time"
                     ]
                 )
 
-                if (
-                    training_nll.ndim != 1
-                    or validation_nll.ndim != 1
-                    or cumulative_time.ndim != 1
+                if not (
+                    _valid_history(
+                        training
+                    )
+                    and _valid_history(
+                        validation
+                    )
+                    and _valid_history(
+                        cumulative
+                    )
                 ):
                     return False
 
                 if not (
-                    len(training_nll)
-                    == len(validation_nll)
-                    == len(cumulative_time)
-                ):
-                    return False
-
-                if len(
-                    training_nll
-                ) == 0:
-                    return False
-
-                if not np.all(
-                    np.isfinite(
-                        training_nll
-                    )
-                ):
-                    return False
-
-                if not np.all(
-                    np.isfinite(
-                        validation_nll
-                    )
-                ):
-                    return False
-
-                if not np.all(
-                    np.isfinite(
-                        cumulative_time
-                    )
+                    len(training)
+                    == len(validation)
+                    == len(cumulative)
                 ):
                     return False
 
                 if not np.all(
                     np.diff(
-                        cumulative_time
+                        cumulative
                     )
                     >= 0.0
                 ):
@@ -585,14 +745,16 @@ def artifact_is_complete(
                 if not (
                     0
                     <= best_epoch
-                    < len(validation_nll)
+                    < len(
+                        validation
+                    )
                 ):
                     return False
 
                 if (
                     int(
                         np.argmin(
-                            validation_nll
+                            validation
                         )
                     )
                     != best_epoch
@@ -606,12 +768,209 @@ def artifact_is_complete(
                 )
 
                 if not np.isclose(
-                    validation_nll[
+                    validation[
                         best_epoch
                     ],
                     stored_best,
                     rtol=1e-7,
                     atol=1e-7,
+                ):
+                    return False
+
+            # ------------------------------------------------------
+            # Split Adam histories.
+            # ------------------------------------------------------
+
+            if method == "adam_split":
+                drift_train = np.asarray(
+                    data[
+                        "final_drift_training_mse"
+                    ]
+                )
+
+                drift_validation = np.asarray(
+                    data[
+                        "final_drift_validation_mse"
+                    ]
+                )
+
+                drift_time = np.asarray(
+                    data[
+                        "final_drift_cumulative_time"
+                    ]
+                )
+
+                covariance_train = np.asarray(
+                    data[
+                        "covariance_training_nll"
+                    ]
+                )
+
+                covariance_validation = np.asarray(
+                    data[
+                        "covariance_validation_nll"
+                    ]
+                )
+
+                covariance_time = np.asarray(
+                    data[
+                        "covariance_cumulative_time"
+                    ]
+                )
+
+                histories = (
+                    drift_train,
+                    drift_validation,
+                    drift_time,
+                    covariance_train,
+                    covariance_validation,
+                    covariance_time,
+                )
+
+                if not all(
+                    _valid_history(
+                        history
+                    )
+                    for history in histories
+                ):
+                    return False
+
+                if not (
+                    len(
+                        drift_train
+                    )
+                    == len(
+                        drift_validation
+                    )
+                    == len(
+                        drift_time
+                    )
+                ):
+                    return False
+
+                if not (
+                    len(
+                        covariance_train
+                    )
+                    == len(
+                        covariance_validation
+                    )
+                    == len(
+                        covariance_time
+                    )
+                ):
+                    return False
+
+                if not np.all(
+                    np.diff(
+                        drift_time
+                    )
+                    >= 0.0
+                ):
+                    return False
+
+                if not np.all(
+                    np.diff(
+                        covariance_time
+                    )
+                    >= 0.0
+                ):
+                    return False
+
+                drift_best_epoch = int(
+                    data[
+                        "final_drift_best_epoch"
+                    ].item()
+                )
+
+                covariance_best_epoch = int(
+                    data[
+                        "covariance_best_epoch"
+                    ].item()
+                )
+
+                if (
+                    int(
+                        np.argmin(
+                            drift_validation
+                        )
+                    )
+                    != drift_best_epoch
+                ):
+                    return False
+
+                if (
+                    int(
+                        np.argmin(
+                            covariance_validation
+                        )
+                    )
+                    != covariance_best_epoch
+                ):
+                    return False
+
+                if not np.isclose(
+                    drift_validation[
+                        drift_best_epoch
+                    ],
+                    float(
+                        data[
+                            "final_drift_best_validation_mse"
+                        ].item()
+                    ),
+                    rtol=1e-7,
+                    atol=1e-7,
+                ):
+                    return False
+
+                if not np.isclose(
+                    covariance_validation[
+                        covariance_best_epoch
+                    ],
+                    float(
+                        data[
+                            "covariance_best_validation_nll"
+                        ].item()
+                    ),
+                    rtol=1e-7,
+                    atol=1e-7,
+                ):
+                    return False
+
+                fold_best_epochs = np.asarray(
+                    data[
+                        "fold_best_epochs"
+                    ]
+                )
+
+                fold_best_losses = np.asarray(
+                    data[
+                        "fold_best_validation_mse"
+                    ]
+                )
+
+                if (
+                    fold_best_epochs.ndim
+                    != 1
+                    or fold_best_losses.ndim
+                    != 1
+                    or len(
+                        fold_best_epochs
+                    )
+                    != len(
+                        fold_best_losses
+                    )
+                    or len(
+                        fold_best_epochs
+                    )
+                    == 0
+                ):
+                    return False
+
+                if not np.all(
+                    np.isfinite(
+                        fold_best_losses
+                    )
                 ):
                     return False
 
@@ -694,8 +1053,14 @@ def run_seed(
             + "\n"
             + f"seed {seed} start\n"
             + f"time: {timestamp()}\n"
-            + f"command: {' '.join(command)}\n"
-            + f"CUDA_VISIBLE_DEVICES={device}\n"
+            + (
+                "command: "
+                f"{' '.join(command)}\n"
+            )
+            + (
+                "CUDA_VISIBLE_DEVICES="
+                f"{device}\n"
+            )
             + "=" * 80
             + "\n"
         ),
@@ -708,64 +1073,29 @@ def run_seed(
         ),
     )
 
-    print(
-        "=" * 80
+    output_path.parent.mkdir(
+        parents=True,
+        exist_ok=True,
     )
 
-    print(
-        f"{method.upper()} "
-        f"{experiment} "
-        f"seed {seed}"
-    )
-
-    print(
-        f"Started: {timestamp()}"
-    )
-
-    print(
-        "=" * 80
-    )
-
-    # Remove a stale artifact before starting. This ensures a failed
-    # run can never leave an older artifact paired with a new log.
-    if artifact_path.exists():
-        artifact_path.unlink()
-
+    # Open first so an interrupted seed leaves an obvious incomplete
+    # zero/partial log that --resume can safely replace.
     with output_path.open(
         "w",
         encoding="utf-8",
-    ) as output_handle:
-        process = subprocess.Popen(
+    ) as handle:
+        completed = subprocess.run(
             command,
             cwd=REPO_ROOT,
             env=environment,
-            stdout=subprocess.PIPE,
+            stdout=handle,
             stderr=subprocess.STDOUT,
-            text=True,
-            bufsize=1,
+            check=False,
         )
 
-        assert (
-            process.stdout
-            is not None
-        )
-
-        for line in process.stdout:
-            print(
-                line,
-                end="",
-                flush=True,
-            )
-
-            output_handle.write(
-                line
-            )
-
-            output_handle.flush()
-
-        returncode = (
-            process.wait()
-        )
+    returncode = (
+        completed.returncode
+    )
 
     log_machine_snapshot(
         metadata_path,
@@ -787,8 +1117,7 @@ def run_seed(
         raise RuntimeError(
             f"{method} {experiment} "
             f"seed {seed} failed "
-            f"with return code "
-            f"{returncode}."
+            f"with return code {returncode}."
         )
 
     if not seed_is_complete(
@@ -857,7 +1186,7 @@ def parse_args():
         help=(
             "Skip seeds whose log and artifact "
             "both pass integrity checks. "
-            "Incomplete seed outputs are replaced."
+            "Incomplete outputs are replaced."
         ),
     )
 
@@ -949,18 +1278,42 @@ def main():
             + "#" * 80
             + "\n"
             + "PRODUCTION BATCH\n"
-            + f"method: {args.method}\n"
-            + f"experiment: {args.experiment}\n"
-            + f"device: {args.device}\n"
-            + f"first seed: {first_seed}\n"
-            + f"last seed: {last_seed}\n"
-            + f"n runs: {n_runs}\n"
-            + f"resume: {args.resume}\n"
+            + (
+                f"method: "
+                f"{args.method}\n"
+            )
+            + (
+                f"experiment: "
+                f"{args.experiment}\n"
+            )
+            + (
+                f"device: "
+                f"{args.device}\n"
+            )
+            + (
+                f"first seed: "
+                f"{first_seed}\n"
+            )
+            + (
+                f"last seed: "
+                f"{last_seed}\n"
+            )
+            + (
+                f"n runs: "
+                f"{n_runs}\n"
+            )
+            + (
+                f"resume: "
+                f"{args.resume}\n"
+            )
             + (
                 "idle poll seconds: "
                 f"{args.idle_poll_seconds}\n"
             )
-            + f"batch start: {timestamp()}\n"
+            + (
+                f"batch start: "
+                f"{timestamp()}\n"
+            )
             + "#" * 80
             + "\n"
         ),
@@ -995,7 +1348,7 @@ def main():
             if args.resume:
                 if complete:
                     print(
-                        f"Skipping completed "
+                        "Skipping completed "
                         f"seed {seed}: "
                         f"{output_path}"
                     )
@@ -1003,7 +1356,7 @@ def main():
                     continue
 
                 print(
-                    f"Replacing incomplete "
+                    "Replacing incomplete "
                     f"seed {seed}: "
                     f"{output_path}"
                 )
