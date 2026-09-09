@@ -1,0 +1,13 @@
+{
+  "utc": "2026-09-08T15:40:54.025971+00:00",
+  "adam_completed": 84,
+  "adam_worker_failures": [],
+  "arff_state": {
+    "jobs_total": 180,
+    "status": "waiting_adam_campaign",
+    "updated_at": "2026-09-08T15:40:39.051062+00:00"
+  },
+  "accepted_ex8_recheck": "PASS120 artifacts240 file hashes; existing collector; no outputs modified",
+  "checks": "Adam3tiny-fixture exact native histories; ARFF3control-flow fixtures plus7fit archive;2mock supervisor suites;syntax,diffcheck;summary incomplete guard and sampleSD",
+  "active_work": "Persistent campaigns and completion watcher; no isolated timings yet"
+}

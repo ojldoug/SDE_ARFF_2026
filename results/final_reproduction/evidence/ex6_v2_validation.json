@@ -1,0 +1,46 @@
+{
+  "original_sha256": "0966236d8a2a6aecf0eca85d9dc568145d46ef499eb5755e1bf20dc92c6304f7",
+  "source_revision": "2288344cb4f36ceb35216621941597982eef36c1",
+  "source_sha256": "f65412a9fd35444aa747a5e38a7ce4b5fba742c783a96913b51a57f5950e917f",
+  "replay": {
+    "x_bitwise_identical": true,
+    "r_bitwise_identical": true,
+    "trajectory_sha256": "6393cab5e9d22006338c1be1b8391c0bfc400db6cf2aeef80c43d8b490e800d8"
+  },
+  "changed_rows": {
+    "step_sizes": 498,
+    "x_data_space": 497502,
+    "x_data_time": 0,
+    "r_data": 0,
+    "split_indices": 0
+  },
+  "stochastic_noise_subtracted_drift_identity": {
+    "before": {
+      "max_abs": 2.4998026105103857,
+      "rmse": 0.10992492809625562
+    },
+    "after": {
+      "max_abs": 2.7551294579097885e-11,
+      "rmse": 3.0486311478728784e-12
+    }
+  },
+  "zero_noise_actual_grid_and_forcing": {
+    "before": {
+      "max_abs": 2.499802610510219,
+      "rmse": 0.050530454693632904
+    },
+    "after": {
+      "max_abs": 2.0099921727023684e-11,
+      "rmse": 2.0109052690155555e-12
+    }
+  },
+  "initialization_noise_variance_ratio": {
+    "before": 0.5,
+    "after": 1.0
+  },
+  "tolerance_drift_units": 1e-07,
+  "identity": "r = h*f(x) + (g(x)/4)*W; h0=Delta^2/4, h_interior=Delta^2/2; Var(W0)=Delta^2, Var(Wj)=2*Delta^2; sigma_eff=g/2",
+  "scientific_choice": "None for autonomous coefficient-learning labels under the existing generator. Time column is retained as the original buffer-index covariate, not reinterpreted as physical observation time. No claim of repairing/redefining the historical SPDE spatial stencil.",
+  "corrected_sha256": "47c4a91d37f494621c4174e5c8a87d951a9b78b16b1da68dc4b146f72dbc85c3",
+  "change_record_sha256": "5263675cc48022108078354c213ea5bff235366546f219d7d42194fc07b27917"
+}

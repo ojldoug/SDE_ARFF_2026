@@ -1,0 +1,92 @@
+{
+  "assignment": "seed modulo 4; Joint completes and validates before Split dispatch",
+  "created_at": "2026-09-08T10:52:33.629293+00:00",
+  "dataset_sha256": "a95f5483184d0e8dad39231fc30b18779d600be59c38d5464e22dca03db707c7",
+  "fourier_frequencies": 128,
+  "gpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "purpose": "width-controlled accuracy/reproducibility",
+  "python": "/home/kammonaa/miniconda3/envs/arff-sde/bin/python",
+  "reused": {
+    "joint": {
+      "seed": -1
+    },
+    "split": {
+      "seed": -1
+    }
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29
+  ],
+  "sessions": {
+    "joint": "joint_fourier_ex8_k128_campaign",
+    "split": "split_fourier_ex8_k128_campaign"
+  },
+  "sole_scientific_change": "fourier_frequencies: 512 -> 128",
+  "source_sha256": {
+    "scripts/run_adam_fourier_experiment.py": "17928bbe8931bac20e446f7a96dfc9c045bea37ad2115bd33cf92ab3411bff3f",
+    "scripts/run_adam_split_fourier_experiment.py": "a893cc34afe003f34328151ed33bc9df8a1df574bed2d537ef368eef7a2ce0dc",
+    "scripts/run_ex8_fourier_width.py": "043f6a211140c61fdabbf45e7910ead6d9b5a8c5b03ce19ebc3e988b82d81e8a",
+    "scripts/run_ex8_k128_campaigns.py": "d4a5829378888ab1232b347d16f9c81c22006ae2112c9734a1d5edfaecda882d",
+    "scripts/run_production_batch.py": "37b21922f984a9514f395fd22ab3ad79cc49e770af3bbec16f0230869c218759",
+    "scripts/summarize_ex8_k128_campaigns.py": "5630a59d22546e06d7b16f7fb5bf0392af770b42175bd91791f67decd5667b67",
+    "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/adam/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/adam/fourier.py": "964abfc69b2e054354a2c74d38bf127ebef718b97b0a1da11b08f82e859acbc5",
+    "src/adam/mlp.py": "62dc60d67059ad91c987f271943827c51e6dc49be52ec926abada643f0f18830",
+    "src/adam/split_fourier.py": "c5fbacebea235a5d41494b5ec355ed33472f4187bfdd5f009f2fac4b6429c473",
+    "src/adam/split_mlp.py": "ce366f598842102bda42a26d2b43a68e457963122dc6cf609846a178085220ca",
+    "src/adam/training.py": "446b2ad46c009a77485affd94c67e395b68a205a7c676a42180da4e6ccc40787",
+    "src/arff/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/arff/covariance.py": "94db858e69947728fea119a9205f7b3007f8053b53af26a298ab9734d00f32fc",
+    "src/arff/evaluation.py": "ba6769dd16a40b78f3bbb0c761b20f245a11a7c1283c8352a285377e92226480",
+    "src/arff/regression.py": "e48d15e3701468255d1307467b864e94c672836fde17843a0f5f5827ccc759e7",
+    "src/arff/two_stage.py": "40e392b5bed70afcbadb5679e3afa59230f1a77725d0fa8c4320234f200bad8c",
+    "src/arff/validation_selected.py": "0846a656cd43deff0279bd9f45b3f14d748ffe9433fc4831ac96fd0532be5894",
+    "src/experiments/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/experiments/config.py": "8f8ce3eafa6118df5b32a7b0463895f775a1119360d3f31a9fbfeaa5de629966",
+    "src/experiments/dataset.py": "b83606b9aaea3cdaed277e0568c58bd6ba388a4195ad378ce5c348b17d1e1d77",
+    "src/experiments/definitions.py": "66a99a0024f9257e4872e1eaf25934af67ca6b63ecdd7c19e969765b119113f4",
+    "src/experiments/em_data.py": "69e5ff49316e95b9eeea7cec4d7b6da2e11129c664b0fb754aa1681bfd4d8c97",
+    "src/experiments/mlp_size.py": "a1f8fcb273777a04e9aa00662914b5bfbe59e03dac6756054f13cf28f2b83497",
+    "src/experiments/model_size.py": "21cef5222f8c64e424f763a5dd2f7a98de41d1771f891210e29b2639f982f54a",
+    "src/experiments/simulation.py": "dcef05d054bd3c99529f3525b6fd689e19b242db55bc81e6e978000005edc595",
+    "src/experiments/sir_ssa.py": "6cac9b864765dcee05991182c9888f9498719e0876442d7e453c0a2a0631449b",
+    "src/experiments/timing.py": "adaf843d47c96652a16fdb808d7409ee36e23a841abbb66dfc6c2013fe78c0ea",
+    "src/experiments/wave_data.py": "f65412a9fd35444aa747a5e38a7ce4b5fba742c783a96913b51a57f5950e917f"
+  },
+  "timing_context": "New jobs run concurrently across four GPUs; shared CPU/memory/PCIe contention. Not isolated publication timing."
+}

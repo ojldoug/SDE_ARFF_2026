@@ -1,0 +1,20 @@
+{
+  "audit_matrix.md": "76b92c78523632d467c1bb509d60ff709938cbee593a2a203abbcf93d79c1071",
+  "FINAL_REPRODUCTION_REPORT.md": "3ba792e9a8265d2ee84269c2b7ac913f7ec8d04917695376332bd09034315c4d",
+  "production_manifest.json": "d38c92645f42fb074250bc2a42bbe67fb0609b1420009f124fbb92c04fec3dfb",
+  "evidence/raul_feedback_layout.txt": "6d371e4a274ac0ab9c8a37b321c5a64d95eba9ae561d976df975568cac7ce07e",
+  "evidence/history_error_search.json": "3605720f57cfdd7dd0bc3b74bed1eb4d01a85175235cf439e6ec71893bf96c95",
+  "evidence/worktree_error_search.json": "d0d3f2c9a2267b1f14ebe95673b630b3d05d4dbb4821e79ac83f3ed91092a675",
+  "evidence/ex6_label_check.json": "114324d58447d0622b9c6fd54494567f1e3df302a7d0b6bc6c2c7c97940aa9d6",
+  "evidence/historical_manuscript_layout.txt": "04109fd42b1bdb1d0a389021ae03e9c95b9958e84ab2422e6699f754b8339b44",
+  "evidence/existing_production_inventory.json": "790344ddb461f96290a3ba9989efd0815de1fe65a8f870f0ef1fc067bedf7a53",
+  "ex8_accepted/reuse_validation.json": "40eb4ab5dc7e8c96a70a4f5722a1ea0476980a5ca2ccbbae45040f0ab7d86da5",
+  "ex8_accepted/per_seed_test_metrics.csv": "970ac2d04a9b05c85441bd7d4bddcfbc10eeb40c856eafd01d073a275d328098",
+  "ex8_accepted/ex8_capacity_matched_w27_covariance_rmse_distribution.pdf": "70d4b6b705f17b9d3e3952743899504efecb514576f8e9c2ab9a9e0b71fd46c7",
+  "ex8_accepted/summary.txt": "e2c32407c8c7281f07163018261cb7151f64433928c735737c480bbaabd72d60",
+  "ex8_accepted/ex8_capacity_matched_w27_rmse_two_panel.pdf": "3d7343e02706e927520d7e892fde75cd393a1815094119a72afe688b4eaad48f",
+  "ex8_accepted/test_distributions.npz": "6235b1c70ec84483c6dc10cc1b2ea4377517018971586b9e160b12dd41d44206",
+  "ex8_accepted/summary.json": "bd4e2700ae220b344a09f2ca79f8ffafa893339b709ea2ec657091de6d2c752c",
+  "ex8_accepted/ex8_capacity_matched_w27_rmse_two_panel.png": "040cfb13246bc86bc42de357801555ec3c747e14a98af3fc1c45fa3b90cd213d",
+  "ex8_accepted/ex8_capacity_matched_w27_covariance_rmse_distribution.png": "d8efa4c290d25304723d4018f4afac991ba2f975bd584e2c6c0058899894d918"
+}

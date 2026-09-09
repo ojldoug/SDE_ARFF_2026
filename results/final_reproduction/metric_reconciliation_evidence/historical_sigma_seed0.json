@@ -1,0 +1,128 @@
+{
+  "ex1_arff_historical_corrected": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 10000,
+    "sigma_rmse": 0.02635966048264054,
+    "nonfinite_entries": 0
+  },
+  "ex1_fourier": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 10000,
+    "sigma_rmse": 0.03227587608565511,
+    "nonfinite_entries": 0
+  },
+  "ex1_mlp_deep": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 10000,
+    "sigma_rmse": 0.027833388473105212,
+    "nonfinite_entries": 0
+  },
+  "ex1_mlp_shallow": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 10000,
+    "sigma_rmse": 0.015084638461387597,
+    "nonfinite_entries": 0
+  },
+  "ex2_arff_historical_corrected": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 10000,
+    "sigma_rmse": 0.0022468459671383867,
+    "nonfinite_entries": 0
+  },
+  "ex2_fourier": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 10000,
+    "sigma_rmse": 0.00244395883879702,
+    "nonfinite_entries": 0
+  },
+  "ex2_mlp_deep": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 10000,
+    "sigma_rmse": 0.0006095367854902658,
+    "nonfinite_entries": 0
+  },
+  "ex2_mlp_shallow": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 10000,
+    "sigma_rmse": 0.0011194083938578221,
+    "nonfinite_entries": 0
+  },
+  "ex3_arff_historical_corrected": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 100000,
+    "sigma_rmse": 0.019044619437346512,
+    "nonfinite_entries": 0
+  },
+  "ex3_mlp_shallow": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 100000,
+    "sigma_rmse": 0.03379409739259196,
+    "nonfinite_entries": 0
+  },
+  "ex6_arff_historical_corrected": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 995004,
+    "sigma_rmse": 0.00027055624795103555,
+    "nonfinite_entries": 0
+  },
+  "ex6_fourier": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 995004,
+    "sigma_rmse": 0.0013715148671804653,
+    "nonfinite_entries": 0
+  },
+  "ex6_mlp_deep": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 995004,
+    "sigma_rmse": 0.00035422209008834527,
+    "nonfinite_entries": 0
+  },
+  "ex6_mlp_shallow": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 995004,
+    "sigma_rmse": 0.0004481786703396367,
+    "nonfinite_entries": 0
+  },
+  "ex7_arff_historical_corrected": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 100000,
+    "sigma_rmse": 0.0005484868124893825,
+    "nonfinite_entries": 0
+  },
+  "ex7_fourier": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 100000,
+    "sigma_rmse": 0.0007095371403398765,
+    "nonfinite_entries": 0
+  },
+  "ex7_mlp_deep": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 100000,
+    "sigma_rmse": 0.00043814539421296617,
+    "nonfinite_entries": 0
+  },
+  "ex7_mlp_shallow": {
+    "seed": 0,
+    "population": "all canonical rows",
+    "n": 100000,
+    "sigma_rmse": 0.00038990780186632767,
+    "nonfinite_entries": 0
+  }
+}

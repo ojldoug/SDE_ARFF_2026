@@ -1,0 +1,26 @@
+{
+  "status": "CONFIRMED_CANONICAL_LABEL_MISMATCH",
+  "fixture": "zero initial state; f(x)=1+x; zero realized noise; dx=dt=0.01",
+  "current_max_drift_identity_error_per_time_row": [
+    0.58,
+    0.010000000000000231,
+    8.881784197001252e-16,
+    0.010000000000001341,
+    1.1102230246251565e-15,
+    0.010000000000003118
+  ],
+  "corrected_label_max_error": 3.1086244689504383e-15,
+  "noise_draw_standard_deviations": [
+    0.01,
+    0.01414213562373095,
+    0.01414213562373095,
+    0.01414213562373095,
+    0.01414213562373095,
+    0.01414213562373095
+  ],
+  "canonical_affected_initialization_rows": 498,
+  "canonical_affected_spatial_rows": 497502,
+  "canonical_total_rows": 995004,
+  "minimal_candidate_correction": "Preserve x/r observations: half h for first 498 rows; add grid_step to spatial coordinate in blocks with integration j even. Audit time-coordinate convention separately; current forcing autonomous.",
+  "scope": "Audit fixture only. No canonical dataset modified or regenerated."
+}

@@ -1,0 +1,1031 @@
+{
+  "manifest_version": 1,
+  "status": "AUDIT_HARD_STOP_EX6_DATA_LABELS; NOT A DISPATCH MANIFEST",
+  "authorization": "No tuning. Reuse blocker-compliant existing code/data. Stop on invalid previously accepted core experiment.",
+  "source_sha256": {
+    "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/Latest_manuscrip_draft.pdf": "7681e0f9167654589efc23c3a297774765e3944140e9e9d6fb7ef38c8217b638",
+    "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/Raul_feedback.pdf": "34a6803eb865a534d6186b9ae372c043658277074c5fa43038e3603966e93b0f",
+    "/home/kammonaa/projects/SDE_NN_overleaf/arXiv_2026/RaulCom_ARFFSDELearning.tex": "b80da730e3fad9475178f9e5ce53ef332437cdcec9ae9e5280daddfbeb042c09",
+    "/home/kammonaa/projects/SDE_NN_overleaf/arXiv_2026/appendices_part2.tex": "02dbf60e0c4c9a2d8e301036afeb3384fc7fb8d77551f152c0cf21aa457ae5a6",
+    "/home/kammonaa/projects/SDE_NN_overleaf/arXiv_2026/appendices_part3.tex": "2e5d13d45a555600c54e280c8a9f5b0b5febad96be9c1174f9f3fed62ead0646",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/adam/split_mlp.py": "ce366f598842102bda42a26d2b43a68e457963122dc6cf609846a178085220ca",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/adam/mlp.py": "62dc60d67059ad91c987f271943827c51e6dc49be52ec926abada643f0f18830",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/adam/split_fourier.py": "c5fbacebea235a5d41494b5ec355ed33472f4187bfdd5f009f2fac4b6429c473",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/adam/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/adam/training.py": "446b2ad46c009a77485affd94c67e395b68a205a7c676a42180da4e6ccc40787",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/adam/fourier.py": "964abfc69b2e054354a2c74d38bf127ebef718b97b0a1da11b08f82e859acbc5",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/sir_ssa.py": "6cac9b864765dcee05991182c9888f9498719e0876442d7e453c0a2a0631449b",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/dataset.py": "b83606b9aaea3cdaed277e0568c58bd6ba388a4195ad378ce5c348b17d1e1d77",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/mlp_size.py": "a1f8fcb273777a04e9aa00662914b5bfbe59e03dac6756054f13cf28f2b83497",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/em_data.py": "69e5ff49316e95b9eeea7cec4d7b6da2e11129c664b0fb754aa1681bfd4d8c97",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/wave_data.py": "f65412a9fd35444aa747a5e38a7ce4b5fba742c783a96913b51a57f5950e917f",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/model_size.py": "21cef5222f8c64e424f763a5dd2f7a98de41d1771f891210e29b2639f982f54a",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/definitions.py": "66a99a0024f9257e4872e1eaf25934af67ca6b63ecdd7c19e969765b119113f4",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/simulation.py": "dcef05d054bd3c99529f3525b6fd689e19b242db55bc81e6e978000005edc595",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/timing.py": "adaf843d47c96652a16fdb808d7409ee36e23a841abbb66dfc6c2013fe78c0ea",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/experiments/config.py": "8f8ce3eafa6118df5b32a7b0463895f775a1119360d3f31a9fbfeaa5de629966",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/arff/covariance.py": "94db858e69947728fea119a9205f7b3007f8053b53af26a298ab9734d00f32fc",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/arff/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/arff/evaluation.py": "ba6769dd16a40b78f3bbb0c761b20f245a11a7c1283c8352a285377e92226480",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/arff/regression.py": "e48d15e3701468255d1307467b864e94c672836fde17843a0f5f5827ccc759e7",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/arff/two_stage.py": "40e392b5bed70afcbadb5679e3afa59230f1a77725d0fa8c4320234f200bad8c",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/arff/validation_selected.py": "0846a656cd43deff0279bd9f45b3f14d748ffe9433fc4831ac96fd0532be5894",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/GPU/lib/lib_ARFF.py": "996e37ab39440d6ffe9c13f5e37bc2196963f5707c6207653158903ebdb79e48",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/GPU/lib/lib_Adam_FF.py": "4db460441e8005f6e35acc2261338965400d40a797791546feee66eeb168e68d",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/GPU/lib/lib_Adam_tanh.py": "0996b13912597526f1aad57eb54f201883d758b98a7ee3ee78cf20569ff13e9c",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/GPU/generate_SPDE_data.ipynb": "870efbcf6bee177e0b0c00120eaa89ebfad7338b77c02240440daf2ebfc1017e",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/scripts/audit_final_reproduction.py": "019b03bd8cf54a4e69e3ac91661533e6cec8a0758cdd2fee711d50e45ac39f73"
+  },
+  "datasets": {
+    "ex1": {
+      "path": "data/ex1.npz",
+      "sha256": "59be2ccebc12fcae77d2fd0413cf667c8f3524571165c896d7da234e6d967580",
+      "metadata": {
+        "data_config": {
+          "em_substeps": 1000,
+          "grid_step": null,
+          "n_trajectories": 10000,
+          "observation_lag": 0.01,
+          "seed": 0,
+          "target_samples": 10000,
+          "trajectory_time": 0.01
+        },
+        "dataset_sha256": "59be2ccebc12fcae77d2fd0413cf667c8f3524571165c896d7da234e6d967580",
+        "experiment": "ex1",
+        "git_commit": "2288344cb4f36ceb35216621941597982eef36c1",
+        "n_samples": 10000,
+        "r_shape": [
+          10000,
+          2
+        ],
+        "split_config": {
+          "seed": 2026,
+          "test_fraction": 0.1,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1
+        },
+        "step_sizes_shape": [
+          10000,
+          1
+        ],
+        "test_samples": 1000,
+        "train_samples": 8000,
+        "validation_samples": 1000,
+        "x_shape": [
+          10000,
+          2
+        ]
+      },
+      "structural_validation": "PASS: finite arrays, positive lags, disjoint exhaustive indices, deterministic saved split, metadata checksum",
+      "h_min": 0.009999999776482582,
+      "h_max": 0.009999999776482582,
+      "scientific_reuse": "YES subject to final implementation audit; no regeneration indicated"
+    },
+    "ex2": {
+      "path": "data/ex2.npz",
+      "sha256": "802b9e68511341cc776f248bf9c833f5faa6bf68b4f395fe3b0f9b9444fb54d5",
+      "metadata": {
+        "data_config": {
+          "em_substeps": 1000,
+          "grid_step": null,
+          "n_trajectories": 10000,
+          "observation_lag": 0.01,
+          "seed": 0,
+          "target_samples": 10000,
+          "trajectory_time": 0.01
+        },
+        "dataset_sha256": "802b9e68511341cc776f248bf9c833f5faa6bf68b4f395fe3b0f9b9444fb54d5",
+        "experiment": "ex2",
+        "git_commit": "2288344cb4f36ceb35216621941597982eef36c1",
+        "n_samples": 10000,
+        "r_shape": [
+          10000,
+          3
+        ],
+        "split_config": {
+          "seed": 2026,
+          "test_fraction": 0.1,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1
+        },
+        "step_sizes_shape": [
+          10000,
+          1
+        ],
+        "test_samples": 1000,
+        "train_samples": 8000,
+        "validation_samples": 1000,
+        "x_shape": [
+          10000,
+          3
+        ]
+      },
+      "structural_validation": "PASS: finite arrays, positive lags, disjoint exhaustive indices, deterministic saved split, metadata checksum",
+      "h_min": 0.009999999776482582,
+      "h_max": 0.009999999776482582,
+      "scientific_reuse": "YES subject to final implementation audit; no regeneration indicated"
+    },
+    "ex3": {
+      "path": "data/ex3.npz",
+      "sha256": "3cc3f954168da8628f6fa68953f6883880ba91743602c42d5a20416808a2016f",
+      "metadata": {
+        "data_config": {
+          "em_substeps": 1000,
+          "grid_step": null,
+          "n_trajectories": 100000,
+          "observation_lag": 0.01,
+          "seed": 0,
+          "target_samples": 100000,
+          "trajectory_time": 0.01
+        },
+        "dataset_sha256": "3cc3f954168da8628f6fa68953f6883880ba91743602c42d5a20416808a2016f",
+        "experiment": "ex3",
+        "git_commit": "2288344cb4f36ceb35216621941597982eef36c1",
+        "n_samples": 100000,
+        "r_shape": [
+          100000,
+          10
+        ],
+        "split_config": {
+          "seed": 2026,
+          "test_fraction": 0.1,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1
+        },
+        "step_sizes_shape": [
+          100000,
+          1
+        ],
+        "test_samples": 10000,
+        "train_samples": 80000,
+        "validation_samples": 10000,
+        "x_shape": [
+          100000,
+          10
+        ]
+      },
+      "structural_validation": "PASS: finite arrays, positive lags, disjoint exhaustive indices, deterministic saved split, metadata checksum",
+      "h_min": 0.009999999776482582,
+      "h_max": 0.009999999776482582,
+      "scientific_reuse": "YES subject to final implementation audit; no regeneration indicated"
+    },
+    "ex4": {
+      "path": "data/ex4.npz",
+      "sha256": "7976ee6b51d8eb30e3cd3730b60788d82e56cbbb8541e2500665ee14c29bc899",
+      "metadata": {
+        "data_config": {
+          "em_substeps": 1000,
+          "grid_step": null,
+          "n_trajectories": 10000,
+          "observation_lag": 0.01,
+          "seed": 0,
+          "target_samples": 10000,
+          "trajectory_time": 0.01
+        },
+        "dataset_sha256": "7976ee6b51d8eb30e3cd3730b60788d82e56cbbb8541e2500665ee14c29bc899",
+        "experiment": "ex4",
+        "git_commit": "2288344cb4f36ceb35216621941597982eef36c1",
+        "n_samples": 10000,
+        "r_shape": [
+          10000,
+          1
+        ],
+        "split_config": {
+          "seed": 2026,
+          "test_fraction": 0.1,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1
+        },
+        "step_sizes_shape": [
+          10000,
+          1
+        ],
+        "test_samples": 1000,
+        "train_samples": 8000,
+        "validation_samples": 1000,
+        "x_shape": [
+          10000,
+          2
+        ]
+      },
+      "structural_validation": "PASS: finite arrays, positive lags, disjoint exhaustive indices, deterministic saved split, metadata checksum",
+      "h_min": 0.009999999776482582,
+      "h_max": 0.009999999776482582,
+      "scientific_reuse": "PENDING Langevin sign/conditioning reconciliation"
+    },
+    "ex5": {
+      "path": "data/ex5.npz",
+      "sha256": "6305d4a8eefe1d5105f34b04d6a143df5d901c305087e46241ad98a02d47dd8c",
+      "metadata": {
+        "data_config": {
+          "em_substeps": null,
+          "grid_step": null,
+          "n_trajectories": 250,
+          "observation_lag": 0.01,
+          "seed": 1,
+          "target_samples": null,
+          "trajectory_time": 4.0
+        },
+        "dataset_sha256": "6305d4a8eefe1d5105f34b04d6a143df5d901c305087e46241ad98a02d47dd8c",
+        "experiment": "ex5",
+        "git_commit": "2288344cb4f36ceb35216621941597982eef36c1",
+        "n_samples": 99719,
+        "r_shape": [
+          99719,
+          2
+        ],
+        "split_config": {
+          "seed": 2026,
+          "test_fraction": 0.1,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1
+        },
+        "step_sizes_shape": [
+          99719,
+          1
+        ],
+        "test_samples": 9973,
+        "train_samples": 79775,
+        "validation_samples": 9971,
+        "x_shape": [
+          99719,
+          2
+        ]
+      },
+      "structural_validation": "PASS: finite arrays, positive lags, disjoint exhaustive indices, deterministic saved split, metadata checksum",
+      "h_min": 0.01,
+      "h_max": 0.01,
+      "scientific_reuse": "YES subject to final implementation audit; no regeneration indicated"
+    },
+    "ex6": {
+      "path": "data/ex6.npz",
+      "sha256": "0966236d8a2a6aecf0eca85d9dc568145d46ef499eb5755e1bf20dc92c6304f7",
+      "metadata": {
+        "data_config": {
+          "em_substeps": null,
+          "grid_step": 0.001,
+          "n_trajectories": null,
+          "observation_lag": 5e-07,
+          "seed": 1,
+          "target_samples": 995004,
+          "trajectory_time": 2.0
+        },
+        "dataset_sha256": "0966236d8a2a6aecf0eca85d9dc568145d46ef499eb5755e1bf20dc92c6304f7",
+        "experiment": "ex6",
+        "git_commit": "2288344cb4f36ceb35216621941597982eef36c1",
+        "n_samples": 995004,
+        "r_shape": [
+          995004,
+          1
+        ],
+        "split_config": {
+          "seed": 2026,
+          "test_fraction": 0.1,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1
+        },
+        "step_sizes_shape": [
+          995004,
+          1
+        ],
+        "test_samples": 99501,
+        "train_samples": 796003,
+        "validation_samples": 99500,
+        "x_shape": [
+          995004,
+          2
+        ]
+      },
+      "structural_validation": "PASS: finite arrays, positive lags, disjoint exhaustive indices, deterministic saved split, metadata checksum",
+      "h_min": 5e-07,
+      "h_max": 5e-07,
+      "scientific_reuse": "NO as-is: half-lag initialization and alternating spatial-label mismatch"
+    },
+    "ex7": {
+      "path": "data/ex7.npz",
+      "sha256": "79273ad71e7c6b3078b95cbab5431aa27eafa43f755c0777056fc9ba27680e0d",
+      "metadata": {
+        "data_config": {
+          "em_substeps": 1000,
+          "grid_step": null,
+          "n_trajectories": 100000,
+          "observation_lag": 0.001,
+          "seed": 0,
+          "target_samples": 100000,
+          "trajectory_time": 0.001
+        },
+        "dataset_sha256": "79273ad71e7c6b3078b95cbab5431aa27eafa43f755c0777056fc9ba27680e0d",
+        "experiment": "ex7",
+        "git_commit": "2288344cb4f36ceb35216621941597982eef36c1",
+        "n_samples": 100000,
+        "r_shape": [
+          100000,
+          2
+        ],
+        "split_config": {
+          "seed": 2026,
+          "test_fraction": 0.1,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1
+        },
+        "step_sizes_shape": [
+          100000,
+          1
+        ],
+        "test_samples": 10000,
+        "train_samples": 80000,
+        "validation_samples": 10000,
+        "x_shape": [
+          100000,
+          2
+        ]
+      },
+      "structural_validation": "PASS: finite arrays, positive lags, disjoint exhaustive indices, deterministic saved split, metadata checksum",
+      "h_min": 0.0010000000474974513,
+      "h_max": 0.0010000000474974513,
+      "scientific_reuse": "YES subject to final implementation audit; no regeneration indicated"
+    },
+    "ex8": {
+      "path": "data/ex8.npz",
+      "sha256": "a95f5483184d0e8dad39231fc30b18779d600be59c38d5464e22dca03db707c7",
+      "metadata": {
+        "data_config": {
+          "em_substeps": 1000,
+          "grid_step": null,
+          "n_trajectories": 100000,
+          "observation_lag": 0.0001,
+          "seed": 0,
+          "target_samples": 100000,
+          "trajectory_time": 0.0001
+        },
+        "dataset_sha256": "a95f5483184d0e8dad39231fc30b18779d600be59c38d5464e22dca03db707c7",
+        "experiment": "ex8",
+        "git_commit": "2288344cb4f36ceb35216621941597982eef36c1",
+        "n_samples": 100000,
+        "r_shape": [
+          100000,
+          2
+        ],
+        "split_config": {
+          "seed": 2026,
+          "test_fraction": 0.1,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1
+        },
+        "step_sizes_shape": [
+          100000,
+          1
+        ],
+        "test_samples": 10000,
+        "train_samples": 80000,
+        "validation_samples": 10000,
+        "x_shape": [
+          100000,
+          2
+        ]
+      },
+      "structural_validation": "PASS: finite arrays, positive lags, disjoint exhaustive indices, deterministic saved split, metadata checksum",
+      "h_min": 9.999999747378752e-05,
+      "h_max": 9.999999747378752e-05,
+      "scientific_reuse": "YES subject to final implementation audit; no regeneration indicated"
+    }
+  },
+  "studies": {
+    "ex1": {
+      "historical_arff": {
+        "K": 256,
+        "delta": 0.05,
+        "lambda_reg": 0.001,
+        "M_min": 30,
+        "M_max": 1000,
+        "resampling": true,
+        "metropolis_test": false,
+        "gamma": 1
+      },
+      "historical_adam": {
+        "K": 256,
+        "epochs": 800,
+        "learning_rate": 0.001,
+        "batch_size": 512,
+        "shallow_hidden_sizes": [
+          256
+        ],
+        "deep_hidden_sizes": [
+          128,
+          128
+        ]
+      },
+      "repetitions": 30,
+      "current_config": {
+        "name": "ex1",
+        "fourier_frequencies": 256,
+        "data": {
+          "seed": 0,
+          "n_trajectories": 10000,
+          "trajectory_time": 0.01,
+          "observation_lag": 0.01,
+          "em_substeps": 1000,
+          "target_samples": 10000,
+          "grid_step": null
+        },
+        "split": {
+          "seed": 2026,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1,
+          "test_fraction": 0.1
+        },
+        "arff": {
+          "M_min": 25,
+          "M_max": 25,
+          "lambda_reg": 0.001,
+          "gamma": 1.0,
+          "delta": 0.2,
+          "resampling": true,
+          "metropolis_test": false,
+          "n_folds": 5
+        },
+        "adam": {
+          "epochs": 300,
+          "learning_rate": 0.0001,
+          "batch_size": 256
+        },
+        "adam_mlp": {
+          "epochs": 300,
+          "learning_rate": 0.001,
+          "batch_size": 256
+        },
+        "evaluation": {
+          "n_runs": 30,
+          "spd_epsilon": 1e-06,
+          "covariance_rmse_before_projection": true
+        }
+      },
+      "production_status": "NOT_DISPATCHED: audit hard-stop on canonical ex6 label invalidity; estimator/checkpoint reconciliation pending",
+      "evidence": [
+        "Latest_manuscrip_draft.pdf Tables 4\u20136,8\u201311",
+        "current arXiv_2026/appendices_part2.tex and appendices_part3.tex"
+      ],
+      "methods_shown_in_historical_table": [
+        "arff",
+        "adam_fourier",
+        "adam_tanh_shallow",
+        "adam_tanh_deep"
+      ]
+    },
+    "ex2": {
+      "historical_arff": {
+        "K": 128,
+        "delta": 0.01,
+        "lambda_reg": 1e-05,
+        "M_min": 20,
+        "M_max": 1000,
+        "resampling": true,
+        "metropolis_test": false,
+        "gamma": 1
+      },
+      "historical_adam": {
+        "K": 128,
+        "epochs": 100,
+        "learning_rate": 0.0001,
+        "batch_size": 256,
+        "shallow_hidden_sizes": [
+          128
+        ],
+        "deep_hidden_sizes": [
+          64,
+          64
+        ]
+      },
+      "repetitions": 30,
+      "current_config": {
+        "name": "ex2",
+        "fourier_frequencies": 128,
+        "data": {
+          "seed": 0,
+          "n_trajectories": 10000,
+          "trajectory_time": 0.01,
+          "observation_lag": 0.01,
+          "em_substeps": 1000,
+          "target_samples": 10000,
+          "grid_step": null
+        },
+        "split": {
+          "seed": 2026,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1,
+          "test_fraction": 0.1
+        },
+        "arff": {
+          "M_min": 25,
+          "M_max": 25,
+          "lambda_reg": 0.001,
+          "gamma": 1.0,
+          "delta": 0.2,
+          "resampling": true,
+          "metropolis_test": false,
+          "n_folds": 5
+        },
+        "adam": {
+          "epochs": 300,
+          "learning_rate": 0.0001,
+          "batch_size": 256
+        },
+        "adam_mlp": {
+          "epochs": 300,
+          "learning_rate": 0.001,
+          "batch_size": 256
+        },
+        "evaluation": {
+          "n_runs": 30,
+          "spd_epsilon": 1e-06,
+          "covariance_rmse_before_projection": true
+        }
+      },
+      "production_status": "NOT_DISPATCHED: audit hard-stop on canonical ex6 label invalidity; estimator/checkpoint reconciliation pending",
+      "evidence": [
+        "Latest_manuscrip_draft.pdf Tables 4\u20136,8\u201311",
+        "current arXiv_2026/appendices_part2.tex and appendices_part3.tex"
+      ],
+      "methods_shown_in_historical_table": [
+        "arff",
+        "adam_fourier",
+        "adam_tanh_shallow",
+        "adam_tanh_deep"
+      ]
+    },
+    "ex3": {
+      "historical_arff": {
+        "K": 1024,
+        "delta": 0.01,
+        "lambda_reg": 0.01,
+        "M_min": 50,
+        "M_max": 1000,
+        "resampling": true,
+        "metropolis_test": false,
+        "gamma": 1
+      },
+      "historical_adam": {
+        "K": 1024,
+        "epochs": 300,
+        "learning_rate": 0.0001,
+        "batch_size": 1024,
+        "shallow_hidden_sizes": [
+          1024
+        ],
+        "deep_hidden_sizes": [
+          512,
+          512
+        ]
+      },
+      "repetitions": 30,
+      "current_config": {
+        "name": "ex3",
+        "fourier_frequencies": 1024,
+        "data": {
+          "seed": 0,
+          "n_trajectories": 100000,
+          "trajectory_time": 0.01,
+          "observation_lag": 0.01,
+          "em_substeps": 1000,
+          "target_samples": 100000,
+          "grid_step": null
+        },
+        "split": {
+          "seed": 2026,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1,
+          "test_fraction": 0.1
+        },
+        "arff": {
+          "M_min": 50,
+          "M_max": 50,
+          "lambda_reg": 0.001,
+          "gamma": 1.0,
+          "delta": 0.2,
+          "resampling": true,
+          "metropolis_test": false,
+          "n_folds": 5
+        },
+        "adam": {
+          "epochs": 300,
+          "learning_rate": 0.0001,
+          "batch_size": 256
+        },
+        "adam_mlp": {
+          "epochs": 300,
+          "learning_rate": 0.001,
+          "batch_size": 256
+        },
+        "evaluation": {
+          "n_runs": 30,
+          "spd_epsilon": 0.01,
+          "covariance_rmse_before_projection": true
+        }
+      },
+      "production_status": "NOT_DISPATCHED: audit hard-stop on canonical ex6 label invalidity; estimator/checkpoint reconciliation pending",
+      "evidence": [
+        "Latest_manuscrip_draft.pdf Tables 4\u20136,8\u201311",
+        "current arXiv_2026/appendices_part2.tex and appendices_part3.tex"
+      ],
+      "methods_shown_in_historical_table": [
+        "arff",
+        "adam_tanh_shallow"
+      ]
+    },
+    "ex4": {
+      "historical_arff": {
+        "K": 128,
+        "delta": 0.1,
+        "lambda_reg": 0.001,
+        "M_min": 20,
+        "M_max": 1000,
+        "resampling": true,
+        "metropolis_test": false,
+        "gamma": 1
+      },
+      "historical_adam": {
+        "K": 128,
+        "epochs": 100,
+        "learning_rate": 0.0001,
+        "batch_size": 256,
+        "shallow_hidden_sizes": [
+          128
+        ],
+        "deep_hidden_sizes": [
+          64,
+          64
+        ]
+      },
+      "repetitions": 30,
+      "current_config": {
+        "name": "ex4",
+        "fourier_frequencies": 128,
+        "data": {
+          "seed": 0,
+          "n_trajectories": 10000,
+          "trajectory_time": 0.01,
+          "observation_lag": 0.01,
+          "em_substeps": 1000,
+          "target_samples": 10000,
+          "grid_step": null
+        },
+        "split": {
+          "seed": 2026,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1,
+          "test_fraction": 0.1
+        },
+        "arff": {
+          "M_min": 50,
+          "M_max": 50,
+          "lambda_reg": 0.001,
+          "gamma": 1.0,
+          "delta": 0.2,
+          "resampling": true,
+          "metropolis_test": false,
+          "n_folds": 5
+        },
+        "adam": {
+          "epochs": 300,
+          "learning_rate": 0.0001,
+          "batch_size": 256
+        },
+        "adam_mlp": {
+          "epochs": 300,
+          "learning_rate": 0.001,
+          "batch_size": 256
+        },
+        "evaluation": {
+          "n_runs": 30,
+          "spd_epsilon": 1e-06,
+          "covariance_rmse_before_projection": true
+        }
+      },
+      "production_status": "NOT_DISPATCHED: audit hard-stop on canonical ex6 label invalidity; estimator/checkpoint reconciliation pending",
+      "evidence": [
+        "Latest_manuscrip_draft.pdf Tables 4\u20136,8\u201311",
+        "current arXiv_2026/appendices_part2.tex and appendices_part3.tex"
+      ],
+      "methods_shown_in_historical_table": [
+        "arff",
+        "adam_fourier",
+        "adam_tanh_shallow",
+        "adam_tanh_deep"
+      ]
+    },
+    "ex5": {
+      "historical_arff": {
+        "K": 256,
+        "delta": 0.1,
+        "lambda_reg": 0.002,
+        "M_min": 20,
+        "M_max": 1000,
+        "resampling": true,
+        "metropolis_test": false,
+        "gamma": 1
+      },
+      "historical_adam": {
+        "K": 256,
+        "epochs": 100,
+        "learning_rate": 0.0001,
+        "batch_size": 256,
+        "shallow_hidden_sizes": [
+          256
+        ],
+        "deep_hidden_sizes": [
+          128,
+          128
+        ]
+      },
+      "repetitions": 30,
+      "current_config": {
+        "name": "ex5",
+        "fourier_frequencies": 256,
+        "data": {
+          "seed": 1,
+          "n_trajectories": 250,
+          "trajectory_time": 4.0,
+          "observation_lag": 0.01,
+          "em_substeps": null,
+          "target_samples": null,
+          "grid_step": null
+        },
+        "split": {
+          "seed": 2026,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1,
+          "test_fraction": 0.1
+        },
+        "arff": {
+          "M_min": 50,
+          "M_max": 50,
+          "lambda_reg": 0.001,
+          "gamma": 1.0,
+          "delta": 0.2,
+          "resampling": true,
+          "metropolis_test": false,
+          "n_folds": 5
+        },
+        "adam": {
+          "epochs": 300,
+          "learning_rate": 0.0001,
+          "batch_size": 256
+        },
+        "adam_mlp": {
+          "epochs": 300,
+          "learning_rate": 0.001,
+          "batch_size": 256
+        },
+        "evaluation": {
+          "n_runs": 30,
+          "spd_epsilon": 1e-06,
+          "covariance_rmse_before_projection": true
+        }
+      },
+      "production_status": "NOT_DISPATCHED: audit hard-stop on canonical ex6 label invalidity; estimator/checkpoint reconciliation pending",
+      "evidence": [
+        "Latest_manuscrip_draft.pdf Tables 4\u20136,8\u201311",
+        "current arXiv_2026/appendices_part2.tex and appendices_part3.tex"
+      ],
+      "methods_shown_in_historical_table": [
+        "arff",
+        "adam_fourier",
+        "adam_tanh_shallow",
+        "adam_tanh_deep"
+      ]
+    },
+    "ex6": {
+      "historical_arff": {
+        "K": 512,
+        "delta": 0.3,
+        "lambda_reg": 0.001,
+        "M_min": 50,
+        "M_max": 1000,
+        "resampling": true,
+        "metropolis_test": false,
+        "gamma": 1
+      },
+      "historical_adam": {
+        "K": 512,
+        "epochs": 600,
+        "learning_rate": 0.001,
+        "batch_size": 512,
+        "shallow_hidden_sizes": [
+          512
+        ],
+        "deep_hidden_sizes": [
+          256,
+          256
+        ]
+      },
+      "repetitions": 30,
+      "current_config": {
+        "name": "ex6",
+        "fourier_frequencies": 512,
+        "data": {
+          "seed": 1,
+          "n_trajectories": null,
+          "trajectory_time": 2.0,
+          "observation_lag": 5e-07,
+          "em_substeps": null,
+          "target_samples": 995004,
+          "grid_step": 0.001
+        },
+        "split": {
+          "seed": 2026,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1,
+          "test_fraction": 0.1
+        },
+        "arff": {
+          "M_min": 200,
+          "M_max": 200,
+          "lambda_reg": 0.001,
+          "gamma": 1.0,
+          "delta": 0.2,
+          "resampling": true,
+          "metropolis_test": false,
+          "n_folds": 5
+        },
+        "adam": {
+          "epochs": 300,
+          "learning_rate": 0.0001,
+          "batch_size": 256
+        },
+        "adam_mlp": {
+          "epochs": 300,
+          "learning_rate": 0.001,
+          "batch_size": 256
+        },
+        "evaluation": {
+          "n_runs": 30,
+          "spd_epsilon": 1e-06,
+          "covariance_rmse_before_projection": true
+        }
+      },
+      "production_status": "NOT_DISPATCHED: audit hard-stop on canonical ex6 label invalidity; estimator/checkpoint reconciliation pending",
+      "evidence": [
+        "Latest_manuscrip_draft.pdf Tables 4\u20136,8\u201311",
+        "current arXiv_2026/appendices_part2.tex and appendices_part3.tex"
+      ],
+      "methods_shown_in_historical_table": [
+        "arff",
+        "adam_fourier",
+        "adam_tanh_shallow",
+        "adam_tanh_deep"
+      ]
+    },
+    "ex7": {
+      "historical_arff": {
+        "K": 512,
+        "delta": 0.5,
+        "lambda_reg": 0.01,
+        "M_min": 50,
+        "M_max": 1000,
+        "resampling": false,
+        "metropolis_test": true,
+        "gamma": 1
+      },
+      "historical_adam": {
+        "K": 512,
+        "epochs": 300,
+        "learning_rate": 0.0001,
+        "batch_size": 512,
+        "shallow_hidden_sizes": [
+          512
+        ],
+        "deep_hidden_sizes": [
+          256,
+          256
+        ]
+      },
+      "repetitions": 30,
+      "current_config": {
+        "name": "ex7",
+        "fourier_frequencies": 512,
+        "data": {
+          "seed": 0,
+          "n_trajectories": 100000,
+          "trajectory_time": 0.001,
+          "observation_lag": 0.001,
+          "em_substeps": 1000,
+          "target_samples": 100000,
+          "grid_step": null
+        },
+        "split": {
+          "seed": 2026,
+          "train_fraction": 0.8,
+          "validation_fraction": 0.1,
+          "test_fraction": 0.1
+        },
+        "arff": {
+          "M_min": 25,
+          "M_max": 25,
+          "lambda_reg": 0.001,
+          "gamma": 1.0,
+          "delta": 0.2,
+          "resampling": true,
+          "metropolis_test": false,
+          "n_folds": 5
+        },
+        "adam": {
+          "epochs": 300,
+          "learning_rate": 0.0001,
+          "batch_size": 256
+        },
+        "adam_mlp": {
+          "epochs": 300,
+          "learning_rate": 0.001,
+          "batch_size": 256
+        },
+        "evaluation": {
+          "n_runs": 30,
+          "spd_epsilon": 1e-06,
+          "covariance_rmse_before_projection": true
+        }
+      },
+      "production_status": "NOT_DISPATCHED: audit hard-stop on canonical ex6 label invalidity; estimator/checkpoint reconciliation pending",
+      "evidence": [
+        "Latest_manuscrip_draft.pdf Tables 4\u20136,8\u201311",
+        "current arXiv_2026/appendices_part2.tex and appendices_part3.tex"
+      ],
+      "methods_shown_in_historical_table": [
+        "arff",
+        "adam_fourier",
+        "adam_tanh_shallow",
+        "adam_tanh_deep"
+      ]
+    },
+    "ex8": {
+      "production_status": "FROZEN_ACCEPTED_REUSE",
+      "repetitions": 30,
+      "fourier_K": 128,
+      "fourier_parameters": 1792,
+      "mlp_hidden_sizes": [
+        27,
+        27
+      ],
+      "mlp_parameters": 1814,
+      "evidence": "Explicit user acceptance; results/capacity_matched_ex8_w27/summary.json"
+    },
+    "section6_2_N": {
+      "status": "UNRESOLVED_NO_DISPATCH",
+      "repetitions": 10,
+      "fixed_K": 512,
+      "drift": "Experiment 7 localized broad-spectrum drift",
+      "diffusion_factor": "diag(0.25*x0**2+0.25,0.25*x1**2+0.25); covariance is its square",
+      "grid": null,
+      "missing": [
+        "exact grid",
+        "fixed N and h",
+        "study-specific optimizer settings and seeds",
+        "test-set generation protocol"
+      ],
+      "excess_definition": "NLL_learned-NLL_oracle on same test set",
+      "evidence": "Primary PDF Section 6.2 and Appendix A/Table 6; active TeX lines 1413\u20131516; available images do not identify exact grids"
+    },
+    "section6_2_h": {
+      "status": "UNRESOLVED_NO_DISPATCH",
+      "repetitions": 10,
+      "fixed_K": 512,
+      "drift": "Experiment 7 localized broad-spectrum drift",
+      "diffusion_factor": "diag(0.25*x0**2+0.25,0.25*x1**2+0.25); covariance is its square",
+      "grid": null,
+      "missing": [
+        "exact grid",
+        "fixed N and h",
+        "study-specific optimizer settings and seeds",
+        "test-set generation protocol"
+      ],
+      "excess_definition": "NLL_learned-NLL_oracle on same test set",
+      "evidence": "Primary PDF Section 6.2 and Appendix A/Table 6; active TeX lines 1413\u20131516; available images do not identify exact grids"
+    },
+    "section6_2_K": {
+      "status": "UNRESOLVED_NO_DISPATCH",
+      "repetitions": 10,
+      "fixed_K": null,
+      "drift": "Experiment 7 localized broad-spectrum drift",
+      "diffusion_factor": "diag(0.25*x0**2+0.25,0.25*x1**2+0.25); covariance is its square",
+      "grid": null,
+      "missing": [
+        "exact grid",
+        "fixed N and h",
+        "study-specific optimizer settings and seeds",
+        "test-set generation protocol",
+        "NLL_infinity regression family, fitting domain, weights, treatment across runs/methods"
+      ],
+      "excess_definition": "NLL(K)-NLL_infinity",
+      "evidence": "Primary PDF Section 6.2 and Appendix A/Table 6; active TeX lines 1413\u20131516; available images do not identify exact grids"
+    }
+  },
+  "global_split": {
+    "current": "stored deterministic 80/10/10 seed 2026",
+    "historical": "90/10; surviving notebooks reshuffle split across repetitions",
+    "decision": "Preserve canonical files unchanged; document existing reproducibility correction. No silent resplit."
+  },
+  "publication_timings": "Parallel accuracy timings not isolated. Isolated protocol deferred until resolved accuracy production and scientific hard-stop cleared.",
+  "git_commit": "04266ee52c13a28b3108417aba0f92d8c717b98c",
+  "git_status": "?? GPU/run_legacy_ex8_seed0.py\n?? adam_ex1_seed0.txt\n?? adam_ex2_seed0.txt\n?? adam_ex4_seed0.txt\n?? adam_ex5_seed0.txt\n?? adam_ex6_seed0.txt\n?? adam_ex7_seed0.txt\n?? adam_ex8_seed0.txt\n?? docs/\n?? ex3_adam_seed0.txt\n?? ex3_capacity_diagnostic.txt\n?? ex3_spd_floor_diagnostic.txt\n?? ex3_spd_nll_diagnostic.txt\n?? ex6_matmul_precision_diagnostic.txt\n?? ex6_precision_diagnostic.txt\n?? ex6_resampling_diagnostic.txt\n?? scripts/audit_final_reproduction.py\n?? scripts/diagnose_ex8_oracle_drift_mlp.py\n?? scripts/diagnose_ex8_oracle_drift_mlp_curve.py\n?? scripts/diagnose_ex8_validation_selected_crossfit.py\n?? scripts/diagnose_ex8_validation_selected_crossfit_resampling.py\n?? scripts/diagnose_owen_arff.py\n?? scripts/plot_ex8_covariance_recovery.py\n?? scripts/plot_ex8_final_candidates.py\n?? scripts/run_adam_split_mlp_experiment.py\n?? scripts/run_ex8_arff_validation_selected_crossfit.py\n?? scripts/run_ex8_campaigns.py\n?? scripts/run_ex8_fourier_width.py\n?? scripts/run_ex8_k128_campaigns.py\n?? scripts/run_ex8_mlp_w27.py\n?? scripts/run_ex8_mlp_w27_campaign.py\n?? scripts/smoke_test_ex8_arff_production.py\n?? scripts/smoke_test_ex8_campaigns.py\n?? scripts/smoke_test_ex8_k128.py\n?? scripts/smoke_test_ex8_k128_supervisor.py\n?? scripts/smoke_test_ex8_mlp_w27.py\n?? scripts/smoke_test_ex8_mlp_w27_supervisor.py\n?? scripts/summarize_ex8_capacity_matched.py\n?? scripts/summarize_ex8_final_campaigns.py\n?? scripts/summarize_ex8_joint_production.py\n?? scripts/summarize_ex8_k128_campaigns.py\n?? scripts/summarize_production_results.py\n?? src/adam/split_mlp.py\n?? src/arff/validation_selected.py\n"
+}

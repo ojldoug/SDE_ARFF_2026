@@ -1,0 +1,24 @@
+Experiment 8 — capacity-matched comparison
+
+All 30 width-27 MLP artifacts, 60 K=128 Fourier artifacts and 30 corrected ARFF artifacts validated; 30 seeds per method.
+
+Joint Fourier Adam K=128
+  drift_rmse: mean=8.94108671e-01, SD=7.39953216e-02, median=8.90349656e-01, range=[7.55599439e-01, 1.04977179e+00]
+  covariance_rmse: mean=7.15407008e-01, SD=1.50445003e-01, median=6.97613567e-01, range=[5.18142760e-01, 1.06687760e+00]
+  nll: mean=-8.34665222e+00, SD=6.42691747e-02, median=-8.34164143e+00, range=[-8.51828289e+00, -8.18805695e+00]
+
+Split Fourier Adam K=128
+  drift_rmse: mean=6.62861796e-01, SD=4.32528908e-02, median=6.57935500e-01, range=[5.97982824e-01, 7.69255519e-01]
+  covariance_rmse: mean=6.17333004e-01, SD=9.23780101e-02, median=6.12523645e-01, range=[4.70928252e-01, 8.41145396e-01]
+  nll: mean=-8.33751469e+00, SD=6.08397137e-02, median=-8.33095360e+00, range=[-8.49736881e+00, -8.18302917e+00]
+
+Corrected ARFF K=128
+  drift_rmse: mean=9.44981909e-01, SD=2.89835793e-01, median=9.23459947e-01, range=[6.19377673e-01, 2.01029420e+00]
+  covariance_rmse: mean=1.13833867e-01, SD=2.53400992e-03, median=1.13753002e-01, range=[1.07108638e-01, 1.18692763e-01]
+  nll: mean=-8.87375002e+00, SD=9.74213516e-02, median=-8.88570404e+00, range=[-9.00995064e+00, -8.63503551e+00]
+
+Joint MLP Adam 27×27 — 1814 parameters
+  drift_rmse: mean=3.06212545e-01, SD=5.83011065e-02, median=2.91582272e-01, range=[2.29265004e-01, 4.47318196e-01]
+  covariance_rmse: mean=2.65343288e-01, SD=8.12042815e-02, median=2.38212511e-01, range=[1.82699844e-01, 4.80786383e-01]
+  nll: mean=-1.00185671e+01, SD=1.87633702e-01, median=-1.00341868e+01, range=[-1.04330530e+01, -9.68098068e+00]
+

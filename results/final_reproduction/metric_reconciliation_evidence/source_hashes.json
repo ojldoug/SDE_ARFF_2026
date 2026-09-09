@@ -1,0 +1,12 @@
+{
+  "GPU/plot_true_trained.ipynb": "edbf615d6b702af3f1d7f66b4954fca0a6f1c5321d1e1ba5719dcd226a94a48b",
+  "GPU/Adam_training.ipynb": "f4295df43598f491ae1f73c9950e0cfb53aa06afa2ddb1e10404b9942458378a",
+  "GPU/true_functions/true_functions.ipynb": "fcb2725fd93230d47b0d2e56107abd692bbdc9fb0239932dfec3b55a5a8e05db",
+  "GPU/lib/lib_Adam_tanh.py": "0996b13912597526f1aad57eb54f201883d758b98a7ee3ee78cf20569ff13e9c",
+  "GPU/lib/lib_Adam_FF.py": "4db460441e8005f6e35acc2261338965400d40a797791546feee66eeb168e68d",
+  "GPU/lib/lib_ARFF.py": "996e37ab39440d6ffe9c13f5e37bc2196963f5707c6207653158903ebdb79e48",
+  "scripts/run_final_historical_adam.py": "e6c0311446cf5dd9457772fd9c3c04775dcd3bac47e766bb79205ff335c712a8",
+  "src/arff/evaluation.py": "ba6769dd16a40b78f3bbb0c761b20f245a11a7c1283c8352a285377e92226480",
+  "results/final_reproduction/resolved_accuracy_v1/summary.json": "e6365b01b2624b81c44147fd8f2504cc1ae6bada25045eac3f8c24ab75d5a756",
+  "results/final_reproduction/resolved_accuracy_v1/tables.md": "7723a9076130962a0179e20b67596b9801f8fba413aba2c300dad211fe507323"
+}

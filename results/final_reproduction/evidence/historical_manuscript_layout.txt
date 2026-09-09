@@ -1,0 +1,1565 @@
+    Drift–Diffusion Decomposition for Likelihood-Based SDE Learning
+                  with Adaptive Random Fourier Features
+                 Owen Douglas, Aku Kammonen, Anamika Pandey, Raul Tempone
+                                                    February 2026
+
+                                                        Abstract
+         Learning stochastic dynamics from limited observations is a central challenge in data-driven modelling
+     of Itô SDEs. We present a training procedure for estimating drift and diffusion from snapshot triples
+     (x0 , x1 , h) under the Gaussian transition density induced by Euler–Maruyama discretisation. Our approach
+     exploits the structure of the resulting negative log-likelihood: fixing the diffusion reduces the loss to a least-
+     squares regression for the drift increments, and the pointwise likelihood minimisers for the diffusion then
+     serve as regression targets for learning the diffusion covariance. This sequential formulation enables efficient
+     training using adaptive random Fourier features (ARFF), which combines frequency resampling, random-
+     walk updates, and closed-form least-squares solves. Experiments on polynomial systems, an underdamped
+     Langevin model, a stochastic SIR mean-field limit, a stochastic wave equation, and a near-singular spectral
+     benchmark show that the proposed method attains comparable or better final accuracy than Adam, with
+     comparable or faster convergence across all benchmarks considered. In the near-singular benchmark, we
+     further observe that Adam itself performs substantially better when applied to the sequential regression
+     problems than when optimising the joint negative log-likelihood directly.
+
+
+1    Introduction
+Identifying stochastic dynamics from limited and noisy observations is a central challenge across science and
+engineering. Stochastic differential equations (SDEs) provide flexible models for noisy, multiscale systems in
+physics [25, 32], finance [1, 13], and biology [27]. Classical estimation methods—such as maximum likelihood,
+method of moments, and Bayesian inference [21, 28]—require strong model assumptions and substantial ana-
+lytical work, and can become computationally prohibitive in complex or high-dimensional systems. Classical
+statistics for discretely observed diffusions provides maximum-likelihood approximations, estimating functions,
+Bayesian methods, and nonparametric coefficient estimators [3, 5, 6, 7, 8]. These methods are powerful, but
+often require model-specific transition-density approximations, asymptotic regimes, or nontrivial numerical in-
+tegration. Our setting emphasises scattered snapshot triples, flexible multivariate covariance regression, and
+computational training through adaptive random features.
+Recent machine learning approaches aim to relax these limitations by fitting drift and diffusion directly from
+data. Neural SDEs [31] and SDE-Net [17] parametrise the coefficients with neural networks, while [5, 6] proposed
+likelihood-based training under Euler–Maruyama discretisation. Gaussian-process and related nonparametric
+formulations have also been explored [20], and neural SDE variants [31, 17, 5, 6] are promising; however, neural
+networks typically rely on gradient-based training (e.g., Adam), which motivates seeking a simpler alternative.
+Random Fourier features (RFF) [23, 20] offer a contrasting approach: functions are represented with randomised
+trigonometric bases, and training reduces to closed-form least squares. Recent works have further advanced the
+theoretical understanding and extensions of RFF: Szabó & Sriperumbudur study derivative approximations via
+RFF [29], Li et al. propose quadrature-based Fourier features for scalable Gaussian process regression [19], and
+Yao et al. introduce bootstrap error estimation techniques for RFFs [35]. Adaptive variants (ARFF) [14, 15, 12]
+iteratively resample and perturb frequencies toward the optimal Fourier spectrum, yielding improved accuracy
+and stability. The ARFF approach was first proposed in [14], where the Fourier frequencies are adapted using a
+Metropolis-based sampling. This built upon earlier RFF works such as [23, 24, 3, 2], where authors attempted
+to identify optimal frequency sampling distributions or feature weights. Later, [15] enhanced this idea by adding
+a resampling step, inspired by particle-filtering, which improved the stability of the training with respect to
+hyperparameter choices such as proposal step length and acceptance exponents. To our knowledge, ARFF has
+not yet been explored for likelihood-based SDE training. The present manuscript substantially revises and
+extends our earlier ARFF-for SDE-learning preprint by sharpening the drift–diffusion split, adding near-singular
+covariance diagnostics, and expanding the empirical analysis.
+This sequential formulation enables training with adaptive random Fourier features (ARFF), whose loops consist
+only of resampling, random-walk updates in frequency space, and closed-form least-squares solves, yielding a
+
+
+                                                             1
+simple alternative to gradient-based optimisation for learning SDEs from snapshot data. Importantly, the
+benefits of this sequential formulation are not tied to the ARFF training algorithm itself: even when trained
+with the same optimiser (Adam), the sequential regression problems can improve training behavior compared
+with direct optimisation of the joint likelihood.
+The key observation underlying this work is that the Gaussian Euler–Maruyama likelihood identifies the drift
+through a conditional mean and the covariance through a conditional second moment. This motivates a se-
+quential estimator: first regress scaled increments to estimate the drift, then regress residual outer products to
+estimate the covariance. The resulting algorithm avoids differentiating through inverse covariance matrices and
+can be trained efficiently with adaptive random Fourier features (ARFF).
+The key observation underlying this work is that the Gaussian Euler–Maruyama negative log-likelihood admits
+a structural decomposition into two independent regression problems: one for the drift and one for the diffu-
+sion covariance. This decoupling is non-trivial, as the original likelihood couples the two through the inverse
+covariance, and it enables the use of closed-form least-squares solvers in place of gradient-based optimisation.
+
+Contributions (i) We derive a likelihood-based decomposition of the Gaussian Euler–Maruyama loss, which
+reduces SDE training to two tractable regression problems yields a two-stage regression-based training proce-
+dure for drift and diffusion. (ii) We show how these regression problems can be solved efficiently with adaptive
+random Fourier features (ARFF), yielding a new training procedure (Alg. 2) tailored to SDEs. This approach
+avoids backpropagation through nonlinear networks by relying instead on closed-form least-squares solves com-
+bined with adaptive frequency sampling. (iii) We provide a complexity analysis and demonstrate that our
+method achieves comparable or better final accuracy than Adam, with comparable or faster convergence across
+polynomial, Langevin, epidemic, spectrally wide, and SPDE benchmarks. (iv) We demonstrate empirically,
+through a near-singular diffusion covariance example, that the split formulation can improve convergence com-
+pared with direct optimisation of the joint negative log-likelihood, even when both approaches use the same
+optimiser (Adam).
+
+Paper outline Section 2 reviews ARFF. Section 3 formulates the likelihood-based learning problem, and
+Section 4 presents the proposed ARFF training procedure. Section 5 describes the benchmark setup, and
+Section 6 reports the experimental results. Section 7 concludes with a discussion of findings and future directions.
+Experiment specifications are provided in Appendix A, and reproducibility information in Appendix B.
+
+
+2    Adaptive Random Fourier Features Training Algorithm
+                                        ′
+Consider the data (xn , yn ) ∈ RD ×RD ,      n = 1, . . . , N, where the inputs xn are drawn i.i.d. from an unknown
+                                                                                   ′
+population distribution ρ, and there exists a target function g : RD → RD such that yn = g(xn ) + ξn , where ξn
+denotes possible measurement noise. Fourier feature models approximate a target function g by representing it
+in the finite-dimensional space                 (                              )
+                                                             X K
+                                                                       i ωk ·x
+                                        NK := β(x) =             β̂k e           .
+                                                                  k=1
+
+For a fixed set of frequencies {ωk }K
+                                    k=1 , the coefficients β̂k are obtained by solving a regularised least-squares
+problem, producing an empirical approximation β ≈ g. At the population level this is
+
+                                             n                            K
+                                                                          X            o
+                                       min       Eρ [ ∥y − β(x)∥2 ] + λ         ∥β̂k ∥2 ,                       (1)
+                                      β∈NK
+                                                                          k=1
+
+where λ > 0 is a Tikhonov regularisation parameter and ∥ · ∥ denotes the Euclidean norm. In practice one
+minimises its empirical version, which is attained by replacing ρ with ρ̂ which denotes the empirical distribution
+of {(xn , yn )}N
+               n=1 .                                           n                                    o
+                                                                                       PK
+The ARFF method minimises an upper bound of Eω [minβ̂k Eρ̂ [∥y − β(x)∥2 ] + λ k=1 ∥β̂k ∥2 ], where the
+inner expectation is taken with respect to the empirical distribution ρ̂, the minimisation is over the coefficients
+β̂k , and the frequencies ωk are sampled adaptively.
+
+Optimal sampling density           Following [14] (see also [3, 2]), one obtains the generalisation bound
+                                                   K
+                                                                             g (ω)∥2
+                                                                                     
+                             n               2
+                                                  X
+                                                           2
+                                                             o 1+λ          ∥b
+                       min       Eρ ∥y − β(x)∥ + λ   ∥β̂k ∥ ≤      Eω∼p
+                      β∈NK                                      K         (2π)D p(ω)2
+                                                        k=1
+
+
+
+
+                                                              2
+where the constant in the bound is minimised by the frequency density p∗ (ω) = ∥bg∥b
+                                                                                   g (ω)∥
+                                                                                  ∥ 1 D . The central aim of
+                                                                                                     L (R   )
+ARFF training is to adaptively push the frequency sampling distribution toward p∗ .
+For a set of sampled frequencies {ωk }K     k=1 , the empirical analogy to problem (1) becomes a linear least squares
+problem in the coefficients β̂ = (β̂1 , . . . , β̂K )T with the normal equations
+
+                                                    (S H S + λN I) β̂ = S H y,                                       (2)
+
+where S ∈ CN ×K has entries Sn,k = ei ωk ·xn , y = [y1 , . . . , yN ]T , and I is the K × K identity matrix.
+Although Eq. (2) is written using complex exponentials for compactness, the implementation uses the equivalent
+real sine-cosine feature representation
+
+                                Φ(x) = (cos(ω1 ·x), sin(ω1 ·x), . . . , cos(ωK ·x), sin(ωK ·x)),
+
+and solves the resulting real-valued multi-output ridge-regression problem.
+The Metropolis-inspired ARFF method of [14] updates the frequencies via a random-walk proposal, where
+a proposed frequency is accepted with probability given by the ratio (∥β̂ ′ ∥/∥β̂∥)γ . Here, γ > 0 is a scalar
+parameter that controls how strongly larger amplitudes are favoured. [15] extend this approach by introducing
+a resampling step, in which frequencies are redrawn with probabilities proportional to their current amplitudes,
+improving stability and exploration. A recent convergence analysis by [12] provides a rigorous justification of
+this combined resampling and random-walk training procedure and characterises how to tune it optimally.
+For SDE learning we employ a streamlined ARFF loop: frequencies are resampled with probabilities proportional
+to ∥β̂k ∥, perturbed by a Gaussian random walk, and amplitudes are recomputed via (2). The procedure is
+summarised in Alg. 1. Overall, ARFF provides an alternative neural network training approach, supported by
+a rigorous convergence analysis.
+
+Algorithm 1 Adaptive random Fourier features with Resampling and Metropolis updates
+    Input: {(xn , yn )}N
+                   PKn=1
+    Output: x 7→ k=1 β̂k ei ωk ·x
+    Parameters: Mmin , Mmax , δ, λ, γ
+    Options: Resampling (on/off), Metropolis sampling (on/off)
+
+    initialise frequencies ω (e.g. zeros or base distribution)
+    Compute amplitudes β̂ for the initialised frequencies ω by solving (2)
+    for i = 1 to Mmax do
+       if Resampling then
+          Resample frequency columns ωk with probabilities PK∥β̂k∥∥β̂ ∥
+                                                                           j=1   j
+
+      end if
+      Draw Gaussian perturbation rN ∼ N (0, I)
+      Propose ω ′ = ω + δ rN
+      if Metropolis sampling then
+         Compute the amplitudes β̂ ′ for the proposed
+                                                 frequencies ω ′ by solving (2)
+                                                            ˆ′       γ
+         Update ωk ← ωk′ with probability min 1, ∥∥ββ̂ k∥∥
+                                                      k
+      else
+         ω ← ω′
+      end if
+      Compute the amplitudes β̂ for the proposed frequencies ω by solving (2)
+      if i > Mmin and validation error stagnates1 then
+         break
+      end if
+    end for
+1 Stagnation occurs when the moving average of recent validation errors fails to decrease over several iterations.
+
+
+
+
+3      Mathematical Problem Setting
+This work aims to identify an SDE model that approximates the observed dynamics of a system from one-step
+transition data (snapshot triples (x0 , x1 , h)). The assumed form of the SDE is an Itô diffusion process
+
+                                                  dxt = f (xt ) dt + σ(xt ) dWt ,                                    (3)
+
+
+                                                                   3
+where xt ∈ RD is the system state at time t, f : RD → RD is the drift function, and σ : RD → RD×D is the
+diffusion function. These functions are assumed to satisfy appropriate regularity conditions (see Chapter 5 in
+[21]) that ensure the existence of a solution to Eq. (3). The process Wt is a D-dimensional Wiener process with
+independent increments, such that Wt − Ws ∼ N (0, t − s) for 0 ≤ s < t.
+                                                                                  (n)  (n)                   (n)
+Training data consist of one-step transitions of the system, in the form D = {(x0 , x1 , h(n) )}N
+                                                                                                n=1 , where x0
+                          (n)
+is the initial point and x1 the state after a small time increment h(n) > 0.
+
+Euler–Maruyama Approximation and Transition Density
+Using the Euler–Maruyama (EM) scheme, the forward evolution of the SDE over a time step h > 0 can be
+approximated as x1 ≈ x0 + hf (x0 ) + σ(x0 ) δW , δW ∼ N (0, hID ). Consequently,  the conditional distribution of
+x1 given x0 and h is approximated by x1 | x0 ∼ N x0 + hf (x0 ), hΣ(x0 ) , where Σ(x0 ) = σ(x0 )σ(x0 )⊤ . This
+                                                                          
+
+induces a tractable Gaussian likelihood model that serves as the basis for statistical learning.
+
+Learning Objective
+                                                                                                             P                     
+                                                                                                                 K         iωk ·x
+We introduce two parametrised models. First, the drift model fθ : RD → RD is defined as fθ (x) = ℜ               k=1 β̂k e           ,
+with β̂k ∈ CD and ωk ∈ RD .
+                                                    D       D×D
+Second, the diffusion covariance
+                              Pmodel
+                                   ′
+                                         Σθ′ : R
+                                              ′
+                                                    →R          is represented through its lower–triangular vectori-
+                                 K     ′        ·x
+sation. We write Σ̂θ′ (x) = ℜ    k=1 β̂k e
+                                           iωk      , with β̂k ∈ CD(D+1)/2 and ωk′ ∈ RD . Here Σ̂θ′ (x) denotes the
+                                                             ′
+
+vector of lower–triangular entries of the symmetric matrix Σθ′ (x). We recover the full matrix by reversing this
+vectorisation.
+                                                                                                ′         ′
+The full parameter sets are θ ∈ Θβ̂ × Θω ⊆ CD×K × RD×K and θ′ ∈ Θβ̂ ′ × Θω′ ⊆ CD(D+1)/2×K × RD×K .
+Following [5, 6], the negative log-likelihood for one sample is
+
+                            1                                                              1                  D
+ L(θ, θ′ | x0 , x1 , h) =     (x1 − x0 − hfθ (x0 ))⊤ (hΣθ′ (x0 ))−1 (x1 − x0 − hfθ (x0 )) + log |hΣθ′ (x0 )| + log(2π). (4)
+                            2                                                              2                  2
+where ∥v∥2M := v ⊤ M v for any symmetric positive definite matrix M and log | · | denotes the log-determinant.
+The population loss is
+                                   Lpop (θ, θ′ ) = Eρ L(θ, θ′ | x0 , x1 , h) ,
+                                                                           
+                                                                                                           (5)
+with ρ the true distribution of snapshot triples. In practice, ρ is unknown and we minimise the empirical loss
+Lemp obtained by replacing ρ with the empirical distribution ρ̂ of D.
+Minimisation with respect to the diffusion σ is equivalent to minimisation over the covariance Σ = σσ ⊤ . Since
+the mapping σ 7→ Σ is many-to-one, structural assumptions are required for identifiability. For example, if σ
+is symmetric it can be recovered as the principal matrix square root of Σ, while a lower-triangular assumption
+allows recovery via Cholesky decomposition.
+Throughout the manuscript, σ denotes a diffusion factor and Σ = σσ ⊤ denotes the associated covariance. Al-
+gorithm 2 learns Σ directly through residual covariance targets. Whenever errors or visualizations are reported,
+we state explicitly whether the quantity shown is σ or Σ.
+
+
+4     Drift and Diffusion Training Algorithm
+This section presents how the likelihood formulation in Section 3 reduces to two tractable regression problems:
+one for the drift fθ and one for the diffusion covariance Σθ′ . These are first derived at the population level,
+i.e. as expectations with respect to the true distribution ρ, and are then approximated by empirical averages
+over the dataset D. In practice, we approximate the minimisers of these least-squares problems using neural
+networks trained with adaptive random Fourier features (ARFF) (Alg. 1), i.e., linear models in Fourier features
+with coefficients obtained via least-squares solves.
+In particular, drift learning reduces to a regression of the scaled increments h−1 (x1 − x0 ) onto fθ (x0 ), while
+diffusion learning reduces to a regression of the conditional covariance h−1 rr⊤ onto Σθ′ (x0 ).
+This section presents the proposed drift and diffusion training procedure. Under the Gaussian Euler–Maruyama
+observation model, the drift and diffusion covariance are characterised by the conditional mean of the scaled
+increments and the conditional second moment of the residuals, respectively. These identities motivate the
+regression surrogates used in Alg. 2.
+For a symmetric matrix A, the relation A ≻ 0 means A is (symmetric) positive definite, and A ⪰ 0 means
+positive semidefinite. For a vector v and M ≻ 0, we write ∥v∥2M := v ⊤ M v.
+
+
+
+
+                                                               4
+4.1    Derivation of the drift regression reductionDrift learning objective
+This section provides the detailed derivation referenced in Section 4. The reduction from the likelihood loss to
+a regression problem follows from a projection argument in weighted L2 space, which directly establishes the
+equivalence to the unweighted regression form up to constant scaling.
+Let y := h−1 (x1 − x0 ). For fixed diffusion parameters θ′ = θ̃′ , the population loss is
+                         h                                    i       h                                          i
+          L(fθ ) := 12 Eρ ∥x1 − x0 − hfθ (x0 )∥2(hΣ ′ (x0 ))−1 = h2 Eρ (y − fθ (x0 ))⊤ Σθ̃−1
+                                                                                           ′
+                                                                                             (x0 ) (y − fθ (x0 )) .
+                                                     θ̃
+
+
+Since Σθ̃′ (x0 ) ≻ 0 almost surely, L(fθ ) is a strictly convex quadratic functional in fθ . Minimising it corresponds
+to projecting y onto the space of functions of x0 in the weighted L2 sense, which yields the population minimiser
+
+                                            f ∗ (x0 ) = E h−1 (x1 − x0 ) | x0 .
+                                                                            
+
+Thus, minimising the Gaussian negative log-likelihood with respect to the drift is exactly a (weighted) least-
+squares regression of increments onto fθ (x0 ), and the population minimiser is the conditional mean of the
+increments. This requires only that Σθ̃′ (x0 ) be SPD almost surely; no locality or smoothness assumption on
+Σθ̃′ is needed.
+This subsection derives the population drift target induced by the Gaussian Euler–Maruyama likelihood and
+relates it to the regression surrogate used in Alg. 2.
+Assume that the fixed covariance field satisfies
+
+                                                           Σθ̃′ (x) ≻ 0
+
+for all x (or almost surely with respect to ρ).
+Define
+                                            x1 − x0
+                                      y :=          ,                A(x) := Σθ̃′ (x)−1 .
+                                                h
+For fixed diffusion parameters θ′ = θ̃′ , the quadratic part of the population negative log-likelihood is
+                                            1 
+                                              Eρ h (y − f (x0 ))⊤ A(x0 )(y − f (x0 )) .
+                                                                                     
+                                  Q(f ) =
+                                            2
+Since A(x0 ) ≻ 0 almost surely, the unrestricted minimiser satisfies
+                                                               Eρ [hy | x0 = x]
+                                               f ∗ (x) =                        .
+                                                               Eρ [h | x0 = x]
+If h is deterministic, or if the conditional expectation
+
+                                                     Eρ [y | x0 = x, h]
+
+is independent of h, then
+                                                f ∗ (x) = Eρ [y | x0 = x].
+Under the frozen-coefficient one-step Euler–Maruyama model,
+
+                                               Eρ [y | x0 = x, h] = f (x),
+
+and therefore
+                                                          f ∗ (x) = f (x).
+Thus, under the Euler–Maruyama observation model, the weighted and unweighted population targets coincide.
+
+
+Empirical and regularised problem              Replacing ρ by the empirical distribution ρ̂ and restricting to the
+Fourier-feature hypothesis class
+                                                          n          K
+                                                                     X                o
+                                             NK :=            x 7→         β̂k eiωk ·x ,
+                                                                     k=1
+with Tikhonov regularisation parameter λ ≥ 0, gives
+                              (    N                               K
+                                                                            )
+                                1 X −1 (n)          (n)    (n) 2
+                                                                   X
+                        min            h (x1 − x0 ) − fθ (x0 ) + λ   ∥β̂k ∥2 ,
+                       fθ ∈NK   N n=1 n
+                                                                                            k=1
+
+                                                 D
+where ∥ · ∥ denotes the Euclidean norm on R . This is precisely the objective minimised in practice by Alg. 2
+                                (n)      (n)  (n)
+when applied to the dataset {(x0 , h−1              N
+                                     n (x1 − x0 ))}n=1 .
+
+
+                                                                     5
+Empirical surrogate       Replacing population expectations by empirical averages yields the ordinary ridge-
+regression problem                      (                                         )
+                                               N               2            K
+                                            1 X            (n)
+                                                                   X
+                                 min              Yn − f (x0 ) + λ   ∥β̂k ∥22         ,
+                                f ∈NK       N n=1              2
+                                                                        k=1
+
+where
+                                                          (n)    (n)
+                                                       x1 − x0
+                                                   Yn =          .
+                                                           hn
+This objective is not, in general, the exact finite-sample minimizer of the Gaussian negative log-likelihood.
+
+Exact fixed-covariance likelihood. For fixed covariance parameters θ′ = θ̃′ , the exact finite-sample Gaus-
+sian likelihood yields the generalized least-squares problem
+                        (     N                                                   K
+                                                                                            )
+                           1 X                 (n) ⊤     (n) −1          (n) 
+                                                                                  X
+                                                                                          2
+                   min           hn Yn − f (x0 ) Σθ̃′ (x0 )      Yn − f (x0 ) + λ   ∥β̂k ∥2 .
+                  f ∈NK   N n=1
+                                                                                           k=1
+
+Thus, the exact finite-sample likelihood corresponds to a covariance-weighted generalized least-squares problem,
+whereas Algorithm 2 employs ordinary ridge regression. Under the Euler–Maruyama observation model, both
+formulations identify the same population drift function.
+
+4.2     Diffusion minimiser: pointwise characterisation and plug-in targets
+Fix x0 ∈ RD and a drift fθ . For one observation (x1 , h), define the residual
+
+                                               r := x1 − x0 − h fθ (x0 ).
+
+As a function of the covariance Σ ∈ RD×D with Σ ≻ 0, the (centered) negative log-likelihood contribution is
+
+                             ℓ(Σ; x0 , x1 , h) = 12 r⊤ (hΣ)−1 r + 21 log |hΣ| + const.                          (6)
+
+Conditioning on x0 and taking expectation over (x1 , h) | x0 yields the pointwise population objective
+
+              L(Σ; x0 ) = 12 tr Σ−1 C(x0 ) + 12 log |Σ| + const,       C(x0 ) := E h−1 rr⊤ | x0 .
+                                                                                             
+                                                                                                                (7)
+
+
+Proposition (Pointwise minimiser and uniqueness) Assume C(x0 ) ≻ 0. Then L(Σ; x0 ) is strictly convex
+in Σ ≻ 0 and has the unique minimiser
+                                      h                                           ⊤   i
+                 Σ∗ (x0 ) = C(x0 ) = E h−1 x1 − x0 − hfθ (x0 ) x1 − x0 − hfθ (x0 )
+                                                              
+                                                                                     x0 .
+
+
+Let
+                                     SD
+                                      ++ := {A ∈ R
+                                                   D×D
+                                                       : A = A⊤ , A ≻ 0}
+denote the set of symmetric positive definite matrices.
+
+Proposition (Pointwise minimiser and uniqueness) Assume C(x0 ) ≻ 0. Consider
+                                            1               1
+                            L(Σ; x0 ) =       tr Σ−1 C(x0 ) + log det Σ,        Σ ∈ SD
+                                                                                     ++ .
+                                            2                2
+Under the precision parametrisation P = Σ−1 , define
+
+                      e ; x0 ) := L(P −1 ; x0 ) = 1 tr P C(x0 ) − 1 log det P,            P ∈ SD
+                                                               
+                      L(P                                                                      ++ .
+                                                  2               2
+The function L(P
+             e ; x0 ) is strictly convex in P . Consequently, its unique minimiser is
+
+                                                    P ∗ = C(x0 )−1 ,
+
+and the unique covariance minimiser is
+                                                   Σ∗ (x0 ) = C(x0 ).
+Proof. The mapping Σ 7→ P = Σ−1 is a bijection on SD                                         D
+                                                   ++ . Hence minimising L(Σ; x0 ) over Σ ∈ S++ is equivalent
+              e ; x0 ) over P ∈ SD
+to minimising L(P                ++ .
+
+
+                                                           6
+The term P 7→ tr(P C(x0 )) is linear, while P 7→ − log det P is strictly convex on SD
+                                                                                    ++ [4]. Therefore L(P ; x0 ) is
+                                                                                                      e
+strictly convex.
+Its gradient is
+                                            e ; x0 ) = 1 C(x0 ) − 1 P −1 ,
+                                        ∇P L(P
+                                                        2          2
+where P is symmetric. The unique stationary point satisfies
+
+                                                  P −1 = C(x0 ),
+
+and therefore
+                                                 P ∗ = C(x0 )−1 .
+Returning to the covariance variable gives
+                                                 Σ∗ (x0 ) = C(x0 ).
+                                                                                                       □
+Proof. Under the bijective change of variables P = Σ−1 , minimising L(Σ; x0 ) over Σ ≻ 0 is equivalent to
+minimising L(P ; x0 ) over P ≻ 0.
+Reparametrise by the precision P = Σ−1 ≻ 0 and define
+
+                                      Ψ(P ) := 21 tr(P C(x0 )) − 21 log |P |.
+
+This is strictly convex on P ≻ 0 because the map P 7→ − log |P | is strictly convex and P 7→ tr(P C) is linear.
+The gradient is
+                                      ∇P Ψ(P ) = 21 C(x0 ) − 21 P −T .
+Setting ∇P Ψ(P ) = 0 yields P −T = C(x0 ); since the minimiser is symmetric, P = C(x0 )−1 and hence Σ∗ (x0 ) =
+C(x0 ).                                                                                                      □
+
+Remarks (i) If C(x0 ) ⪰ 0 is singular (e.g., deterministic residual directions), L is minimised on the boundary
+{Σ ⪰ 0} and the infimum is not attained in Σ ≻ 0. In practice one uses a ridge εI:
+
+                                        Σ∗ε (x0 ) = C(x0 ) + εI,         ε > 0,
+
+or constrains Σ structurally (e.g., diagonal, low rank).
+(ii) The presence of variable h is handled by the definition of C(x0 ): the optimal covariance is the conditional
+second moment of the scaled residual h−1/2 r.
+
+Remark on singular conditional covariance If C(x0 ) ⪰ 0 is singular, the objective generally has no finite
+minimiser over SD++ . Indeed, covariance eigenvalues corresponding to null directions of C(x0 ) may approach zero
+without increasing the trace term, while the log-determinant term tends to −∞. A well-posed SPD estimate
+therefore requires an eigenvalue floor, ridge regularisation, or an appropriate structural constraint.
+For example, one may regularise the target by
+
+                                        Cε (x0 ) = C(x0 ) + εI,          ε > 0,
+
+or constrain the admissible covariance matrices by
+
+                                                   Σ − εI ⪰ 0.
+
+
+
+                                                                   (n)
+Empirical targets and ARFF regression In data, each x0 is typically observed once. Define the unbiased
+plug-in target
+                                                        (n)    (n)         (n) 
+                              Σ∗(n) := h−1    ⊤
+                                        n rn rn , rn = x1 − x0 − hn fθ x0 ,
+                   (n)       (n)                                                               (n)
+so that E[Σ∗(n) | x0 ] = Σ∗ x0 . We then learn the regression map x0 7→ Σθ′ (x0 ) from pairs {(x0 , Σ∗(n) )}N
+                                                                                                            n=1 .
+
+
+
+
+                                                         7
+                                                                     (n)
+Empirical targets and ARFF regression               In data, each x0       is typically observed once. We therefore define
+the plug-in residual target
+                                                               (n)         (n)         (n) 
+                              Σ∗(n) := h−1    ⊤
+                                        n rn rn ,       rn = x1 − x0 − hn fθ x0                .
+
+For a fixed drift estimate fθ that is independent of observation n, this target is conditionally unbiased in the
+sense that                                  h             i
+                                                      (n)         (n) 
+                                           E Σ∗(n) | x0     = Σ∗ x0 .
+
+In Alg. 2, however, the same training data are used both to estimate fθ and to construct the residual targets.
+Therefore, this finite-sample conditional unbiasedness need not hold exactly because of same-sample fitting
+effects. We nevertheless use these plug-in residual targets to learn the regression map x0 7→ Σθ′ (x0 ) from the
+         (n)
+pairs {(x0 , Σ∗(n) )}N
+                     n=1 .
+Since Alg. 1 handles vector outputs, we vectorise by stacking the lower–triangular entries:
+                                          b ∗ ∈ Rq ,
+                                          Σ                q = D(D+1)/2.
+                                            (n)
+
+With a Fourier-feature hypothesis class NK ′ for each component and Tikhonov parameter λΣ ≥ 0, we solve the
+(decoupled) ridge regressions
+                                                                                   
+                                    1 X N                        2      K′         
+                                                      b θ′ x(n)
+                                                                         X
+                                              b∗ − Σ                        ∥β̂k′ ∥2 ,
+                                                                
+                             min              Σ (n)         0       + λΣ
+                           b ′ ∈N ′  N
+                           Σ                                                        
+                            θ    K        n=1                                    k=1
+
+
+followed by reconstruction of the symmetric matrix Σθ′ (x) from its vectorised form.
+
+Structural parametrisations (optional) If one restricts Σ(x) to a structured form such as Σ(x) = L(x)L(x)⊤
+(Cholesky factorisation), diagonal, or low-rank, the corresponding population minimiser is the projection of C(x)
+onto that constrained set under the geometry induced by the log-determinant term. In practice, we simply fit
+the chosen parametrisation directly to the empirical targets Σb ∗ as described above.
+                                                                (n)
+
+
+Drift–diffusion coupling      Let ∆f := f − fθ . Under the frozen-coefficient one-step Euler-Maruyama obser-
+vation model                                              √
+                               x1 = x0 + hf (x0 ) + σ(x0 ) h ξ,   ξ ∼ N (0, I),
+the residual satisfies                                                      √
+                                r = x1 − x0 − hfθ (x0 ) = h∆f (x0 ) + σ(x0 ) h ξ.
+Therefore
+               Σ∗ (x0 ) = E h−1 rr⊤ | x0 = Σ(x0 ) + h∆f (x0 )∆f (x0 )⊤ ,            Σ(x0 ) = σ(x0 )σ(x0 )⊤ .
+                                       
+
+For fixed-lag observations generated by the underlying SDE, or by multiple internal Euler-Maruyama steps
+over the lag, this identity is instead a small-time approximation. Under standard smoothness and moment
+assumptions,
+                              E h−1 rr⊤ | x0 = x = Σ(x) + h∆f (x)∆f (x)⊤ + O(h),
+                                               
+
+where the O(h) term vanishes for the frozen-coefficient one-step Euler-Maruyama model. Thus drift error
+perturbs the residual covariance target by a term of order h∥∆f (x)∥2 , in addition to the usual finite-lag Euler-
+Maruyama bias; see Eq. (8).                                √
+Writing the true√dynamics as x1 = x0 + hf (x0 ) + σ(x0 ) h ξ with ξ ∼ N (0, I), the residual becomes r =
+h∆f (x0 ) + σ(x0 ) h ξ, where ∆f := f − fθ . Then
+
+                        Σ∗ (x0 ) = E h−1 rr⊤ | x0 = σ(x0 )σ(x0 )⊤ + h ∆f (x0 )∆f (x0 )⊤ .
+                                                
+
+
+Thus, if the drift is estimated with error ∥∆f (x0 )∥ = εf , then the diffusion targets are biased away from the
+true covariance Σ(x0 ) by O(h ε2f ); see Eq. (8).
+Alg. 2 summarises the resulting two-stage training procedure.
+
+
+
+
+                                                           8
+Algorithm 2 ARFF training for drift and covariance diffusion
+              (n)     (n)
+  Input: {(x0 , x1 , hn )}N
+                          n=1
+  Output: Drift fθ (x), covariance diffusion Σθ′ (x)
+
+  (1) Drift:
+                             (n)      (n)  (n)
+  Train fθ with Alg. 1 on {(x0 , h−1            N
+                                  n (x1 − x0 ))}n=1 .
+
+
+  (2) Diffusion:
+                                                       (n)  (n)         (n)
+  For each n, compute Σ∗(n) = h−1      ⊤
+                                 n rn rn , where rn = x1 − x0 − hn fθ (x0 ).
+                                       b ∗ ∈ RD(D+1)/2 .
+  vectorise the lower-triangular part: Σ     (n)
+        b θ′ with Alg. 1 on {(x(n) , Σ
+  Train Σ                            b ∗ )}N .
+                               0       (n) n=1
+  Recover Σθ′ (x) by reversing the vectorisation.
+
+
+The inputs to Alg. 1 are normalised before training and denormalised afterward in both stages.
+
+4.3    Split vs joint training
+Existing SDE learning approaches employ joint gradient-based optimisation of the likelihood (5) [5, 6]. In
+contrast, Alg. 2 adopts a split regression-based formulation. This leads to two main fundamental learning
+differences: (i) dependence on the inverse covariance, and (ii) enforcement of positive definite covariance.
+
+Dependence on the inverse covariance. In joint likelihood-based training, the loss depends explicitly on
+the precision matrix (hΣθ (x))−1 . Consequently, learning requires repeated inversion of the covariance. When
+Σθ (x) is close to singular, the precision matrix becomes ill-conditioned, amplifying errors and leading to unstable
+behaviour.
+In contrast, the split formulation avoids any explicit dependence on the inverse covariance. The covariance
+diffusion is learned via regression on empirical covariance targets constructed from residuals, reducing the
+problem to a sequence of well-conditioned least-squares-type problems. As a result, the method can remain
+stable even when the diffusion is small or near-singular.
+
+Positive definite covariance. Joint training enforces positive definiteness structurally through its parametri-
+sation, typically via a Cholesky-type factorisation. This guarantees that the learned covariance is symmetric
+positive definite at every point, and therefore always defines a valid diffusion model.
+In the split formulation, the empirical covariance targets are inherently positive semidefinite, providing well-
+behaved training data. However, positive definiteness is not enforced pointwise in the learned function, and the
+resulting covariance field may fail to be positive definite away from the training data.
+
+Implications. These differences lead to distinct stability properties. Joint training guarantees a valid co-
+variance but is sensitive to ill-conditioning through the inverse covariance. The split formulation avoids this
+instability by construction, whilst not explicitly enforcing positive definiteness of the learned covariance.
+These effects are investigated empirically in Section 6.
+
+4.4    Error decomposition for drift and diffusion training
+We analyse the main sources of error in the learned transition model, measured in terms of the negative log-
+likelihood (NLL) in (4).
+
+discretisation       The EM likelihood introduces a bias of order O(h) relative to the continuous-time SDE [see,
+e.g., 21, 16].
+
+Approximation          For the regression targets
+
+                    gdrift (x) := E h−1 (x1 − x0 ) | x0 =x ,           gdiff (x) := vecℓ E h−1 rr⊤ | x0 =x ,
+                                                                                                       
+
+
+the Fourier-feature hypothesis class NK achieves an O(K −1 ) approximation rate in L2 (ρx0 ), in the sense that
+the squared L2 (ρx0 ) error satisfies
+                                         ∥g − βK ∥2L2 (ρx ) ≤ CK −1 ,
+                                                                   0
+
+
+
+
+                                                               9
+whenever the target and its Fourier transform are both integrable, that is,
+
+                               gdrift , gbdrift ∈ L1 (RD )   and gdiff , gbdiff ∈ L1 (RD ),
+
+see [14]. Here vecℓ (Σ) denotes the vectorisation of the lower–triangular entries (including the diagonal) of a
+symmetric matrix Σ ∈ RD×D , so that vecℓ : SD → Rq with q = D(D+1)/2. Alg. 1 adaptively resamples
+frequencies to reduce the constant in this O(K −1 ) bound; the rate itself is a property of the function class
+rather than the optimiser.
+
+Sampling and optimisation Finite sampling contributes a statistical error of order O(N −1/2 ) under stan-
+dard concentration results for least-squares estimators in finite-dimensional linear models [e.g., 11, 33, 12].
+Numerical tolerances in the regularised least-squares solves introduce a small optimisation error εopt ≥ 0 [see,
+e.g., 9, 30].
+
+Drift–diffusion coupling Because the diffusion targets depend on the drift estimate, errors in the drift
+propagate into the diffusion stage, inducing a bias of order O(h ε2f ); see Section ?? for a detailed derivation.
+
+Combined bound        Collecting all contributions gives an informal estimate for the excess NLL:
+
+                       error ≲ c1 h + c2 Kf−1 + c3 KΣ−1 + c4 N −1/2 + c5 h ε2f + εopt ,                       (8)
+
+where c1 depends on the regularity of f and Σ entering the EM bias, c2 and c3 on the Fourier L1 norms of the
+regression targets gdrift and gdiff (under optimal frequency sampling). The remaining constants c4 and c5 reflect,
+respectively, statistical and coupling effects: c4 captures the variability and conditioning of the finite-sample
+least-squares regressions, depending on data statistics and regularisation, while c5 measures the sensitivity of
+the diffusion stage to drift errors, governed by the geometry and conditioning of the true covariance field Σ(x).
+
+4.5    Computational complexity
+Alg. 2 calls ARFF twice, once for the drift and once for the diffusion. In each call we first perform an initial
+regularised least-squares solve and then repeat up to M iterations of resample → random walk in feature space →
+rebuild features → solve LS, where the iteration count satisfies Mmin ≤ M ≤ Mmax depending on early stopping.
+Constructing (i.e., evaluating or rebuilding) the random Fourier features for N samples in D dimensions to form
+the design matrix S costs O(N KD) [23]. Since the random walk changes the frequencies, this step is repeated in
+every iteration; below we simply refer to it as “rebuilding the features.” The resampling step requires computing
+weights and redrawing K features, costing O(DK) in practice. This is negligible compared to feature evaluation
+and least-squares solves, but we mention it here for completeness. The dominant work remains the LS solve.
+
+Per ARFF call (output dimension q) Let q = D for the drift and q = D(D+1)/2 for the diffusion, cor-
+responding to the output dimensions of the respective neural networks. Direct solvers such as QR factorisation
+or Cholesky decomposition have cubic cost but are numerically stable, while iterative Krylov methods such as
+the conjugate gradient (CG) method avoid the cubic term. The least-squares solve per rebuild is
+
+                                                   direct: O(N K 2 + K 3 + K 2 q),
+                                   iter. explicit (CG): O(T N K),
+                                  iter. implicit (CG): O(T N KD),
+               √
+where T = O( κ log(1/ε)) is the Krylov iteration count, κ is the spectral condition number of the regularised
+normal matrix S H S + N λI (ratio of largest to smallest eigenvalue), and ε is the requested relative residual
+tolerance [30, 22, 10, 26].
+Each Krylov iteration requires one multiply with S and one with S H , costing O(N K) if S is stored explicitly,
+or O(N KD) if the features are recomputed on the fly. Block Krylov methods allow handling all q outputs
+simultaneously, so the per-iteration cost is essentially unchanged.
+
+Totals per ARFF call       With one initial solve plus M further iterations, the cost is
+
+                              direct: (M +1) [ O(N KD) + O(N K 2 + K 3 + K 2 q) ],
+
+                                 iter. explicit: (M +1) [ O(N KD) + O(T N K) ],
+                               iter. implicit: (M +1) [ O(N KD) + O(T N KD) ].
+
+
+                                                             10
+Lower-order terms include O(M DK) for resampling. The iteration count M lies between Mmin and Mmax
+depending on early stopping, and—like SGD or Adam in non-convex settings—there is no convergence-based
+guarantee on the number of iterations required.
+Algorithm 2 (total)         Apply the above with (K, q, M ) = (K, D, Mf ) for the drift, and (K ′ , q ′ , M ′ ) =
+    ′
+(K , D(D + 1)/2, MΣ ) for the diffusion, and add a lower-order O(N D2 ) for constructing and vectorising the
+diffusion targets to obtain the total computational cost of Alg. 2.
+
+
+5     Computational Experiments
+This section presents computational experiments comparing Alg. 2 with the Adam optimiser for learning SDEs.
+The test suite includes both synthetic systems and established benchmarks. Experiments 1–3 consider polyno-
+mial systems of increasing dimensionality and structural complexity; Experiments 4-6 correspond to benchmark
+problems following [5]; and Experiments 7-8 are designed to probe challenging regimes for drift and diffusion
+learning. A summary of all experiments is given in Table 1.
+
+Table 1: Summary of experiments including dimension, (mean) number of training points, and key structural
+characteristics.
+
+                      Exp.       System          Dim.     #Pts                   Key Structure
+                       1       Polynomial         2       10000          cubic drift, diagonal diffusion
+                       2       Polynomial         3       10000     linear drift, lower-triangular diffusion
+                       3       Polynomial         10     100000        cubic drift, symmetric diffusion
+                       4        Langevin           1     10000          second-order, noise on velocity
+                       5          SIR             2       99750           mean-field epidemic model
+                       6          Wave            1      995004            stochastic wave equation
+                       7       Wide-spec          2      100000              wide spectral support
+                       8       Near-sing.         2      100000        rotated near-singular covariance
+
+
+All experiments use a 90%/10% train-validation split. For Experiments 1-4 and 7-8, snapshot data are generated
+via EM with fine time discretisation, followed by subsampling to obtain transition pairs (x0 , x1 , h). Experiments
+5 and 6 use problem-specific data generation procedures. The following subsections describe the underlying
+models and learning setups for each experiment. Precise data-generation procedures and parameter settings are
+provided in Appendix A.
+
+5.1    Experiments 1 to 3: Polynomial
+The first set of experiments evaluates the performance on data generated from polynomial drift and diffusion
+functions, with varying dimensionality and structural complexity. These experiments span dimensions 2, 3, and
+10, with varying polynomial degrees and diffusion structures.
+
+5.2    Underdamped Langevin Equations: Experiment 4
+This experiment considers the underdamped Langevin equation, a second-order SDE commonly used in physics
+to model stochastic particle dynamics. In this second-order system, noise is applied only to the velocity variables
+vt as follows
+                                       dxt = vt dt,
+                                                                                                                (9)
+                                       dvt = f (xt , vt ) dt + σ(xt , vt ) dWt .
+In this setting, the marginal distribution of xt is no longer Gaussian, requiring a modified loss function to
+approximate the drift f and diffusion σ. Equation (9) can be approximated via the (symplectic) EM scheme
+
+                                              x1 = x0 + v0 h,
+                                                                                                                           (10)
+                                              v1 = v0 + f (x1 , v0 )h + σ(x1 , v0 )δW0 .
+
+We assume access to only snapshot data ((x0 , v0 ), (x1 , v1 ), h); hence, x1 in (10) can be considered a fixed
+parameter for the functions f and σ over a time span of h. Then, v1 is again normally distributed, conditioned
+on x1 , v0 and step size h. Thus, the following loss function can be minimised to learn fθ and Σθ′
+                                            1
+            L(θ, θ′ | x1 , v0 , v1 , h) =     (v1 − v0 − hfθ (x1 , v0 ))⊤ (hΣθ′ (x1 , v0 ))−1 (v1 − v0 − hfθ (x1 , v0 ))
+                                            2
+                                               1                        D
+                                            + log |hΣθ′ (x1 , v0 )| + log(2π).
+                                               2                         2
+
+
+                                                                  11
+5.3     Experiment 5: Stochastic SIR Model
+This section explores the ability of the model to learn the mean-field SDE from data generated from fine-
+scale particle simulations. We consider an epidemic Susceptible-Infected-Recovered-Susceptible (SIRS) model
+[5] derived from Gillespie’s stochastic simulation algorithm (SSA) [7] that is used to simulate a well-stirred,
+spatially homogeneous system. For the SIRS model, SSA tracks three integer-valued stochastic variables: the
+number of susceptible individuals, n0 , the number of infected individuals, n1 , and the number of recovered
+individuals, n2 . Their concentrations are calculated as x̃p = np /N , for p = 0, 1, 2, where N is the total
+population size.
+At each SSA update, the transition rates are computed as r1 = 4k1 x̃0 x̃1 , r2 = k2 x̃1 , and r3 = k3 x̃2 . Then an
+event I + S → I + I, I → R, or R → S is selected with a probability proportional to its corresponding rate. The
+values of np are updated accordingly. In our experiments, we set k1 , k2 , k3 = 1, 1, 0, which reduces the model
+to the classical SIR case.
+SSA simulates individual events in a Markov jump process. For a large population size N , the mean-field
+population behavior can be modelled using a system of Langevin-type SDEs [8]
+                                                      r               r
+                                                         r1             r3
+                               dx̃0 = (−r1 + r3 )dt −       dW1 (t) +      dW3 (t),
+                                                         N              N
+                                                      r              r
+                                                        r1             r2
+                                dx̃1 = (r1 − r2 )dt +      dW1 (t) −      dW2 (t),
+                                                        N              N
+                                                      r              r
+                                                        r2             r3
+                                dx̃2 = (r2 − r3 )dt +      dW2 (t) −      dW3 (t),
+                                                        N              N
+where Wp (t) are independent Wiener processes such that dWp (t) ∼ N (0, dt). For the SIR model, this formulation
+simplifies to a system with drift and diffusion functions:
+                                                           p r1        
+                                              −r1               N     0
+                                    f (x) =         , σ(x) =        p  r2 .                                 (11)
+                                               r2              0       N
+
+Data points are obtained by sampling trajectories generated using SSA and can be applied to Algorithm 2 to
+learn drift and diffusion functions that approximate (11) for large N .
+Data points can be applied to Algorithm 2 to learn drift and diffusion functions that approximate (11) for large
+N
+
+5.4     Experiment 6: Stochastic Wave Equation
+Stochastic partial differential equations extend SDEs to infinite-dimensional spaces, capturing system dynamics
+where finite-size effects remain significant. Unlike finite-dimensional SDEs, SPDEs lack universally applicable
+higher-order numerical schemes akin to EM [34]. However, certain SPDEs can be reformulated into existing
+numerical schemes while preserving critical dynamics. This work revisits one such example from [5]; a stochastic
+wave equation with deterministic driving f (x) and stochastic forcing σ(x), given by
+
+                                  ∂2u     ∂2u
+                                       =      + f (x) + σ(x)dWt , x ∈ R, t > 0,
+                                  ∂t2     ∂x2                                                                   (12)
+                                                       ∂u
+                                   u(x, 0) = u0 (x),      (x, 0) = v0 (x), x ∈ R.
+                                                       ∂t
+To solve (12), a small step size h > 0 is taken to discretise space and time into grid points xi = ih, tj = jh. The
+following numerical scheme approximates the solution to the stochastic wave equation on this staggered grid
+                                               1
+                         ui,−1 = u(xi , t−1 ) =  (u0 (xi−1 ) + u0 (xi+1 )) − hv0 (xi ), i odd;
+                                               2
+                                                            h2          1
+                 ui,1 = u0 (xi−1 ) + u0 (xi+1 ) − ui,−1 + f (xi ) + σ(xi )δW0 (h2 /2), i odd;                  (13)
+                                                             2          2
+                                                               1
+           ui,j+1 = ui+1,j + ui−1,j − ui,j−1 + h f (xi ) + σ(xi )δW0 (h2 ), (i(j + 1)) even, j ≥ 2.
+                                                   2
+                                                               2
+The scheme in (13) can be reformulated into an EM-type update by defining
+                              1 2                1                                    1
+                      h̃ :=     h ,   ũi,j :=     (ui+1,j + ui−1,j ),   ũi,j+1 :=     (ui,j+1 + ui,j−1 ).
+                              2                  2                                    2
+Then,
+
+                         ũi,j+1 = ũi,j + h̃f (xi ) + σ(xi )δW0 (h̃),      (i(j + 1)) even, j ≥ 2.
+
+
+                                                                12
+This reformulation yields an effective one-step update of EM type, allowing the forcing terms f and σ to be
+learned with Alg. 2.
+This manuscript only considers the autonomous case, where f and σ do not depend on time.
+
+5.5    Experiment 7: 2D drift with wide spectral support
+In this experiment, we consider a two-dimensional SDE with drift defined componentwise as
+                                               "                                     #
+                                                 exp(−|x0 |/a) exp − 21 (x20 + x21 )
+                                f (x0 , x1 ) =                                        ,
+                                                 exp(−|x1 |/b) exp − 21 (x20 + x21 )
+with parameters a = 0.1, b = 0.2, and diffusion σ(x) = 0.1 I. The structure combines slow exponential decay in
+each coordinate with a Gaussian envelope, leading to Fourier transforms with relatively wide spectral support
+compared to purely Gaussian drifts. The isotropic diffusion ensures stability and isolates drift complexity as
+the main source of difficulty.
+
+5.6    Experiment 8: Near-singular diffusion benchmark
+To investigate the effect of drift–diffusion splitting on likelihood-based SDE learning, we construct a benchmark
+SDE with a rotated near-singular diffusion factor. The drift is linear and the diffusion factor is
+                                                          
+                         −x0                             ε 0
+               f (x) =         ,     σ(x) = R(ϑ(x))            R(ϑ(x))⊤ ,    ϑ(x) = k atan2(x1 , x0 ),        (14)
+                         −x1                            0 1
+
+where ε = 10−4 , k = 3, and                                          
+                                                     cos ϑ    − sin ϑ
+                                             R(ϑ) =                     .
+                                                      sin ϑ    cos ϑ
+The corresponding covariance is
+                                                            2           
+                                                   ⊤        ε          0
+                                 Σ(x) = σ(x)σ(x) = R(ϑ(x))                 R(ϑ(x))⊤ .
+                                                            0          1
+
+Thus Σ(x) has eigenvalues ε2 and 1, while its principal directions rotate with x.
+To investigate the effect of drift-diffusion splitting on likelihood-based SDE learning, we construct a benchmark
+SDE example with a rotated near-singular covariance. The SDE system has linear drift and state-dependent
+rotated covariance
+                                                           2    
+              −x0                             ⊤               ε 0
+     f (x) =         ,     Σ(x) = σ(x)σ(x) = R(ϑ(x))                 R(ϑ(x))⊤ ,   ϑ(x) = k atan2(x1 , x0 ),   (15)
+              −x1                                             0 1
+
+with ε = 10−4 and k = 3, where R(ϑ) denotes the planar rotation matrix. This construction yields a covariance
+Σ(x) whose smallest eigenvalue is ε2 , while the principal directions rotate with vector x = (x0 , x1 ). Consequently,
+the likelihood term (4) becomes highly sensitive to errors in the EM residual r = x1 − x0 − hfθ (x0 ) and the
+diffusion estimate Σθ′ (x0 ), producing a stiff optimisation landscape for joint training.
+To evaluate this effect, we compare three training strategies: (i) ARFF (split): the proposed two-stage
+regression procedure (Alg. 2); (ii) Adam (split): the same two-stage targets optimised with Adam; (iii)
+Adam (joint NLL): direct minimisation of the empirical negative log-likelihood (4).
+
+
+6     Results
+Alg. 2 is compared with Adam optimisation applied to three baseline network configurations: (i) an equivalent
+Fourier feature network structure NK , (ii) shallow networks with tanh activations and (iii) deep networks
+with tanh activations. This ensures comparison against both architecturally equivalent networks and standard
+neural network implementations [5]. For the near-singular diffusion benchmark (Experiment 8), we additionally
+evaluate split Adam training variants, in which drift and diffusion are learned sequentially using regression
+targets, analogous to Alg. 2.
+Validation loss results are summarised in Table 2, with additional results presented and discussed below. Cumu-
+lative network widths were held constant across methods for each experiment (Table 2), with deep architectures
+consisting of two equal-width hidden layers. Hyperparameters were selected empirically. Full implementation
+details are provided in Appendix B.
+
+
+
+
+                                                         13
+Table 2: Cumulative network layer widths K and mean minimum validation loss over 30 runs of Experiments
+1-8.
+
+                                                       Adam tanh   Adam tanh       Adam tanh      Adam tanh
+         Exp.    log2 (K)   Alg. 2    Adam NK
+                                                        Shallow      Deep         Shallow Split   Deep Split
+           1         8       -3.252      -3.251          -3.235       -3.253            –               –
+           2         7      -11.613     -11.593         -11.625      -11.629            –               –
+           3        10      -25.484         –           -25.750          –              –               –
+           4         7       -2.027      -2.023          -2.023       -2.023            –               –
+           5         8       -9.458      -9.529          -9.519       -9.501            –               –
+           6         9       -9.413      -9.403          -9.395       -9.412            –               –
+           7         9       -6.374      -6.354          -6.361       -6.374            –               –
+           8         9       -8.826         –            -7.063       -10.10         -8.263          -8.931
+
+
+Across Experiments 1–7, Alg. 2 achieves validation losses that are consistently comparable to, and in several
+cases slightly lower than, those obtained by the Adam-based baselines. Differences between Adam methods are
+generally small, with no clear advantage from increasing network depth.
+In contrast, Experiment 8 exhibits qualitatively different behaviour, with a wider spread in performance across
+training strategies.
+To further examine optimisation behaviour, Figures 1 and 2 show validation loss as a function of training time
+for Experiments 1–7. Reported times exclude one-time JIT compilation overheads (tabulated in Appendix B)
+and reflect steady-state iteration cost.
+
+
+
+
+           (a) Exp. 1: two-dimensional, cubic drift.       (b) Exp. 2: three-dimensional, lower-triangular diffusion.
+
+
+
+
+           (c) Exp. 3: ten-dimensional, cubic drift.                 (d) Exp. 4: underdamped Langevin.
+               Figure 1: Mean validation loss vs training time across 30 runs of Experiments 1-4.
+
+
+
+
+                                                           14
+                   (a) Exp. 5: epidemic model.                        (b) Exp. 6: stochastic wave equation.
+
+
+
+
+                                      (c) Exp. 7: 2D drift with wide spectral support.
+
+                 Figure 2: Mean validation loss vs training time across 30 runs of Experiments 5-7.
+
+In Experiments 2–5, all methods exhibit similar convergence behaviour and reach comparable loss values within
+similar time scales, with only minor differences between architectures. Experiment 1 shows a similar final loss
+across methods, although Alg. 2 reaches this level substantially faster than the Adam-based approaches.
+More pronounced differences emerge in the more challenging Experiments 6 and 7. In Experiment 6, Alg. 2
+attains the lowest validation loss, which is not matched by the Adam-based methods even with substantially
+longer training. In Experiment 7, Alg. 2 and the deep Adam model achieve similar final losses, although the
+latter converges more slowly, while the remaining Adam variants maintain higher loss values despite extended
+training.
+To assess the accuracy of the learned models, Table 3 reports the RMSE of the trained drift and covariance
+diffusion networks.
+
+Table 3: Mean RMSE of the learned drift and covariance diffusion (covariance) over 30 runs of Experiments
+1-8.
+
+                                                  Adam tanh          Adam tanh            Adam tanh        Adam tanh
+             Alg. 2            Adam NK
+ Exp.                                              Shallow             Deep              Shallow Split     Deep Split
+         Drift      Diff.    Drift      Diff.    Drift     Diff.    Drift    Diff.       Drift   Diff.    Drift    Diff.
+   1    0.0487      0.0091   0.0498    0.0093   0.0519    0.0109   0.0484   0.0089      –           –        –        –
+   2    0.0072      0.0019   0.0089    0.0022   0.0068    0.0018   0.0065   0.0017      –           –        –        –
+   3    0.0413      0.0215      –         –     0.0376    0.0188      –        –        –           –        –        –
+   4    0.0621      0.0005   0.0634    0.0005   0.0637    0.0005   0.0629   0.0005      –           –        –        –
+   5    0.0143      0.0008   0.0121    0.0007   0.0125    0.0007   0.0127   0.0008      –           –        –        –
+   6    0.0098      0.0003   0.0101    0.0003   0.0104    0.0003   0.0097   0.0003      –           –        –        –
+   7    0.0287      0.0011   0.0305    0.0013   0.0297    0.0012   0.0283   0.0011      –           –        –        –
+   8    0.8622      0.1417      –         –     1.2264    0.6761   1.3786   0.3252   0.8544      0.2494   0.8544   0.0701
+
+
+Across Experiments 1–7, all methods achieve similar levels of accuracy, with only small differences between
+architectures, broadly consistent with the trends observed in the validation loss.
+In Experiment 8, however, the RMSE results show a clear separation between training strategies, with the split
+methods, including Alg. 2, achieving substantially lower errors than the joint Adam approaches. This contrasts
+with the validation loss in Table 2, where the deep joint Adam model attains the lowest loss, revealing a clear
+mismatch between loss minimisation and coefficient accuracy, justifying further examination of this experiment.
+
+
+                                                             15
+6.1    Experiment 8: near-singular diffusion benchmark
+Here we further analyse the discrepancy between the loss and RMSE in Experiment 8. Figure 3 presents the
+evolution of both validation loss and RMSE over training time.
+
+
+
+
+                      (a) Validation Loss.                                    (b) Drift RMSE.
+
+
+
+
+                                             (c) Covariance Diffusion RMSE.
+
+      Figure 3: Mean validation loss and mean RMSE vs training time across 30 runs of Experiment 8.
+
+Figure 3 highlights markedly different training dynamics across methods. The shallow joint Adam model shows
+essentially stagnant validation loss, with drift error increasing over time and diffusion error remaining stagnant.
+The deep joint model achieves the lowest validation loss overall; however, this is not reflected in the corresponding
+RMSE. In particular, the drift error increases substantially during training and remains the largest among all
+methods, while the diffusion error, although reduced relative to the shallow joint model, remains significantly
+higher than for the split approaches. Furthermore, the wide spread across runs indicates highly variable and
+unstable behaviour.
+In contrast, Alg. 2 consistently attains low validation loss and low RMSE, converging substantially faster than
+all Adam-based methods. The split approaches achieve comparable accuracy with longer training times, with
+the deep split variant improving upon the shallow counterpart. Notably, all split methods yield significantly
+more accurate drift and diffusion estimates than the joint training approaches, despite the deep joint Adam
+model achieving the lowest validation loss.
+To better interpret the drift and diffusion errors, Figures 4 and 5 provide visual comparisons of the true and
+trained functions.
+
+
+
+
+                                                          16
+Figure 4: Experiment 8: Heat maps for true and trained drift functions from the runs with lowest validation
+loss evaluated on 100,000 test data points.
+
+
+
+
+Figure 5: Experiment 8: Heat maps for true and trained diffusion functions from the runs with lowest validation
+loss evaluated on 100,000 test data points generated according to training data parameters.
+
+The diffusion estimates reveal clear differences in what each method captures. The shallow joint Adam model
+fails to recover any underlying structure. The shallow split model recovers the overall scale but only partially
+resolves the underlying structure. The deep joint model captures the qualitative pattern; however, the magnitude
+is significantly distorted, with pronounced scaling errors near the centre of rotation. In contrast, Alg. 2 and the
+deep split model accurately capture both the pattern and scale of the true diffusion.
+More striking discrepancies are observed in the drift estimates. All split methods closely match the true
+dynamics. In contrast, both joint models learn distorted drift fields: while remnants of the true structure
+are visible, large regions are corrupted by artefacts resembling the diffusion pattern, indicating a failure to
+disentangle drift and diffusion during training.
+To assess the impact on the resulting dynamics, Figure 6 shows trajectory histograms generated using the
+learned models.
+
+
+
+
+                                                        17
+Figure 6: Experiment 8: Histogram heat maps for trajectories generated via Euler–Maruyama using true and
+learned models.
+
+Predictably, models with more accurate drift and diffusion estimates produce trajectories that better match
+the true distribution. Specifically, the split methods yield substantially more faithful approximations of the
+underlying dynamics than the joint methods.
+
+Summary of results. Across a range of benchmark problems (Experiments 1–7), Alg. 2 achieves performance
+comparable to or better than standard Adam-based approaches, including Adam-optimised deep networks [17]
+[18]. In the more challenging Experiments 6 and 7, Alg. 2 demonstrated improvements in both accuracy and
+training time.
+In the near-singular setting (Experiment 8), a clear distinction emerges. While joint optimisation—particularly
+with deep networks—can achieve low validation loss, this does not translate into accurate recovery of the
+underlying drift and diffusion. In contrast, the split training approaches, including Alg. 2 produce substantially
+more accurate and stable estimates.
+This behaviour is consistent with the optimisation landscape induced by near-singular diffusion. When ε is
+small, joint training repeatedly differentiates through the ill-conditioned precision matrix (hΣθ′ (x0 ))−1 , leading
+to unstable and misleading gradient signals. The split formulation instead replaces this with regression on
+residual-based targets, yielding a more stable and reliable learning signal. As a result, split training provides
+a more robust approach for learning SDEs with near-singular covariance structure. Among the split methods,
+Alg. 2 consistently achieved the fastest convergence.
+Although the split formulation does not enforce positive definiteness of the learned covariance, no violations
+were observed in our experimentation.
+
+6.2     Empirical Error Analysis
+The error decomposition in Section 4 predicts how the training parameters influence the estimation error. The
+error decomposition in (8) motivates a targeted study of the dependence of the estimation error on the number
+of training samples N , the observation step size h, and the feature dimension K.
+Performance is measured using excess negative log-likelihood (NLL). For the N - and h- experiments, we define
+
+                                           ∆ = NLLlearned − NLLoracle ,                                         (16)
+
+where NLLoracle is computed using the true drift and diffusion on the same test set.
+For the K-experiment, performance is measured relative to an empirical asymptotic limit NLL∞ , corresponding
+to the limit K → ∞, which is estimated via regression.
+
+                                            ∆(K) = NLL(K) − NLL∞ .                                              (17)
+
+Experiments are conducted on a modified version of Experiment 7 with quadratic diffusion. Data is generated
+as described in Appendix A, varying only the parameter of interest in each case (Network width K = 29 for the
+N - and h-experiments). Results are obtained from means of 10 runs of Alg. 2 and Adam (tanh, shallow).
+
+6.2.1   Dependence on sample size N
+Under standard concentration behaviour for regression-type estimators, the error is expected to scale as
+
+                                                  ∆(N ) ∝ N −1/2 .
+
+
+                                                         18
+Figure 7 shows the excess NLL ∆ as a function of N , varied over three orders of magnitude.
+
+
+
+
+Figure 7: Mean excess negative log-likelihood vs training dataset size N . The dashed line shows the reference
+rate ∝ N −1/2 .
+
+Both Alg. 2 and Adam approximately follow the reference rate ∝ N −1/2 as expected.
+
+6.2.2   Dependence on step size h
+The discretisation bias introduced by the EM approximation is expected to contribute an error of order,
+
+                                              ∆(htrain ) ∝ htrain .
+
+Figure 8 shows the excess error ∆ as a function of the training step size h, varied over more than three orders
+of magnitude.
+
+
+
+
+Figure 8: Mean excess negative log-likelihood vs training step size htrain . The dashed line shows the reference
+rate ∝ h.
+
+Both methods follow the expected linear scaling in h for sufficiently large step sizes. For smaller h, the error
+saturates (around h = 4 × 10−3 ), indicating that other contributions dominate.
+
+6.2.3   Dependence on feature dimension K
+From the error decomposition in (8), the approximation error associated with the Fourier feature representation
+scales as
+                                                ∆(K) ∝ K −1 ,
+with the same qualitative behaviour expected in function-space errors for the drift and diffusion.
+Figure 9 shows the dependence of excess NLL and reconstruction error on K, varied over approximately three
+orders of magnitude.
+
+
+
+
+                                                       19
+                  (a) Drift MSE.                                               (b) Diffusion MSE.
+
+
+
+
+                                                 (c) Excess NLL.
+
+Figure 9: Mean excess NLL and mean MSE vs layer width K. The dashed line indicates the reference rate
+∝ K −1 .
+
+Both Alg. 2 and Adam exhibit error scaling consistent with the predicted ∝ K −1 in both excess NLL and
+reconstruction error.
+Overall, the empirical error analyses are consistent with the error decomposition in (8).
+
+
+7    Summary and Discussion
+This work introduces a training procedure (Alg. 2) for likelihood-based learning of Itô SDEs from snapshot
+data. The key contribution is a derivation showing that the Gaussian negative log-likelihood induced by Euler–
+Maruyama discretisation decomposes into two tractable regression problems: one for the drift and one for the
+diffusion covariance. This enables the use of adaptive random Fourier features (ARFF) in place of gradient-based
+training.
+Across polynomial, Langevin, epidemic, stochastic PDE, and wide-spectrum benchmarks, Alg. 2 attains loss
+values and coefficient errors comparable to or better than Adam-trained baselines (Fourier-feature, shallow tanh,
+and deep tanh), often in reduced training time.
+The near-singular diffusion benchmark exposes a structural weakness of joint likelihood-based training. The
+likelihood depends on the inverse covariance (hΣθ′ (x0 ))−1 , so when the diffusion becomes near-singular, residual
+errors are strongly amplified. This distorts the optimisation problem and leads to unstable behaviour and
+inaccurate recovery of the drift and diffusion.
+By contrast, the split formulation avoids this amplification by learning the diffusion from residual-based covari-
+ance targets. As a result, the split methods, for both Adam and ARFF optimisation, recover substantially more
+accurate drift and diffusion. Of the split methods, the ARFF implementation achieved the fastest convergence.
+
+Limitations and future work Our benchmarks are primarily low- to moderate-dimensional. Extending the
+approach to higher-dimensional systems, more complex diffusion structures, and larger datasets is an important
+next step.
+
+
+                                                        20
+In contrast to joint training, the split formulation does not explicitly enforce positive definiteness of the learned
+covariance. The residual outer-product targets are positive semidefinite but generally rank deficient. Their
+conditional mean may be positive definite under a nondegeneracy condition on the residual distribution. Since
+the split ARFF implementation regresses covariance entries componentwise, the learned covariance field is not
+guaranteed to be positive definite unless an SPD projection or structured parametrization is added.
+In practice, however, the empirical covariance targets are positive definite, and no violations were observed in
+the learned models. Incorporating structured parametrisations to guarantee positive definiteness could further
+improve robustness.
+A further finite-sample consideration is that the same training data are used to estimate the drift and to
+construct the residual covariance targets. As discussed in Section 4.2, this means that the plug-in targets are
+not guaranteed to be conditionally unbiased at finite sample size. Cross-fitting, in which each residual target
+is constructed using a drift estimate trained without that observation, provides a natural way to remove this
+same-sample dependence and is left for future work.
+Other possible directions include hybrid approaches in which ARFF provides an efficient initialisation followed by
+gradient-based refinement, as well as comparisons with alternative baselines such as Gaussian process regression
+or kernel score matching.
+A further extension is to move beyond the Euler–Maruyama likelihood. While EM yields a tractable Gaussian
+objective, its discretisation introduces a lower-order approximation of the diffusion. Incorporating higher-order
+schemes or alternative likelihood formulations may enable more accurate recovery of diffusion coefficients.
+In preliminary experiments, we also tested repeatedly alternating between drift and diffusion training. This did
+not lead to further reductions in validation error beyond the single drift–diffusion pass used in Alg. 2, and in
+some cases degraded performance; we therefore focus on the simpler single-pass procedure.
+In summary, the main contribution is the likelihood-based drift–diffusion decomposition, which enables a stable
+and efficient alternative to joint gradient-based optimisation. The resulting method provides a simple and
+effective framework for data-driven SDE identification, with particular advantages in regimes where the diffusion
+is ill-conditioned.
+
+
+References
+ [1] Yacine Aı̈t-Sahalia. Maximum likelihood estimation of discretely sampled diffusions: A closed-form ap-
+     proximation approach. Econometrica, 70(1):223–262, 2002.
+ [2] Andrew R. Barron. Approximation and estimation bounds for artificial neural networks. Machine Learning,
+     14(1):115–133, 1994.
+ [3] A.R. Barron. Universal approximation bounds for superpositions of a sigmoidal function. IEEE Transac-
+     tions on Information Theory, 39(3):930–945, 1993.
+ [4] Stephen Boyd and Lieven Vandenberghe. Convex Optimization. Cambridge University Press, 2004.
+
+ [5] Felix Dietrich, Alexei Makeev, George Kevrekidis, Nikolaos Evangelou, Tom Bertalan, Sebastian Reich, and
+     Ioannis G. Kevrekidis. Learning effective stochastic differential equations from microscopic simulations:
+     Linking stochastic numerics to deep learning. Chaos: An Interdisciplinary Journal of Nonlinear Science,
+     33(2):023121, 02 2023.
+ [6] Noura Dridi, Lucas Drumetz, and Ronan Fablet. Learning stochastic dynamical systems with neural
+     networks mimicking the euler-maruyama scheme, 2021.
+ [7] Daniel T Gillespie. A general method for numerically simulating the stochastic time evolution of coupled
+     chemical reactions. Journal of Computational Physics, 22(4):403–434, 1976.
+ [8] Daniel T. Gillespie. The chemical langevin equation. The Journal of Chemical Physics, 113(1):297–306, 07
+     2000.
+
+ [9] Gene H. Golub and Charles F. Van Loan. Matrix Computations - 4th Edition. Johns Hopkins University
+     Press, Philadelphia, PA, 2013.
+[10] Anne Greenbaum. Iterative Methods for Solving Linear Systems. SIAM, 1997.
+[11] László Györfi, Michael Kohler, Adam Krzyżak, and Harro Walk. A Distribution-Free Theory of Nonpara-
+     metric Regression. Springer Series in Statistics. Springer, New York, 2002.
+[12] Xin Huang, Aku Kammonen, Anamika Pandey, Mattias Sandberg, Erik von Schwerin, Anders Szepessy,
+     and Raúl Tempone. Convergence for adaptive resampling of random fourier features, 2025.
+
+
+                                                         21
+[13] J. James and N. Webber. Interest Rate Modelling. Wiley, Chichester, 2000.
+[14] Aku Kammonen, Jonas Kiessling, Petr Plecháč, Mattias Sandberg, and Anders Szepessy. Adaptive random
+     fourier features with metropolis sampling. Foundations of Data Science, 2(3):309–332, 2020.
+
+[15] Aku Kammonen, Anamika Pandey, Erik von Schwerin, and Raúl Tempone. Adaptive random Fourier
+     features training stabilized by resampling with applications in image regression. Foundations of Data
+     Science, 7(3):309–332, 2025.
+[16] Peter E. Kloeden and Eckhard Platen. Numerical Solution of Stochastic Differential Equations, volume 23
+     of Applications of Mathematics. Springer, Berlin, Heidelberg, 1992.
+
+[17] Lingkai Kong, Jimeng Sun, and Chao Zhang. SDE-net: Equipping deep neural networks with uncertainty
+     estimates. In Hal Daumé III and Aarti Singh, editors, Proceedings of the 37th International Conference
+     on Machine Learning, volume 119 of Proceedings of Machine Learning Research, pages 5405–5415. PMLR,
+     2020.
+[18] Alex Krizhevsky, Ilya Sutskever, and Geoffrey E Hinton. Imagenet classification with deep convolutional
+     neural networks. Advances in neural information processing systems, 25, 2012.
+[19] Kevin Li, Max Balakirsky, and Simon Mak. Trigonometric quadrature Fourier features for scalable Gaussian
+     process regression. In Sanjoy Dasgupta, Stephan Mandt, and Yingzhen Li, editors, Proceedings of The 27th
+     International Conference on Artificial Intelligence and Statistics, volume 238 of Proceedings of Machine
+     Learning Research, pages 3484–3492. PMLR, 02–04 May 2024.
+
+[20] Zhu Li, Jean-Francois Ton, Dino Oglic, and Dino Sejdinovic. Towards a unified analysis of random fourier
+     features. Journal of Machine Learning Research, 22(108):1–51, 2021.
+[21] Bernt Øksendal. Stochastic Differential Equations: An Introduction with Applications. Universitext.
+     Springer, Berlin, Heidelberg, 6th edition, 2014.
+
+[22] Christopher C. Paige and Michael A. Saunders. Lsqr: An algorithm for sparse linear equations and sparse
+     least squares. ACM Transactions on Mathematical Software, 8(1):43–71, 1982.
+[23] Ali Rahimi and Benjamin Recht. Random features for large-scale kernel machines. In J. Platt, D. Koller,
+     Y. Singer, and S. Roweis, editors, Advances in Neural Information Processing Systems, volume 20. Curran
+     Associates, Inc., 2007.
+
+[24] Ali Rahimi and Benjamin Recht. Weighted sums of random kitchen sinks: Replacing minimization with
+     randomization in learning. In D. Koller, D. Schuurmans, Y. Bengio, and L. Bottou, editors, Advances in
+     Neural Information Processing Systems, volume 21. Curran Associates, Inc., 2008.
+[25] H. Risken. The Fokker–Planck Equation: Methods of Solution and Applications. Springer, Berlin, Heidel-
+     berg, 2nd edition, 1996.
+
+[26] Yousef Saad. Iterative Methods for Sparse Linear Systems. SIAM, Philadelphia, 2nd edition, 2003.
+[27] Russell Schwartz. Stochastic modelling for systems biology. Briefings in Bioinformatics, 8(3):204–205,
+     2007.
+[28] Michael Sørensen. Parametric inference for discretely sampled stochastic differential equations. In Thomas
+     Mikosch, Jens-Peter Kreiss, Richard A. Davis, and Torben Gustav Andersen, editors, Handbook of Financial
+     Time Series, pages 531–553. Springer, Berlin, Heidelberg, 2009.
+[29] Zoltan Szabo and Bharath Sriperumbudur. On kernel derivative approximation with random fourier fea-
+     tures. In Kamalika Chaudhuri and Masashi Sugiyama, editors, Proceedings of the Twenty-Second Interna-
+     tional Conference on Artificial Intelligence and Statistics, volume 89 of Proceedings of Machine Learning
+     Research, pages 827–836. PMLR, 16–18 Apr 2019.
+[30] Lloyd N. Trefethen and David Bau. Numerical Linear Algebra. SIAM, 1997.
+[31] Belinda Tzen and Maxim Raginsky. Neural stochastic differential equations: Deep latent gaussian models
+     in the diffusion limit, 2019.
+
+[32] N. G. van Kampen. Stochastic Processes in Physics and Chemistry. North Holland, Amsterdam, 3rd
+     edition, 2007.
+
+
+
+                                                      22
+[33] Martin J. Wainwright. High-Dimensional Statistics: A Non-Asymptotic Viewpoint. Cambridge Series in
+     Statistical and Probabilistic Mathematics. Cambridge University Press, Cambridge, 2019.
+[34] John B Walsh. On numerical solutions of the stochastic wave equation. Illinois Journal of Mathematics,
+     50(1-4):991–1018, 2006.
+
+[35] Junwen Yao, N. Benjamin Erichson, and Miles E. Lopes. Error estimation for random fourier features.
+     In Francisco Ruiz, Jennifer Dy, and Jan-Willem van de Meent, editors, Proceedings of The 26th Interna-
+     tional Conference on Artificial Intelligence and Statistics, volume 206 of Proceedings of Machine Learning
+     Research, pages 2348–2364. PMLR, 25–27 Apr 2023.
+
+
+
+A     Details for Numerical Experiments
+This appendix provides precise data-generation procedures and parameter settings for all experiments.
+
+A.1     Experiments 1–4 and 7–8: SDE snapshot generation
+For Experiments 1-4 and 7-8, training data are generated using EM simulation. Each sample begins from an
+initial condition x0 drawn uniformly from a specified domain Dx0 . From this initial state, the SDE is evolved
+for 1000 EM iterations with internal step size ∆t = h/1000, corresponding to a total transition time h. Only
+the initial and final states are retained, yielding training triples (x0 , x1 , h).
+Training data parameters are summarized in Tables 4-7.
+
+                       Table 4: Summary of the training data for the polynomial experiments 1–3.
+
+       Exp.      Dim.               True Drift f (x)                                True Diffusion σ(x)               Step h         Dx0         #Pts
+                                   −16x30 + 8x0 − 1.5
+                                                                                                           
+                                                                                   0.1x0 + 0.5          0
+         1         2                   3                                                                               0.01        [−1, 1]2     10000
+                                   −16x1+ 8x1 − 1.5                               0             0.1x1 + 0.5 
+                                          −x0                                  0.09506           0         0
+         2         3                    −x1                                 0.04639        0.15817      0          0.01        [−1, 1]3     10000
+                                          −x2                                  0.04338        0.07507 0.00853
+                             f (x) = (g(x0 ), . . . , g(x9 ))⊤
+         3         10                                                                       see below                  0.01        [−1, 1]10    100000
+                               g(t) = −16t3 + 8t − 1.5
+
+True diffusion for Experiment 3
+ σ(x) =
+                                                  −0.060878                             −0.009347       −0.029005                   −0.095809    −0.007837
+                                                                                                                                                          
+    0.22832       0.010865        0.090003                           0.012992                                        0.054890
+  0.010865
+                  0.13756         0.003815       0.012116          −0.003058            0.014402       0.005206    0.007598        0.049540     −0.024421
+  0.090003      0.003815           0.27686       −0.073250         −0.057378            0.077955       −0.067661    0.011554       −0.123940     0.032760 
+                                                                                                                                                          
+                                                                                                                                                          
+ −0.060878       0.012116        −0.073250        0.27916           0.020965           0.017321        0.054022    −0.077201        0.072615    −0.063557
+                                                                                                                                                          
+  0.012992      −0.003058        −0.057378        0.020965           0.22742           −0.057193        0.003315   −0.013105        0.022512    −0.009778
+                                                                                                                                                           .
+                                                                                                                                                          
+ −0.009347       0.014402        0.077955        0.017321          −0.057193            0.21696        −0.023792   −0.003358       −0.011393    −0.012749
+ 
+                                                                                                                                                          
+ −0.029005       0.005206        −0.067661        0.054022         0.003315            −0.023792        0.14159    −0.004788        0.053163    −0.029238
+                                                                                                                                                          
+  0.054890
+                0.007598         0.011554        −0.077201         −0.013105           −0.003358       −0.004788    0.20365        −0.021602     0.008506 
+                                                                                                                                                           
+                                                                                                                                                          
+ −0.095809       0.049540        −0.123940        0.072615         0.022512            −0.011393        0.053163   −0.021602        0.29429     −0.043131
+   −0.007837     −0.024421         0.032760       −0.063557         −0.009778           −0.012749       −0.029238    0.008506       −0.043131     0.19488
+
+
+
+                 Table 5: Summary of the training data for the underdamped Langevin experiment.
+
+                                                           True Drift                True Diffusion
+          Exp.        v0 Dim.       x0 Dim.                                                                Step h      Dv0          Dx0        #Pts
+                                                            f (x, v)                    σ(x, v)
+                                                                                         √
+             4           1                1         −x3 − x + 0.5v                         0.1              0.01      [−1, 1]      [−1, 1]     10000
+
+
+
+                  Table 6: Summary of the training data for the wide spectral support experiment.
+
+                 Exp.     Dim.                True Drift f (x)                  True Diffusion σ(x)          Step h           Dx        #Pts
+                                                          −1  (x2   2
+                                      "                                   #
+                                          e−|x0 |/0.1 e         0 +x1 )
+                                                                                                   
+                                                            2                               0.1    0
+                  7           2                           − 2 (x0 +x2
+                                                            1   2                                             0.001      [−1, 1]2      100000
+                                          e−|x1 |/0.2 e             1)                       0    0.1
+
+
+
+
+                                                                                      23
+                                                          0.25x20 + 0.25
+                                                                                       
+                                                                                0
+For error analysis, true diffusion σ(x) =                                                .
+                                                                 0       0.25x21 + 0.25
+
+                    Table 7: Summary of the training data for the near singular diffusion experiment.
+
+                Exp.       Dim.       True Drift f (x)           True Diffusion σ(x)               Step h      Dx          #Pts
+                                                                                   
+                                                                     0.0001        0
+                                                          R(ϑ(x))                   R(ϑ(x))⊤
+                                              −x0                       0          1
+                    8        2                                                                     0.0001    [−2, 2]2     100000
+                                              −x1             R(ϑ): planar rotation matrix
+                                                                 ϑ(x) = k atan2(x1 , x0 )
+
+
+
+A.2       Experiment 5: SIR data generation
+Data for Experiment 5 are generated using Gillespie’s stochastic simulation algorithm (SSA) applied to the SIRS
+jump process described in Section 5. The system tracks integer-valued populations (n0 , n1 , n2 ) corresponding
+to susceptible, infected, and recovered individuals, with concentrations x̃p = np /N .
+At each SSA update, transition rates are given by r1 = 4k1 x̃0 x̃1 , r2 = k2 x̃1 , r3 = k3 x̃2 , and a transition event
+is selected with probability proportional to its rate. The holding time is sampled as ∆τ = − log(U1 )/(N (r1 +
+r2 + r3 )), where U1 ∼ Uniform(0, 1).
+Training data are generated from multiple independent trajectories. Initial concentrations (x̃0 , x̃1 , x̃2 ) are sam-
+pled uniformly from the two-simplex subject to the constraint that N x̃p is integer-valued. Each trajectory is
+evolved until either a predefined maximum time is reached or the number of infected reaches zero.
+Trajectory observations are recorded as the first SSA state after fixed time intervals of length ∆t. Snapshot
+                                   (n)  (n)                    (n)       (n)   (n)                 (n)
+triples are then formed as D = {(x0 , x1 , h(n) )}N                                      2
+                                                  n=1 , where x0 = (x̃0 , x̃2 ) ∈ R , and x1 is the subsequent
+                                                    data
+
+
+observation after an elapsed time h(n) . The infected proportion x̃1 is omitted since x̃0 + x̃1 + x̃2 = 1.
+Training data was generated according to Table 8.
+
+                                 Table 8: Summary of the training data for the SIR experiment.
+
+        Exp.        N         Parameters k              Max Time (s)      No. Traj.      Sample Step Size ∆t (s)         Approx. #Pts
+          5        1024    k1 , k2 , k3 = 1, 1, 0            4                 250                   0.01                        22664
+
+
+A.3       Experiment 6: Stochastic wave equation data generation
+Training data for Experiment 6 are generated by numerically solving the stochastic wave equation described
+in Section 5 on a uniform space-time grid using the staggered-grid scheme in (13). The grid spacing h defines
+both the temporal discretization tj = jh and the spatial discretization xi = ih, and therefore controls the
+resolution of the numerical solution and the resulting number of training samples. The computed solution is
+then converted into training data using the reformulation described in Section 5. Training data parameters are
+summarized in Table 9.
+
+                   Table 9: Summary of the training data for the stochastic wave equation experiment.
+
+   Exp.       Dim.      f (x, t, u)            σ(x, t, u)                 u0 (x)         v0 (x)     Step h     Dx        Dt       Mean #Pts
+                                                        1 2            −150(x− 1 )2
+                                                           
+    6          1        5 sin(4πx)     1
+                                       20
+                                           1 + e−150(x− 2 )        1
+                                                                   20
+                                                                      e        2         −2 du
+                                                                                             dx
+                                                                                               0
+                                                                                                    0.001     [0, 1]    [0, 2]      995004
+
+
+
+
+                                                                          24
+B     Reproducibility and Implementation Details
+B.1   Hyperparameter Selection
+
+                              Table 10: Algorithm 2 hyperparameters.
+
+         Experiment   log2 (K)       δ          λ       Mmin     Mmax   Resampling   Metropolis
+              1           8        0.05     1.00E-03     30      1000      True        False
+              2           7        0.01     1.00E-05     20      1000      True        False
+              3          10        0.01     1.00E-02     50      1000      True        False
+              4           7         0.1     1.00E-03     20      1000      True        False
+              5           8         0.1     2.00E-03     20      1000      True        False
+              6           9         0.3     1.00E-03     50      1000      True        False
+              7           9         0.5     1.00E-02     50      1000      False       True
+          8 (Drift)       9         0.2     1.00E-03    300      1000      False       True
+          8 (Diff.)       9        0.01     1.00E-05     20      1000      False       True
+
+
+        Table 11: Adam hyperparameters. ”Deep” = two hidden layers (L=2), width K/2 each.
+
+                 Experiment      log2 (K)    log2 (Batch Size)   Learning Rate   Epochs
+                     1               8               9             1.00E-03        800
+                     2               7               8             1.00E-04        100
+                     3              10              10             1.00E-04       300
+                     4               7               8             1.00E-04        100
+                     5               8               8             1.00E-04        100
+                     6               9               9             1.00E-03        600
+                     7               9               9             1.00E-04        300
+                     8              10               9             1.00E-03       2000
+
+
+B.2   System and Software Configuration
+
+               Table 12: Hardware and software configuration used in all experiments.
+
+                Component        Details
+                GPU              3 × NVIDIA RTX A6000 (48 GB each)
+                CPU              2 × Intel Xeon Gold 6242 (2.80 GHz, 64 threads total)
+                RAM              512 GB DDR4
+                OS               Ubuntu 22.04 LTS
+                Python           3.11.7
+                JAX              0.4.35 (CUDA 12, cuDNN 9)
+                NumPy            1.26.4
+                SciPy            1.14.1
+                TensorFlow       2.15.0
+
+
+
+
+                                                       25
+B.3    Compilation Times
+
+Table 13: JAX/XLA first-run wall times (seconds) including compilation. These represent one-off initialization
+overheads and are not included in the loss–time curves.
+
+                                          Adam tanh     Adam tanh      Adam tanh      Adam tanh
+            Exp.    Alg. 2   Adam NK
+                                           Shallow        Deep        Shallow Split   Deep Split
+              1       8.2        5.1          4.8           5.6            –              –
+              2       6.7        4.3          4.1           4.9            –              –
+              3      45.3         –          32.1            –             –              –
+              4       6.5        4.2          3.9           4.7            –              –
+              5       9.1        5.7          5.3           6.1            –              –
+              6      15.8        8.4          7.9           9.2            –              –
+              7      28.6       12.1         11.3          13.7            –              –
+              8       7.6         –           7.7          8.1            12.2           11.6
+
+
+
+
+                                                      26
+

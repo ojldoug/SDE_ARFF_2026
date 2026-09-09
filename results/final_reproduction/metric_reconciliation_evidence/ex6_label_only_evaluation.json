@@ -1,0 +1,8 @@
+{
+  "seed": 0,
+  "estimator": "arff_historical_corrected",
+  "original_coordinates_rmse": 0.24544343135166938,
+  "corrected_coordinates_rmse": 0.24564701189238544,
+  "truth_label_shift_rms": 0.03135257264539718,
+  "interpretation": "Fixed current model evaluated at original/corrected labels; not a counterfactual retraining"
+}

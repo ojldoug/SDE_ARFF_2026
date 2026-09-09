@@ -1,0 +1,1276 @@
+  Feedback on Drift–Diffusion Decomposition for Likelihood-Based
+  SDE Learning with Adaptive Random Fourier Features (Internal
+                     Review, Verified Version)
+
+                                           Raúl Tempone
+
+                                             May 4, 2026
+
+Manuscript               Drift–Diffusion Decomposition for Likelihood-Based SDE Learning with
+                         Adaptive Random Fourier Features
+Authors                  Owen Douglas, Aku Kammonen, Anamika Pandey, Raúl Tempone
+Version reviewed         ARFFSDELearning.pdf, 22 pages, revised manuscript supplied for internal
+                         review
+Audit source             Analytical Audit of the Revised SDE Learning Manuscript.docx
+Materials                Main PDF manuscript and audit Word file; project style files
+                         feedback_template.tex and writing_style_notes.txt used for for-
+                         matting and style
+Confidentiality          Confidential draft feedback for authors
+
+
+Contents
+1 How to read this verified feedback                                                                   1
+
+2 Audit-integrated revision note                                                                       2
+
+3 Executive summary                                                                                    2
+  3.1 Summary of contribution as understood . . . . . . . . . . . . . . . . . . . . . . . . .          2
+  3.2 Top-line assessment . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    2
+  3.3 Prioritized action plan . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    3
+
+4 Global comments                                                                                  4
+  4.1 Correctness-critical issues (severity A / blocker) . . . . . . . . . . . . . . . . . . . . . 4
+  4.2 Rigor and clarity issues (severity B / major) . . . . . . . . . . . . . . . . . . . . . . . 8
+  4.3 Exposition and structure improvements (severity C / minor) . . . . . . . . . . . . . 13
+  4.4 Presentation/style notes (severity D / suggestion) . . . . . . . . . . . . . . . . . . . . 14
+
+5 Section-by-section feedback                                                                          15
+  5.1 §1 Introduction . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .    15
+  5.2 §2 Adaptive Random Fourier Features . . . . . . . . . . . . . . . . . . . . . . . . . .          16
+  5.3 §3 Mathematical problem setting . . . . . . . . . . . . . . . . . . . . . . . . . . . . .        16
+  5.4 §4 Drift and diffusion training algorithm . . . . . . . . . . . . . . . . . . . . . . . . .      17
+  5.5 §5 Computational experiments . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .         17
+  5.6 §6 Results . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   18
+
+                                                   1
+    5.7   §7 Summary and discussion . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+
+6 Suggested reorganization for the arXiv revision                                                    19
+
+7 ArXiv readiness and SIMODS fit                                                                   20
+  7.1 ArXiv readiness checklist . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+  7.2 SIMODS fit . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+
+8 Local edits and notation consistency                                                               21
+
+9 Final verification queue                                                                           21
+
+A Suggested missing citations and bibitems                                                            22
+  A.1 Citation priorities . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+
+
+1    How to read this verified feedback
+Severity labels follow the A–D scale requested in the manuscript-review workflow.
+
+• blocker = severity A: correctness or validity issue; must be fixed before an arXiv update or
+  journal submission.
+
+• major = severity B: important rigor, clarity, positioning, numerical, or reproducibility issue.
+
+• minor = severity C: exposition or structural improvement.
+
+• suggestion = severity D: presentation or optional style improvement.
+
+• strength: brief note about what is already working.
+
+Every substantive point is anchored to ARFFSDELearning.pdf by page, section, equation, table,
+figure, or algorithm when available. The audit file is treated as the verification layer: where the
+pre-audit feedback and the audit differed, I adopted the audit-supported correction.
+
+
+2    Audit-integrated revision note
+The attached audit confirmed the main mathematical blockers in the pre-audit feedback and
+sharpened several of them. The verified version below now makes five changes relative to the
+first feedback file. First, it states the drift result as a weighted conditional-moment identity and
+distinguishes it from the ordinary ridge surrogate used in the algorithm. Second, it corrects the
+diffusion proposition to strict convexity in the precision variable, not in the covariance variable,
+and adds the scalar counterexample. Third, it treats residual covariance targets as out-of-fold or
+fixed-drift targets, not automatically unbiased same-sample targets. Fourth, it strengthens the
+covariance-validity recommendation: raw residual outer products are positive semidefinite and rank
+deficient, and the learned covariance must be projected or parametrized to be SPD before likelihood
+evaluation or simulation. Fifth, it qualifies the error decomposition and the experiment narrative,
+especially for fine-step SDE snapshots, the event-level SSA/SIR experiment, and the near-singular
+benchmark.
+
+
+
+                                                   2
+3     Executive summary
+3.1   Summary of contribution as understood
+The paper proposes a likelihood-motivated method for learning Itô SDE coefficients from snapshot
+triples (x0 , x1 , h). The central computational idea is to avoid direct joint optimization of the
+Gaussian Euler–Maruyama negative log-likelihood by using conditional-moment identities: first
+estimate the drift from scaled increments, then estimate the covariance from residual outer products.
+Both stages are trained with adaptive random Fourier features (ARFF), so the main numerical work
+is repeated ridge-type least-squares solution with adaptive frequency resampling and random-walk
+updates.
+
+3.2   Top-line assessment
+• Core idea. The method is useful and potentially publishable: a sequential conditional-moment
+  estimator is a natural way to reduce the ill-conditioning created by inverse covariance matrices
+  in joint Gaussian NLL training.
+
+• Main empirical strength. Experiment 8 is compelling. It shows that low joint NLL can
+  coexist with poor coefficient recovery in a near-singular covariance regime, while split training
+  recovers drift and covariance more faithfully.
+
+• Current readiness. I do not recommend updating arXiv or submitting to SIMODS until the
+  mathematical statements in §4 are rewritten. The current draft overstates the exactness of the
+  decomposition.
+
+• Most important mathematical correction. The Gaussian NLL gives unrestricted population
+  conditional-moment identities. It does not decompose into two independent finite-sample ordinary
+  least-squares problems in the restricted ARFF class.
+
+• Second correction. The diffusion objective is strictly convex in the precision P = a−1 , not in
+  the covariance a or Σ.
+
+• Third correction. Individual empirical covariance targets h−1 rr⊤ are PSD and rank at most
+  one; they are not positive definite for D > 1.
+
+• Implementation risk. The paper must define how the learned covariance is made SPD before
+  computing log-determinants, inverses, validation NLL, and learned trajectories.
+
+• Venue fit. SIMODS is a plausible target after revision. The journal scope is aligned with
+  mathematical, statistical, and computational methods for data science, and its referee instructions
+  explicitly emphasize novelty, correctness, significance, technical soundness, reproducibility, and
+  state-of-the-art comparisons [1, 2].
+
+3.3   Prioritized action plan
+1. [Blocker] Replace “decomposition into two independent regression problems” by “population
+   conditional-moment identities motivating a two-stage regression surrogate” in the abstract,
+   introduction, §4, and §7.
+
+2. [Blocker] Restate the drift result as a weighted conditional-moment proposition and separate
+   the exact GLS objective from the implemented ordinary ridge surrogate.
+
+                                                 3
+ 3. [Blocker] Restate the diffusion proposition: strict convexity is in P = a−1 ; a = C is the unique
+    minimizer only when C ≻ 0.
+
+ 4. [Blocker] Replace the same-sample “unbiased plug-in target” claim by an out-of-fold/cross-fitted
+    residual construction, or qualify the claim for a fixed drift independent of the sample used to
+    form the residual.
+
+ 5. [Blocker] Add an SPD-validity path: projection, Cholesky/log-Cholesky parametrization, or
+    matrix-exponential parametrization. Use the SPD-enforced covariance for NLL and simulation.
+
+ 6. [Blocker] Standardize notation: learn the covariance/diffusivity a = σσ ⊤ , not an identifiable
+    diffusion factor σ.
+
+ 7. [Blocker] Repair or qualify Experiment 5. Either regenerate fixed-lag SSA/CLE snapshots or
+    label it explicitly as an event-level jump-process approximation stress test and report the missing
+    population-size and holding-time details.
+
+ 8. [Major] Rewrite the error discussion as a heuristic for the uniformly elliptic regime; separate
+    target-space errors from excess NLL and state that constants deteriorate as λmin (a) ↓ 0.
+
+ 9. [Major] Make the ARFF regression implementation exact: real sine–cosine features or a precise
+    complex-to-real formulation, multi-output normal equations, normalization, and denormalization
+    order.
+
+10. [Major] Correct the complexity formulas to include output dimension q, multiple right-hand
+    sides, and memory.
+
+11. [Major] Add uncertainty estimates to Tables 2–3 and define all shaded bands/error bars in
+    figure captions.
+
+12. [Major] Add parameter counts, hyperparameter-search ranges, random seeds, train/valida-
+    tion/test generation protocol, solver tolerances, and code/data release information.
+
+13. [Major] Specify the trajectory-histogram protocol for Fig. 6: initial law, number of trajectories,
+    horizon, EM step, binning, random seeds, and covariance enforcement.
+
+14. [Major] Clean the bibliography: cite Kingma–Ba for Adam, Rahimi–Recht for RFF, correct
+    ARFF resampling metadata, and position against classical diffusion inference and recent SDE-
+    learning work.
+
+15. [Minor] Add a notation table after the introduction covering f , σ, a, Σ, θf , θa , Kf , Ka , q, h,
+    and vecℓ .
+
+
+
+
+                                                   4
+4      Global comments
+4.1     Correctness-critical issues (severity A / blocker)
+    blockerARFFSDELearning.pdf, p. 1, §Abstract; ARFFSDELearning.pdf, p. 2, §Contributions;
+    ARFFSDELearning.pdf, p. 4, §4; ARFFSDELearning.pdf, p. 17, §7
+
+    Observation. The current draft repeatedly says that the Gaussian Euler–Maruyama NLL
+    decomposes into two independent regression problems. This is too strong. At the unrestricted
+    population level, the likelihood identifies drift and covariance through conditional moments.
+    At the restricted ARFF level, the exact NLL projection differs from the implemented ordinary
+    least-squares surrogate. At the empirical level, the diffusion stage depends on the first-stage
+    drift estimate through the residuals.
+    Action. Use the following replacement language throughout:
+
+         “The Gaussian Euler–Maruyama likelihood yields conditional-moment identities for
+         the drift and covariance. We exploit these identities through a two-stage regression
+         surrogate: first regress scaled increments to estimate the conditional mean, then
+         regress residual outer products to estimate the conditional covariance.”
+
+    In the abstract, replace “admits a structural decomposition into two independent regression
+    problems” by “admits a conditional-moment characterization that motivates two sequential
+    regression problems.”
+
+    blocker ARFFSDELearning.pdf, p. 4, §4.1, drift reduction; ARFFSDELearning.pdf, p. 4, §3,
+    Eq. (4); ARFFSDELearning.pdf, p. 6, §4.2, Alg. 2
+
+    Observation. The stage-one drift derivation treats ordinary least squares on Y = h−1 (x1 − x0 )
+    as the exact fixed-covariance NLL minimizer. This is not correct when h varies or when one
+    cares about the exact finite-sample fixed-covariance NLL. For fixed covariance field aη (x), the
+    quadratic part is weighted by both H and aη (X0 )−1 .
+    Action. State the corrected population identity. Let
+                                      X1 − X0
+                                  Y :=         ,    A(x) := aη (x)−1 .
+                                         H
+    For fixed A(x) ≻ 0, the quadratic part of the population NLL is
+                                      1 h                                     i
+                           Q(f ) =      E H (Y − f (X0 ))⊤ A(X0 )(Y − f (X0 )) .
+                                      2
+    The unrestricted minimizer is
+                                                 E[HY | X0 = x]
+                                         f ∗ (x) =                .
+                                                  E[H | X0 = x]
+    If H is deterministic, or if E[Y | X0 = x, H = h] is independent of h, then f ∗ (x) = E[Y | X0 = x].
+    Under the frozen-coefficient one-step Euler–Maruyama model, E[Y | X0 = x, H = h] = f (x), so
+    the weighted and unweighted population targets coincide. Then explicitly state that Alg. 2 uses
+    the ordinary ridge surrogate
+                                        N                    K
+                                     1 X            (n) 2   X
+                                min        Yn − f (x0 ) + λ     ∥βbk ∥2 ,
+                               f ∈NK N
+                                       n=1                  k=1
+
+
+
+
+                                                      5
+not the exact fixed-covariance empirical NLL minimizer.
+
+blocker ARFFSDELearning.pdf, p. 4, §4.1, empirical drift problem; ARFFSDELearning.pdf,
+p. 2, §2, Eq. (2)
+
+Observation. If the authors want an exact finite-sample optimizer of the fixed-covariance NLL,
+the sample problem is generalized ridge regression, not the ordinary multi-output ridge system
+in Eq. (2). This distinction is central because the manuscript presents closed-form ordinary LS
+solves as an exact likelihood reduction.
+                                                                                                   (n)
+Action. Add the exact GLS formulation as a remark. With a real feature vector ϕn = ϕ(x0 ) ∈
+                                                                                 (n) −1
+RK , coefficient matrix B ∈ RK×D , fB (xn ) = (ID ⊗ ϕ⊤
+                                                     n ) vec(B), and An = aη (x0 ) , the
+fixed-covariance empirical objective is
+                         N
+                      1 X     
+                                         (n) ⊤
+                                              
+                                                          (n)
+                                                              
+                  min       hn Yn − fB (x0 ) An Yn − fB (x0 ) + λ∥B∥2F .
+                   B N
+                        n=1
+
+The normal equations are
+          " N                                          #              N
+                 hn (ID ⊗ ϕn )An (ID ⊗ ϕ⊤
+           X                                                          X
+                                        n ) + λN IKD       vec(B) =         hn (ID ⊗ ϕn )An Yn .
+           n=1                                                        n=1
+
+This shows precisely why the implemented ordinary ridge stage is a computationally attractive
+surrogate rather than an exact finite-sample NLL minimizer.
+
+blocker            ARFFSDELearning.pdf, p. 5, §4.2, Proposition “Pointwise minimiser and
+uniqueness”; ARFFSDELearning.pdf, p. 5, §4.2, Eq. (7)
+
+Observation. The pointwise minimizer a∗ (x) = C(x) is correct when C(x) ≻ 0, but the
+stated strict convexity in the covariance variable is false. In one dimension with C = 1,
+        1
+ϕ(s) = 2s + 12 log s has
+                                                 2−s
+                                       ϕ′′ (s) =      ,
+                                                  2s3
+which is negative for s > 2. The proof in the draft actually proves strict convexity after
+reparametrizing by the precision P = a−1 .
+Action. Replace the proposition by:
+     Proposition. Assume C(x) ≻ 0 and define
+                                   1               1
+                       Φx (a) =      tr(a−1 C(x)) + log det a,         a ∈ SD
+                                                                            ++ .
+                                   2               2
+     Equivalently, with P = a−1 ,
+                                   1             1
+                       Ψx (P ) =     tr(P C(x)) − log det P,          P ∈ SD
+                                                                           ++ .
+                                   2             2
+     The function Ψx is strictly convex in P . Hence its unique minimizer is P ∗ = C(x)−1 ,
+     and the unique covariance minimizer is a∗ (x) = C(x).
+
+
+                                                  6
+Cite a standard convex-optimization source for convexity of − log det on the SPD cone [17].
+Add: if C(x) is singular, the SPD objective has no finite interior minimizer and an SPD ridge
+or structural constraint is required.
+
+blockerARFFSDELearning.pdf, p. 5, §4.2, “unbiased plug-in target”; ARFFSDELearning.pdf,
+p. 6, §4.2, Alg. 2
+
+Observation. The target h−1         ⊤
+                              n rn rn is conditionally unbiased for the fixed-drift residual second
+moment only when the drift used to form rn is fixed independently of the observation used
+for that residual. In Alg. 2, the same data are used to fit fθ and construct residual covariance
+targets, so overfitting can bias the diffusion stage.
+Action. Use cross-fitting or qualify the statement. I recommend adding the following optional
+but robust version of Alg. 2:
+
+1. Split the training indices into L folds I1 , . . . , IL .
+
+2. For each fold ℓ, train fb(−ℓ) on the data outside Iℓ .
+
+3. For n ∈ Iℓ , compute
+                                (n)     (n)               (n)          −1 cf cf ⊤
+                       rncf = x1 − x0 − hn fb(−ℓ) (x0 ),        bcf
+                                                                a n = hn rn (rn ) .
+
+                                              (n)     N
+                                                bcf
+4. Fit the covariance regressor on {(x0 , vecℓ (an ))}n=1 .
+
+Cross-fitting is a standard way to reduce same-sample nuisance-estimation bias in flexible
+two-stage procedures [18]. If the current code is not cross-fitted, replace “unbiased plug-in
+target” by “plug-in residual target; unbiased for a fixed drift independent of the sample used to
+construct the residual.”
+
+blocker                  ARFFSDELearning.pdf, p. 6, §4.3, positive-definiteness paragraph;
+ARFFSDELearning.pdf, p. 18, §7, limitations paragraph
+
+Observation. The manuscript says, on p. 18, that empirical covariance targets are positive
+definite. This is false. Each target h−1    ⊤
+                                      n rn rn is positive semidefinite and has rank at most one. For
+D > 1 it is singular unless additional averaging has already occurred. Moreover, componentwise
+ARFF regression of lower-triangular entries does not preserve positive semidefiniteness at test
+points.
+Action. Replace the statement by:
+
+      “The residual outer-product targets are positive semidefinite but generally rank
+      deficient. Their conditional mean may be positive definite under a nondegeneracy
+      condition on the residual distribution. Since the split ARFF implementation regresses
+      covariance entries componentwise, the learned covariance field is not guaranteed
+      to be positive definite unless an SPD projection or structured parametrization is
+      added.”
+
+
+
+
+                                                      7
+blocker        ARFFSDELearning.pdf, p. 4, §3, Eq. (4); ARFFSDELearning.pdf, p. 6, §4.3;
+ARFFSDELearning.pdf, p. 15, §6.1, Fig. 6; ARFFSDELearning.pdf, p. 18, §7
+
+Observation. The NLL, log determinant, inverse covariance, and Euler–Maruyama simulation
+are undefined if the learned covariance is indefinite. The statement “no violations were observed”
+is empirical reassurance, not an algorithmic definition.
+Action. Add an explicit SPD-enforcement path. The simplest retrofit is
+                   1                 
+        Bη (x) =     a         bη (x)⊤ ,
+                      bη (x) + a              Bη (x) = Q(x) diag(λ1 (x), . . . , λD (x))Q(x)⊤ ,
+                   2
+           bη,ε (x) = Q(x) diag max{λ1 (x), ε}, . . . , max{λD (x), ε} Q(x)⊤ ,
+                                                                       
+           a                                                                           ε > 0.
+Use a
+    bη,ε for all validation NLLs and simulations. Report
+
+                                         1 NX  test
+                            viol(a
+                                 b) =               1{λmin (Bη (xj )) ≤ 0},
+                                        Ntest j=1
+
+and state whether RMSE is computed before or after projection.
+
+
+blocker         ARFFSDELearning.pdf, p. 3, §3, Eq. (3); ARFFSDELearning.pdf, p. 10, §5.6,
+Eq. (14); ARFFSDELearning.pdf, p. 20, §A.1, Table 7; Tables 2–3
+
+Observation. The manuscript alternates between learning the diffusion factor σ and the
+covariance Σ = σσ ⊤ . Alg. 2 learns a covariance matrix field, but several experiment tables
+and captions call the true object “diffusion σ(x)”. Experiment 8 is particularly ambiguous:
+Eq. (14) defines a symmetric SPD matrix under the symbol σ(x) and then says the covariance
+has smallest eigenvalue ε2 .
+Action. Use a(x) = σ(x)σ(x)⊤ for the learned covariance/diffusivity and reserve σ for a square
+root. Rewrite the likelihood as
+
+                                                                           aη (x) ∈ SD
+                                                                 
+               X1 | X0 = x, H = h ≈ N x + hfθ (x), haη (x) ,                         ++ .
+
+For Experiment 8 choose one convention and apply it everywhere:
+
+          Option A:     σ(x) = R(ϑ) diag(ε, 1)R(ϑ)⊤ ,       a(x) = R(ϑ) diag(ε2 , 1)R(ϑ)⊤ ,
+
+or                                                                          √
+         Option B:      a(x) = R(ϑ) diag(ε, 1)R(ϑ)⊤ ,      σ(x) = R(ϑ) diag( ε, 1)R(ϑ)⊤ .
+Then update all RMSE labels, heat-map captions, and tables to say explicitly whether “Diff.”
+means a or σ.
+
+blocker ARFFSDELearning.pdf, p. 9, §5.3; ARFFSDELearning.pdf, p. 21, §A.2, SIR data
+generation; Table 8
+
+Observation. Experiment 5 is the most fragile experimental section. The text records a
+snapshot at every SSA event with holding time h = − log(U )/(r1 + r2 + r3 ). For an exact
+
+
+
+
+                                                   8
+ exponential holding time H, E[1/H] = ∞, so the event-level scaled-increment target (X1 −X0 )/H
+ has delicate or infinite moments. The propensity scaling is also ambiguous: the text defines
+ concentration-level rates rj (x̃) but uses them as SSA hazards without reporting the population
+ size N . In a count-based SSA compatible with the displayed CLE scaling, total hazards are
+ typically N rj (x̃), up to the chosen time scaling.
+ Action. Either regenerate the experiment as fixed-lag snapshots or explicitly label it as a
+ jump-process/CLE approximation stress test. A clean fixed-lag version would simulate SSA
+ from t to t + hobs and record only (X(t), X(t + hobs ), hobs ). If retaining event-level data, report
+ population size N , count-to-concentration scaling, total propensities, the empirical distribution
+ of h, any truncation/winsorization of very small h, and why the scaled-increment regression is
+ stable. Cite Gillespie’s SSA and chemical Langevin equation papers for context [19, 20].
+
+
+4.2   Rigor and clarity issues (severity B / major)
+ major                  ARFFSDELearning.pdf, p. 4, §4; ARFFSDELearning.pdf, p. 5, §4.2;
+ ARFFSDELearning.pdf, p. 6, §4.2, Alg. 2
+
+ Observation. The exact restricted covariance NLL projection is not the same as Frobenius
+ regression onto residual outer products. The pointwise unrestricted minimizer is C(x), but after
+ restricting aη to an ARFF class, the objective
+                               h                                        i
+                             E tr aη (X0 )−1 C(X0 ) + log det aη (X0 )
+
+ need not have the same minimizer as
+                                   h                                i
+                                E ∥ vecℓ (C(X0 )) − vecℓ (aη (X0 ))∥2 .
+
+ Action. Add this qualifier after the diffusion proposition:
+
+      “For unrestricted pointwise covariance functions, the NLL minimizer is C(x). In a
+      restricted regression class, our Frobenius least-squares fit to residual outer products
+      is a moment-regression surrogate. The exact restricted NLL projection would
+      reintroduce inverse covariances, log-determinants, and SPD constraints.”
+
+ major                   ARFFSDELearning.pdf, p. 6, §4.2, drift–diffusion coupling formula;
+ ARFFSDELearning.pdf, p. 20, §A.1
+
+ Observation. The displayed formula a∗ (x) = a(x) + h∆f (x)∆f (x)⊤ is exact only for the
+ frozen-coefficient one-step Euler–Maruyama observation model at fixed h. Appendix A.1 says
+ Experiments 1–4 and 7–8 are generated by 1000 internal EM steps over total lag h, which
+ approximates the true transition rather than the frozen one-step transition.
+ Action. Write the fixed-lag small-time identity as
+                    h                          i
+                  E h−1 rr⊤ | X0 = x, H = h = a(x) + h∆f (x)∆f (x)⊤ + O(h),
+ under smoothness and moment assumptions, where the O(h) term vanishes for the frozen-
+ coefficient one-step EM model. If H varies, state the identity conditional on both (X0 , H) or
+
+
+                                                   9
+replace h by E[H | X0 = x] only after saying why this conditioning is appropriate. Cite standard
+SDE numerical analysis for Euler–Maruyama and small-step bias context [21].
+
+
+major        ARFFSDELearning.pdf, p. 7, §4.4, Eq. (8); ARFFSDELearning.pdf, p. 15, §6.2,
+Fig. 7–ARFFSDELearning.pdf, p. 17, §6.2, Fig. 9
+
+Observation. Equation (8) mixes discretization bias, random-feature approximation, sampling
+error, optimization tolerance, residual-target bias, and excess NLL. The audit confirms the
+direction but recommends a weaker and more precise statement. In particular, the hε2f term
+is directly a residual-covariance target perturbation; converting it into excess NLL requires
+ellipticity and local smoothness of the NLL map. Constants necessarily deteriorate as λmin (a)
+approaches zero.
+Action. Replace Eq. (8) by a heuristic scaling paragraph. State assumptions such as
+
+                        0 < λ0 I ⪯ a(x), a
+                                         b(x) ⪯ Λ0 I,     E∥Y ∥4 < ∞,
+
+and write:
+
+     “This error discussion is heuristic and intended for the uniformly elliptic regime.
+     Target-space errors arise from EM bias, random-feature approximation, finite sam-
+     pling, optimization tolerance, and drift-induced residual-covariance bias. Excess NLL
+     is locally controlled by drift error weighted by a−1 and covariance error weighted by
+     a−1 ⊗ a−1 ; the constants degrade as λmin (a) ↓ 0. Therefore Eq. (8) should not be
+     read as uniform in the near-singular parameter ε.”
+
+major                             ARFFSDELearning.pdf, p. 7, §4.4, approximation paragraph
+
+Observation. The draft states that the Fourier-feature class achieves an O(K −1 ) squared L2
+approximation rate whenever the target and its Fourier transform are integrable. This should
+be phrased as an expected random-feature approximation bound whose constant depends on
+the frequency density and Fourier/Barron-type norm. It is not a deterministic guarantee for
+every sampled frequency set.
+Action. Replace by:
+
+     “Under the Fourier integrability assumptions used in RFF/ARFF analyses, the
+     expected squared L2 (ρ) approximation error of an appropriate random-feature
+     estimator scales as O(K −1 ). ARFF adapts the empirical frequency distribution to
+     reduce the constant in this bound; it does not change the Monte Carlo rate itself.”
+
+Cite the original RFF and ARFF sources [11, 12, 13, 14].
+
+
+major ARFFSDELearning.pdf, p. 2, §2, Eq. (1)–(2); ARFFSDELearning.pdf, p. 3, §2, Alg. 1
+
+Observation. The ARFF section defines real-valued predictors through the real part of complex
+Fourier sums, but Eq. (2) is written as a complex least-squares system with a single right-hand
+side. It is unclear whether the code solves real sine–cosine ridge regression, complex ridge
+
+
+
+                                              10
+regression, a conjugate-pair formulation, or complex ridge followed by taking real parts. These
+are not identical descriptions.
+Action. Use a real feature formulation in the text. For example,
+
+              Φ(x) = cos(ω1 · x), sin(ω1 · x), . . . , cos(ωK · x), sin(ωK · x) ∈ R2K ,
+                                                                                
+
+
+with target matrix Y ∈ RN ×q and coefficient matrix B ∈ R2K×q :
+
+                                     (Φ⊤ Φ + λN I)B = Φ⊤ Y.
+
+If the implementation remains complex, rewrite Eq. (2) in multi-output form and explain
+precisely how the real-valued objective is obtained.
+
+major                    ARFFSDELearning.pdf, p. 6, §4.2, Alg. 2 normalization sentence;
+ARFFSDELearning.pdf, p. 21, §B.1, Table 10–ARFFSDELearning.pdf, p. 22, §B.1, Table 11
+
+Observation. Alg. 2 says inputs are normalized and outputs denormalized, but the transforma-
+tions are not specified. This is a reproducibility issue, especially for covariance entries because
+denormalization must precede symmetric reconstruction and SPD projection.
+Action. Add formulas:
+
+            e = (x − µx ) ⊘ sx ,
+            x                        ye = (y − µy ) ⊘ sy ,                  b ) − µa ) ⊘ sa ,
+                                                                ze = (vecℓ (a
+
+where all statistics are computed on the training split only. At prediction time use the order:
+
+predict normalized entries → denormalize → reconstruct symmetric matrix → symmetrize → SPD projection.
+
+majorARFFSDELearning.pdf, p. 7, §4.5; ARFFSDELearning.pdf, p. 8, §4.5, complexity totals
+
+Observation. The complexity formulas suppress important dependence on the output dimension
+q. This matters because the diffusion stage has q = D(D +1)/2, which can dominate in moderate
+dimension. The statement that block Krylov methods make the per-iteration cost essentially
+unchanged in q needs qualification.
+Action. Let K denote the number of real feature columns. One direct rebuild should be
+reported as
+                O(N KD) + O(N K 2 ) + O(N Kq) + O(K 3 ) + O(K 2 q).
+The terms are feature construction, Gram formation, right-hand-side formation, factorization,
+and triangular solves for q outputs. If S is stored, a block iterative method has matrix–block
+products scaling like O(N Kq) per iteration; if features are recomputed, add feature-evaluation
+costs. Report memory as
+
+O(N K+Kq)      if S is stored,     O(KD+Kq)           plus data if features are recomputed on the fly.
+
+Then specialize q = D for drift and q = D(D + 1)/2 for covariance.
+
+
+
+
+                                                 11
+major           ARFFSDELearning.pdf, p. 8, §5; ARFFSDELearning.pdf, p. 8, §5, Table 1;
+ARFFSDELearning.pdf, p. 20, §A.1; ARFFSDELearning.pdf, p. 21, §A.3
+
+Observation. The experiments mix several observation models: fixed-lag snapshots generated
+by fine-step EM, event-level SSA, and a stochastic-wave discretization reformulated as an
+EM-type update. This is acceptable, but the manuscript currently presents the theory as if all
+data were one-step frozen-coefficient Gaussian EM observations.
+Action. Add a paragraph at the start of §5:
+
+     “Experiments 1–4 and 7–8 use small-lag snapshots generated by fine-step Euler–
+     Maruyama simulation and are interpreted as small-lag approximations to SDE
+     transitions. Experiment 5 uses SSA data from a jump process and is interpreted as
+     a mean-field/CLE approximation experiment unless regenerated at fixed observation
+     lag. Experiment 6 uses an EM-type reformulation of a staggered-grid stochastic-wave
+     scheme and is included as a problem-specific benchmark.”
+
+For Experiment 6, define the variance and independence structure of the stochastic increments
+in Eq. (13).
+
+
+major ARFFSDELearning.pdf, p. 11, §6, Table 2; ARFFSDELearning.pdf, p. 12, §6, Table 3;
+ARFFSDELearning.pdf, p. 11, §6, Fig. 1–ARFFSDELearning.pdf, p. 17, §6.2, Fig. 9
+
+Observation. Tables 2–3 report means over 30 runs but not standard deviations, confidence
+intervals, or standard errors. The figures appear to use bands/error bars, but the captions
+should be self-contained.
+Action. Report entries as mean ± standard deviation, or mean with 95% confidence interval.
+Add to each relevant caption:
+
+     “Curves show sample means over 30 independent runs; shaded regions/error bars
+     show ±1 sample standard deviation.”
+
+If some figures use standard errors instead, state that.
+
+major      ARFFSDELearning.pdf, p. 10, §6; ARFFSDELearning.pdf, p. 21, §B.1, Table 10;
+ARFFSDELearning.pdf, p. 22, §B.1, Table 11
+
+Observation. The baseline comparison is not yet reproducible enough for SIMODS. “Hyperpa-
+rameters were selected empirically” is too vague. It is also unclear whether the methods have
+comparable parameter counts, tuning budgets, validation rules, and early stopping criteria.
+Action. Add a reproducibility table with: search ranges, number of configurations, validation
+criterion, model-selection rule, random seeds, data split protocol, parameter counts, optimizer
+steps/epochs, batch size, solver tolerances, stored versus recomputed feature matrices, and
+code/data release status. This aligns with the SIMODS referee checklist for algorithmic detail,
+experimental completeness, reproducibility, and comparison to the state of the art [2].
+
+
+
+
+                                               12
+ major       ARFFSDELearning.pdf, p. 15, §6.2, Eq. (15); ARFFSDELearning.pdf, p. 15, §6.2,
+ Eq. (16); ARFFSDELearning.pdf, p. 17, §6.2, Fig. 9
+
+ Observation. The empirical scaling study defines ∆(K) = NLL(K) − NLL∞ , where NLL∞ is
+ estimated by regression, but the regression model and fitting range are not specified.
+ Action. State the exact model, for example
+
+                                   NLL(K) = NLL∞ + cK −α ,
+
+ then specify whether α is fixed to 1 or estimated, which K values are used, whether Alg. 2 and
+ Adam have separate asymptotes, and uncertainty in NLL∞ .
+
+ major                                               ARFFSDELearning.pdf, p. 15, §6.1, Fig. 6
+
+ Observation. The trajectory histogram is important, but its simulation protocol is missing.
+ Without this, Fig. 6 cannot be reproduced and the SPD issue cannot be audited.
+ Action. Report the number of trajectories, initial distribution, time horizon, EM simulation
+ step, covariance enforcement, random seeds/noise coupling if any, and histogram binning. State
+ whether simulations use the raw learned covariance or the SPD-projected covariance.
+
+ major        ARFFSDELearning.pdf, p. 18, §References; ARFFSDELearning.pdf, p. 15, §6.1,
+ “Adam-optimised deep networks [17]”
+
+ Observation. Reference [17] is AlexNet, not Adam. Since Adam is central to the baseline
+ comparison, the original Adam paper should be cited.
+ Action. Replace “Adam-optimised deep networks [17]” by “Adam-optimized neural networks
+ [16]”. Keep Krizhevsky et al. only if the paper discusses the historical impact of deep convolu-
+ tional networks; otherwise remove it.
+
+
+ major                                     ARFFSDELearning.pdf, p. 18, §References, Ref. [14]
+
+ Observation. The current Ref. [14] metadata appears outdated. The publisher metadata for the
+ resampling-stabilized ARFF article lists Foundations of Data Science, volume 8, pages 200–235,
+ 2026, DOI 10.3934/fods.2025007, with early access on May 30, 2025.
+ Action. Update Ref. [14] to the publisher metadata [13]. If the manuscript cites an early-
+ access/preprint form, label it explicitly.
+
+
+4.3   Exposition and structure improvements (severity C / minor)
+ minor                               ARFFSDELearning.pdf, p. 2, §Introduction, Paper outline
+
+ Observation. The outline says “Detailed derivations are provided in Appendix 4.1”. Section 4.1
+ is in the main text, not an appendix.
+ Action. Replace by:
+      “Detailed derivations are provided in §4.1–§4.2, experiment specifications in Ap-
+
+
+                                               13
+      pendix A, and reproducibility information in Appendix B.”
+
+minor             ARFFSDELearning.pdf, p. 1, §Introduction; pp. 1–2, related-work paragraphs
+
+Observation. The related work mixes classical inference, neural SDE learning, RFF theory,
+and ARFF history in one sequence. The contribution would be clearer if the literature were
+grouped by role.
+Action. Use four short paragraphs: (i) classical diffusion inference and approximate likeli-
+hood/estimating functions [3, 4, 5, 6, 7]; (ii) neural and EM-likelihood SDE learning [8, 9]; (iii)
+kernel/GP SDE learning [10]; (iv) RFF/ARFF methods [11, 12, 13, 14].
+
+
+minor        ARFFSDELearning.pdf, p. 3, §3; ARFFSDELearning.pdf, p. 4, §4; global notation
+
+Observation. The notation θ and θ′ is fragile, and the draft overloads σ, Σ, and “diffusion”.
+Action. Use θf for drift and θa or η for covariance:
+
+                             fθf : RD → RD ,         aθa : RD → SD
+                                                                 ++ .
+
+Add a notation table after the introduction.
+
+minor                      ARFFSDELearning.pdf, p. 4, §4; ARFFSDELearning.pdf, p. 7, §4.4
+
+Observation. The derivations need standing assumptions before propositions. Right now the
+assumptions are distributed across the prose.
+Action. Add a box:
+
+     “Standing assumptions for the population identities: H > 0 a.s.; E[H∥Y ∥2 ] < ∞;
+     aη (x) is measurable and uniformly positive definite on the domain considered;
+     conditional expectations exist; and the regression targets belong to the stated
+     L2 (ρX0 ) spaces.”
+
+Then separately state SDE existence/uniqueness assumptions when interpreting the identities
+as small-lag SDE approximations.
+
+minor                                                          ARFFSDELearning.pdf, p. 6, §4.3
+
+Observation. The split-versus-joint discussion is conceptually good but conflates conditioning,
+validity, and statistical target.
+Action. Organize §4.3 into three short paragraphs: (i) inverse-covariance conditioning in joint
+NLL training; (ii) covariance validity and SPD enforcement; (iii) restricted-class surrogate bias
+of split Frobenius regression relative to exact restricted NLL projection.
+
+
+
+
+                                                14
+ minor                                                    ARFFSDELearning.pdf, p. 8, §5, Table 1
+
+ Observation. Table 1 gives a useful overview but hides observation lag and data-generator
+ differences.
+ Action. Add columns “observation lag”, “data generator”, and “learned object”. For Experi-
+ ment 5, mark clearly whether it is fixed-lag SSA/CLE or event-level SSA.
+
+
+4.4   Presentation/style notes (severity D / suggestion)
+ suggestion                                                                                 Global notation
+ Observation. Several stochastic-numerics notations are not consistently typeset.
+ Action. Use
+                   dWt ,     ∆Wn ∼ N (0, hI),           Wt − Ws ∼ N (0, (t − s)I).
+ Use det(·) for determinants and reserve | · | for absolute values or vector norms unless already
+ defined locally.
+
+ suggestion                                                 ARFFSDELearning.pdf, p. 3, §2, Alg. 1
+
+ Observation. Alg. 1 has implementation edge cases: zero amplitudes in resampling probabilities,
+ zero denominators in Metropolis ratios, and an informal stagnation criterion.
+ Action. Define safe weights and acceptance ratios, for example
+                                                             (                   !γ )
+                            ∥βbk ∥ + εw                           ∥βbk′ ∥ + εw
+                  pk = PK                      ,   αk = min 1,                          .
+                           j=1 (∥βj ∥ + εw )                      ∥βbk ∥ + εw
+                                 b
+
+ State εw , validation-window length, tolerance, and whether the returned model is the best
+ validation iterate.
+
+ suggestion ARFFSDELearning.pdf, p. 14, §6.1, Fig. 4; ARFFSDELearning.pdf, p. 14, §6.1,
+ Fig. 5
+
+ Observation. The heat-map captions should identify the plotted object. At present it is
+ unclear whether they show entries of σ or a = σσ ⊤ .
+ Action. Use a caption such as:
+
+      “Rows show the (1, 1), (1, 2), and (2, 2) entries of the covariance a(x) = σ(x)σ(x)⊤
+      evaluated on the test grid.”
+
+ If the plotted object is a diffusion factor, say that instead and adjust RMSE labels.
+
+
+
+
+                                                   15
+5      Section-by-section feedback
+5.1      §1 Introduction
+    major                   ARFFSDELearning.pdf, p. 1, §1, abstract and key observation paragraph
+
+    Observation. The introduction has the right motivation, but the strongest sentence is
+    mathematically wrong: the NLL does not yield two independent empirical ordinary regressions.
+    Action. Use this replacement for the key observation paragraph:
+
+          “The key observation underlying this work is that the Gaussian Euler–Maruyama
+          likelihood identifies the drift and covariance through conditional moments. This
+          motivates a sequential estimator: a drift regression on scaled increments followed by
+          a covariance regression on residual outer products. The resulting algorithm avoids
+          differentiating through inverse covariance matrices and can be trained with adaptive
+          random Fourier features.”
+
+    major                    ARFFSDELearning.pdf, p. 1, §1, novelty sentence “To our knowledge”
+
+    Observation. The audit notes that an earlier public arXiv version of this project exists
+    under the title An Adaptive Random Fourier Features approach Applied to Learning Stochastic
+    Differential Equations [15]. Absolute novelty wording should not obscure that the current
+    manuscript is a revised and strengthened version of that preprint.
+    Action. Use:
+
+          “The present manuscript substantially revises and extends our earlier ARFF-for-
+          SDE-learning preprint by sharpening the drift–diffusion split, adding near-singular
+          covariance diagnostics, and expanding the empirical analysis.”
+
+    For journal submission, do one final search for non-author ARFF likelihood-SDE papers and
+    keep the novelty claim modest.
+
+    major                             ARFFSDELearning.pdf, p. 1, §1, classical inference paragraph
+
+    Observation. The paragraph says classical methods require strong model assumptions and
+    can become prohibitive. This is directionally true but too broad. A journal referee may object
+    because there is a mature literature on approximate likelihood, estimating functions, and
+    nonparametric drift/diffusion estimation.
+    Action. Replace by:
+
+          “Classical statistics for discretely observed diffusions provides maximum-likelihood ap-
+          proximations, estimating functions, Bayesian methods, and nonparametric coefficient
+          estimators. These methods are powerful, but often require model-specific transition-
+          density approximations, asymptotic regimes, or nontrivial numerical integration.
+          Our setting emphasizes scattered snapshot triples, flexible multivariate covariance
+          regression, and computational training through adaptive random features.”
+
+    Cite [3, 4, 5, 6, 7].
+
+
+
+                                                    16
+5.2   §2 Adaptive Random Fourier Features
+ major       ARFFSDELearning.pdf, p. 2, §2, Eq. (2); ARFFSDELearning.pdf, p. 3, §2, Alg. 1
+
+ Observation. Eq. (2) is written for a single right-hand side y, whereas drift and covariance
+ stages are multi-output. The ARFF amplitude norm used for resampling must be defined for
+ matrix coefficients.
+ Action. Write Y ∈ RN ×q and B ∈ RK×q or B ∈ R2K×q depending on the real/complex
+ representation. Then define the row amplitude as ∥Bk,: ∥2 and use it for resampling.
+
+
+ minor                                     ARFFSDELearning.pdf, p. 3, §2, Alg. 1, initialization
+
+ Observation. Alg. 1 allows zero-frequency initialization. If all frequencies are zero, the initial
+ feature matrix has duplicate columns and the unregularized problem is degenerate.
+ Action. Recommend base-distribution initialization, e.g. ωk ∼ N (0, s20 I), or explain why ridge
+ regularization and the first random-walk proposal make zero initialization harmless.
+
+
+5.3   §3 Mathematical problem setting
+ blocker ARFFSDELearning.pdf, p. 3, §3, Eq. (3); ARFFSDELearning.pdf, p. 4, §3, Eq. (4)
+
+ Observation. The model takes Wt to be D-dimensional and σ : RD → RD×D , then discusses
+ covariance learning. This excludes common cases with Brownian dimension m = ̸ D or degenerate
+ noise, and it conflicts with the Langevin example where noise acts only on velocity.
+ Action. Use the general notation
+
+  dXt = f (Xt ) dt + σ(Xt ) dWt ,    Wt ∈ Rm ,        σ(x) ∈ RD×m ,     a(x) = σ(x)σ(x)⊤ ∈ SD
+                                                                                            +.
+
+ Then state that the Gaussian likelihood in Eq. (4) requires a(x) ≻ 0 on the coordinates included
+ in the likelihood, or else one must restrict to noisy coordinates/add an SPD ridge.
+
+
+ minor                      ARFFSDELearning.pdf, p. 4, §3, covariance identifiability paragraph
+
+ Observation. The identifiability paragraph is correct in spirit but should be tied to a = σσ ⊤ .
+ Action. Write:
+
+      “The transition density identifies a = σσ ⊤ , not a unique diffusion factor σ. A square
+      root can be recovered only after imposing a convention, such as the principal square
+      root or a Cholesky factor. This convention is irrelevant for likelihood evaluation but
+      relevant for simulating learned trajectories.”
+
+
+
+
+                                                 17
+5.4   §4 Drift and diffusion training algorithm
+ blocker              ARFFSDELearning.pdf, p. 4, §4.1; ARFFSDELearning.pdf, p. 5, §4.2;
+ ARFFSDELearning.pdf, p. 6, §4.2, Alg. 2
+
+ Observation. This is the section that must be rewritten before arXiv. The current deriva-
+ tion conflates unrestricted population identities, restricted-class NLL projections, and the
+ implemented empirical surrogate.
+ Action. Restructure §4 as:
+
+ 1. Population drift identity: weighted conditional mean for fixed covariance.
+
+ 2. Population covariance identity: precision-convex pointwise minimizer.
+
+ 3. Restricted-class surrogate: ordinary ridge for drift and Frobenius residual-covariance
+    regression for a.
+
+ 4. Algorithm: optional cross-fitted residual construction and mandatory SPD enforcement for
+    evaluation/simulation.
+
+
+ major                                  ARFFSDELearning.pdf, p. 6, §4.3, split vs joint training
+
+ Observation. The qualitative distinction between split and joint training is valuable, but the
+ text should not imply the split formulation is automatically well-conditioned or valid. Least-
+ squares conditioning still depends on the feature matrix and ridge parameter, and covariance
+ validity still requires a projection or parametrization.
+ Action. Replace “well-conditioned least-squares-type problems” by “least-squares-type problems
+ that avoid inverse covariance matrices; their numerical conditioning is governed by the feature
+ design matrix and regularization.”
+
+
+5.5   §5 Computational experiments
+ major                                          ARFFSDELearning.pdf, p. 9, §5.2, Langevin loss
+
+ Observation. The draft says the marginal distribution of xt is no longer Gaussian. The sharper
+ point is that under the symplectic update, the position update is deterministic conditional on
+ (x0 , v0 ), while the velocity update is Gaussian conditional on (x1 , v0 , h).
+ Action. Replace by:
+
+      “Under the symplectic EM update, the conditional distribution of the full pair (x1 , v1 )
+      is degenerate in the position component. We therefore apply the Gaussian likelihood
+      only to the velocity update, conditioned on (x1 , v0 , h).”
+
+
+ blocker                ARFFSDELearning.pdf, p. 9, §5.3; ARFFSDELearning.pdf, p. 21, §A.2
+
+ Observation. The SIR experiment cannot remain mathematically underspecified. The current
+ writeup does not report total population size N , uses concentration-level rates as if they were
+ event hazards, and records event-level holding times in a Gaussian snapshot framework.
+
+
+                                                 18
+ Action. Add the count-level SSA propensities. For example, if x̃i = ni /N and rj (x̃) are
+ concentration-level rates, write total hazards as
+
+                                  aj (n) = N rj (x̃),      j = 1, 2, 3,
+
+ or state a different time scaling explicitly. Then report N and the h distribution. Prefer fixed-lag
+ SSA snapshots if the goal is to test the Gaussian EM theory.
+
+
+ major       ARFFSDELearning.pdf, p. 9, §5.4; ARFFSDELearning.pdf, p. 9, §5.4, Eq. (13);
+ ARFFSDELearning.pdf, p. 21, §A.3
+
+ Observation. The stochastic-wave scheme uses symbols such as δW0 (h2 /2) and δW0 (h2 )
+ without defining their variance and independence structure.
+ Action. State the exact distribution of every stochastic increment in the staggered-grid scheme,
+ e.g. ∆W ∼ N (0, h)
+                  e with the correct h,e and specify independence across grid cells and time
+ levels.
+
+
+5.6   §6 Results
+ major ARFFSDELearning.pdf, p. 11, §6, Table 2; ARFFSDELearning.pdf, p. 12, §6, Table 3
+
+ Observation. The results text says Alg. 2 is comparable to or better than Adam across
+ Experiments 1–7. Tables 2–3 show broadly comparable results, but not strict dominance; for
+ example, some Adam baselines have slightly lower RMSE in Experiment 5 and lower validation
+ loss in some cases.
+ Action. Use:
+
+      “Across Experiments 1–7, the methods achieve broadly comparable validation NLL
+      and coefficient RMSE. Alg. 2 is competitive throughout and improves training time
+      or final loss in several cases, notably Experiments 1, 6, and 7.”
+
+ major       ARFFSDELearning.pdf, p. 13, §6.1; ARFFSDELearning.pdf, p. 13, §6.1, Fig. 3;
+ ARFFSDELearning.pdf, p. 15, §6.1
+
+ Observation. The near-singular explanation attributes joint Adam failure to unstable gradients
+ through the precision matrix. This is plausible, but the current figures do not directly show
+ gradient or conditioning diagnostics.
+ Action. Add diagnostics for Experiment 8:
+
+       λmin (a
+             b(xj )),    κ(a
+                           b(xj )),     ∥∇θ L∥,         fraction of large Mahalanobis residuals.
+
+ Then write “This supports the interpretation” rather than “This proves”.
+
+
+
+
+                                                   19
+    minor ARFFSDELearning.pdf, p. 14, §6.1, Fig. 4; ARFFSDELearning.pdf, p. 14, §6.1, Fig. 5;
+    ARFFSDELearning.pdf, p. 15, §6.1, Fig. 6
+
+    Observation. The Experiment 8 visualizations are strong but should be made self-contained.
+    Captions should identify the plotted matrix entries, test grid, run-selection criterion, color
+    normalization, and whether outputs are raw or SPD-projected.
+    Action. Add those details to captions and ensure the same object, a or σ, is used across the
+    RMSE table and the heat maps.
+
+
+5.7     §7 Summary and discussion
+    blocker                   ARFFSDELearning.pdf, p. 17, §7; ARFFSDELearning.pdf, p. 18, §7
+
+    Observation. The conclusion repeats the overstrong decomposition claim and says empirical
+    covariance targets are positive definite. Both statements need correction.
+    Action. Replace the first conclusion paragraph by:
+
+         “This work introduces a two-stage conditional-moment training procedure for
+         likelihood-based learning of Itô SDEs from snapshot data. The Gaussian Euler–
+         Maruyama likelihood identifies the drift and covariance through conditional moments;
+         Alg. 2 turns these identities into sequential regression surrogates trained with ARFF.”
+
+    Replace the positive-definiteness sentence by:
+
+         “The split implementation does not guarantee positive definiteness unless an SPD
+         projection or structured parametrization is added. In the current experiments, we
+         observed no violations on the evaluated points, but future versions should report
+         eigenvalue diagnostics and use an SPD-enforced covariance for NLL and simulation.”
+
+
+6      Suggested reorganization for the arXiv revision
+I recommend the following organization for the next manuscript version.
+
+1. Introduction: keep the motivation, but weaken the decomposition claim and group related
+   work by role.
+
+2. Problem setting and notation: define a = σσ ⊤ , Brownian dimension m, snapshot law,
+   fixed-lag versus variable-lag assumptions, and standing assumptions.
+
+3. Population identities: state and prove the corrected drift and covariance propositions.
+
+4. Sequential ARFF estimator: present Alg. 2 as a regression surrogate, with cross-fitting and
+   SPD enforcement options.
+
+5. Numerical implementation: real/complex features, normalization, solvers, complexity, mem-
+   ory, and hyperparameter selection.
+
+6. Experiments: separate benchmark definitions from observation-model qualifications; fix or
+   qualify SIR.
+
+
+                                                     20
+7. Results: include uncertainty, parameter counts, SPD diagnostics, conditioning diagnostics, and
+   trajectory protocol.
+
+8. Limitations: state the uniformly elliptic scope of the heuristic error discussion, non-guaranteed
+   SPD without enforcement, and low/moderate dimensional scope.
+
+
+7     ArXiv readiness and SIMODS fit
+7.1   ArXiv readiness checklist
+• The abstract and introduction no longer claim exact independent regression decomposition.
+
+• §4 contains theorem-style population statements with assumptions and correct proofs.
+
+• The drift stage is identified as exact GLS for fixed covariance if weighted, and as an ordinary
+  ridge surrogate if unweighted.
+
+• The diffusion stage is described as precision-convex pointwise NLL minimization plus restricted-
+  class Frobenius surrogate.
+
+• The covariance/diffusivity object a is used consistently in equations, tables, heat maps, and
+  RMSE definitions.
+
+• SPD enforcement is defined and used for validation NLL and trajectory simulation.
+
+• Experiment 5 is either fixed-lag SSA/CLE or explicitly labeled as event-level SSA with all missing
+  details reported.
+
+• Tables 2–3 include uncertainty estimates.
+
+• Hyperparameter selection, parameter counts, random seeds, solver tolerances, and data-generation
+  protocols are reproducible.
+
+• Bibliography includes primary citations for Adam, RFF, ARFF, EM SDE learning, diffusion
+  inference, SSA, and CLE.
+
+7.2   SIMODS fit
+SIMODS is a reasonable target after the blocker items are fixed. The paper has the right ingredients
+for the journal: a mathematically motivated estimator, a computational method with a structural
+advantage, and a benchmark suite that exposes an interpretable near-singular failure mode of
+joint NLL optimization. The present version should not yet be submitted because SIMODS
+referee guidance explicitly asks whether the paper is mathematically sound, technically justified,
+experimentally complete, reproducible, and compared to the state of the art [1, 2]. A revised arXiv
+version should stabilize the claims first; the SIMODS submission can then add the full reproducibility
+package and the strengthened related-work discussion.
+
+
+
+
+                                                 21
+8    Local edits and notation consistency
+
+ Location                        Edit
+ ARFFSDELearning.pdf, p. 1, Replace “fixing the diffusion reduces the loss to a least-squares
+ Abstract                   regression” by “fixing the diffusion yields a weighted conditional-
+                            moment problem; we use an ordinary ridge surrogate under the
+                            EM conditional-mean identity.”
+ ARFFSDELearning.pdf, p. 1, Replace “pointwise likelihood minimisers for the diffusion then
+ Abstract                   serve as regression targets” by “pointwise covariance minimizers
+                            motivate residual outer-product regression targets.”
+ ARFFSDELearning.pdf, p. 2, Replace “Appendix 4.1” by “§4.1–§4.2”.
+ outline
+ ARFFSDELearning.pdf, p. 3, Write Wt ∈ Rm and a = σσ ⊤ ∈ SD     +.
+ SDE notation
+ ARFFSDELearning.pdf, p. 4, Use aη instead of Σθ′ or define Σ as a strict alias once.
+ Eq. (4)
+ ARFFSDELearning.pdf, p. 5, Replace “strictly convex in Σ” by “strictly convex in P = Σ−1 ”.
+ Proposition
+ ARFFSDELearning.pdf, p. 5, Replace “unbiased plug-in target” by “out-of-fold residual covari-
+ empirical targets          ance target” or a fixed-drift qualification.
+ ARFFSDELearning.pdf, p. 6, Replace “well-conditioned” by “avoids inverse-covariance condi-
+ §4.3                       tioning; LS conditioning is governed by the feature matrix and
+                            ridge parameter.”
+ ARFFSDELearning.pdf, p. 6, Replace “whilst” by “while”.
+ §4.3
+ ARFFSDELearning.pdf, p. 7, Label the bound “heuristic scaling in a uniformly elliptic regime”
+ Eq. (8)                    and remove any impression of a theorem.
+ ARFFSDELearning.pdf, p. 8, Use 4–6 and 7–8, not “4-6” and “7-8”.
+ §5                                         "               #
+                                             cos ϑ − sin ϑ
+ ARFFSDELearning.pdf,       Define R(ϑ) =                     .
+                                              sin ϑ cos ϑ
+ p. 10, Eq. (14)
+ ARFFSDELearning.pdf,       Replace the Adam citation [17] by Kingma–Ba [16].
+ p. 15, §6.1
+ ARFFSDELearning.pdf,       Replace “empirical covariance targets are positive definite” by
+ p. 18, §7                  “residual outer-product targets are positive semidefinite and gen-
+                            erally rank deficient.”
+                                                                (n) (n)
+ ARFFSDELearning.pdf,       The dataset is written as D = {(x1 , x0 , h(n) )}. Use the order-
+ p. 21, Appendix A.2                                      (n) (n)
+                            ing used elsewhere: D = {(x0 , x1 , h(n) )}.
+
+
+9    Final verification queue
+The audit resolved the main mathematical and bibliographic issues. The remaining items require
+source-code or data-generation inspection and cannot be verified from the PDF alone.
+1. Verify whether the implementation uses real sine–cosine features, complex least squares, conjugate
+   frequency pairs, or complex least squares followed by taking real parts.
+
+                                                 22
+ 2. Verify whether stage-one drift training is unweighted ordinary ridge, sample-weighted scalar
+    ridge, or full covariance-weighted GLS.
+
+ 3. Verify whether validation NLL and trajectory simulation use raw covariance outputs, jitter,
+    eigenvalue clipping, Cholesky/log-Cholesky output, or another SPD path.
+
+ 4. Verify whether Table 3 “Diff.” RMSE is computed against the covariance a = σσ ⊤ or against a
+    diffusion factor σ.
+
+ 5. Verify Experiment 5: population size N , total propensity scaling, event-level versus fixed-lag
+    snapshots, holding-time distribution, and any truncation of small h.
+
+ 6. Verify whether the 30 runs share a fixed dataset/split or regenerate data each run, and list all
+    random seeds.
+
+ 7. Verify the model-selection protocol: hyperparameter grid, validation criterion, early stopping,
+    and tuning budget parity across ARFF and Adam baselines.
+
+ 8. Verify how NLL∞ is estimated in §6.2.3 and whether uncertainty in this estimate affects the
+    reported K −1 scaling.
+
+ 9. Verify the Fig. 6 trajectory-histogram protocol: initial law, number of trajectories, horizon, EM
+    step, binning, and covariance enforcement.
+
+10. Verify code/data release plan, repository commit hash, and scripts for reproducing all tables and
+    figures.
+
+
+ A     Suggested missing citations and bibitems
+ A.1    Citation priorities
+ • Correct attribution: cite Kingma–Ba for Adam and Rahimi–Recht for RFF.
+
+ • ARFF lineage: cite the original Metropolis ARFF paper, the resampling-stabilized ARFF
+   paper with updated publisher metadata, and the recent convergence preprint.
+
+ • SDE-learning positioning: keep Dietrich et al. and Dridi et al. as close EM-likelihood
+   comparators; cite Darcy et al. for kernel/GP SDE learning.
+
+ • Classical diffusion inference: add Aït-Sahalia, Kessler, Sørensen, Kutoyants, and Comte–
+   Genon-Catalot–Rozenholc to avoid making the paper look unaware of discretely observed diffusion
+   inference.
+
+ • Experiment 5: cite Gillespie’s SSA and chemical Langevin equation papers if SSA/CLE data
+   remain central.
+
+ • Cross-fitting: cite Chernozhukov et al. if the paper adopts or motivates out-of-fold nuisance
+   estimation.
+
+
+
+
+                                                 23
+References
+ [1] Society for Industrial and Applied Mathematics. SIAM Journal on Mathematics of Data Science.
+     Official journal page, accessed 2026-05-04. URL: https://www.siam.org/publications/
+     siam-journals/siam-journal-on-mathematics-of-data-science/.
+
+ [2] Society for Industrial and Applied Mathematics. SIMODS – Instructions for Referees. Of-
+     ficial referee instructions, accessed 2026-05-04. URL: https://epubs.siam.org/simods/
+     instructions-for-referees.
+
+ [3] Yacine Aït-Sahalia. Maximum likelihood estimation of discretely sampled diffusions: A closed-
+     form approximation approach. Econometrica, 70(1):223–262, 2002. DOI: https://doi.org/
+     10.1111/1468-0262.00274.
+
+ [4] Mathieu Kessler. Estimation of an ergodic diffusion from discrete observations. Scandina-
+     vian Journal of Statistics, 24(2):211–229, 1997. DOI: https://doi.org/10.1111/1467-9469.
+     00059.
+
+ [5] Michael Sørensen. Parametric inference for discretely sampled stochastic differential equations.
+     In Thomas G. Andersen, Richard A. Davis, Jens-Peter Kreiß, and Thomas Mikosch, editors,
+     Handbook of Financial Time Series, pages 531–553. Springer, Berlin, Heidelberg, 2009. DOI:
+     https://doi.org/10.1007/978-3-540-71297-8_23.
+
+ [6] Yury A. Kutoyants. Statistical Inference for Ergodic Diffusion Processes. Springer Series in
+     Statistics. Springer, London, 2004. DOI: https://doi.org/10.1007/978-1-4471-3866-2.
+
+ [7] Fabienne Comte, Valentine Genon-Catalot, and Yves Rozenholc. Penalized nonparametric
+     mean square estimation of the coefficients of diffusion processes. Bernoulli, 13(2):514–543, 2007.
+     DOI: https://doi.org/10.3150/07-BEJ5173.
+
+ [8] Noura Dridi, Lucas Drumetz, and Ronan Fablet. Learning stochastic dynamical systems
+     with neural networks mimicking the Euler–Maruyama scheme. In Proceedings of the 29th
+     European Signal Processing Conference (EUSIPCO), 2021. DOI: https://doi.org/10.23919/
+     EUSIPCO54536.2021.9616068; arXiv: https://arxiv.org/abs/2105.08449.
+
+ [9] Felix Dietrich, Alexei Makeev, George Kevrekidis, Nikolaos Evangelou, Tom Bertalan, Sebastian
+     Reich, and Ioannis G. Kevrekidis. Learning effective stochastic differential equations from
+     microscopic simulations: Linking stochastic numerics to deep learning. Chaos: An Interdisci-
+     plinary Journal of Nonlinear Science, 33(2):023121, 2023. DOI: https://doi.org/10.1063/5.
+     0113632.
+
+[10] Matthieu Darcy, Boumediene Hamzi, Giulia Livieri, Houman Owhadi, and Peyman Tavallali.
+     One-shot learning of stochastic differential equations with data-adapted kernels. Physica D:
+     Nonlinear Phenomena, 444:133583, 2023. DOI: https://doi.org/10.1016/j.physd.2022.
+     133583.
+
+[11] Ali Rahimi and Benjamin Recht. Random features for large-scale kernel machines. In J.
+     Platt, D. Koller, Y. Singer, and S. Roweis, editors, Advances in Neural Information Processing
+     Systems, volume 20, pages 1177–1184. Curran Associates, Inc., 2007. URL: https://papers.
+     nips.cc/paper/3182-random-features-for-large-scale-kernel-machines.
+
+
+
+                                                 24
+[12] Aku Kammonen, Jonas Kiessling, Petr Plecháč, Mattias Sandberg, and Anders Szepessy.
+     Adaptive random Fourier features with Metropolis sampling. Foundations of Data Science,
+     2(3):309–332, 2020. DOI: https://doi.org/10.3934/fods.2020014.
+
+[13] Aku Kammonen, Anamika Pandey, Erik von Schwerin, and Raúl Tempone. Adaptive ran-
+     dom Fourier features training stabilized by resampling with applications in image regres-
+     sion. Foundations of Data Science, 8:200–235, 2026. Early access May 30, 2025. DOI:
+     https://doi.org/10.3934/fods.2025007.
+
+[14] Xin Huang, Aku Kammonen, Anamika Pandey, Mattias Sandberg, Erik von Schwerin, Anders
+     Szepessy, and Raúl Tempone. Convergence for adaptive resampling of random Fourier features.
+     arXiv preprint, 2025. arXiv: https://arxiv.org/abs/2509.03151.
+
+[15] Owen Douglas, Aku Kammonen, Anamika Pandey, and Raúl Tempone. An adaptive random
+     Fourier features approach applied to learning stochastic differential equations. arXiv preprint,
+     2025. arXiv: https://arxiv.org/abs/2507.15442.
+
+[16] Diederik P. Kingma and Jimmy Ba. Adam: A method for stochastic optimization. In
+     International Conference on Learning Representations (ICLR), 2015. arXiv: https://arxiv.
+     org/abs/1412.6980.
+
+[17] Stephen Boyd and Lieven Vandenberghe. Convex Optimization. Cambridge University Press,
+     Cambridge, 2004. URL: https://web.stanford.edu/~boyd/cvxbook/.
+
+[18] Victor Chernozhukov, Denis Chetverikov, Mert Demirer, Esther Duflo, Christian Hansen,
+     Whitney Newey, and James Robins. Double/debiased machine learning for treatment and
+     structural parameters. The Econometrics Journal, 21(1):C1–C68, 2018. DOI: https://doi.
+     org/10.1111/ectj.12097.
+
+[19] Daniel T. Gillespie. A general method for numerically simulating the stochastic time evolution
+     of coupled chemical reactions. Journal of Computational Physics, 22(4):403–434, 1976. DOI:
+     https://doi.org/10.1016/0021-9991(76)90041-3.
+
+[20] Daniel T. Gillespie. The chemical Langevin equation. The Journal of Chemical Physics,
+     113(1):297–306, 2000. DOI: https://doi.org/10.1063/1.481811.
+
+[21] Peter E. Kloeden and Eckhard Platen. Numerical Solution of Stochastic Differential Equations.
+     Applications of Mathematics, volume 23. Springer, Berlin, Heidelberg, 1992. DOI: https:
+     //doi.org/10.1007/978-3-662-12616-5.
+
+
+
+
+                                                 25
+

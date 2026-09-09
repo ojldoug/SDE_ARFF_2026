@@ -1,0 +1,12 @@
+{
+  "D": 2,
+  "h": 0.0010000000474974513,
+  "gaussian_constant": 1.8378770664093453,
+  "half_logdet": -11.512925148010254,
+  "mean_half_quadratic": 0.9882171154022217,
+  "oracle_nll": -8.686830966198688,
+  "log10": 2.302585092994046,
+  "omit_h_shift": 6.907755278982137,
+  "density_r_over_sqrt_h_jacobian": 6.907755278982137,
+  "density_r_over_h_jacobian": 13.815510557964274
+}

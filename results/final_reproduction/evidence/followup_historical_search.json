@@ -1,0 +1,215 @@
+{
+  "files_scanned": 261,
+  "matches": [
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/scripts/run_adam_split_mlp_experiment.py",
+      "sha256": "9ba76de0a006bea7e11bee152456085f2b3a07a6392efbb8fee69116015796b3",
+      "hits": [
+        "  python scripts/run_adam_split_mlp_experiment.py ex2 --seed 30 --validation-only",
+        "  python scripts/run_adam_split_mlp_experiment.py ex2 --seed 30 \\",
+        "from src.adam.split_mlp import (",
+        "    drift_mse, fit_split_mlp_adam,",
+        "    if str(arrays['method'].item()) != 'adam_split_mlp' or int(arrays['artifact_version']) != 4:",
+        "        artifact_version=4, method='adam_split_mlp', experiment=name, seed=seed,",
+        "    source_paths = ['src/adam/mlp.py','src/adam/training.py','src/adam/split_mlp.py',",
+        "                    'scripts/run_adam_split_mlp_experiment.py','src/experiments/config.py']",
+        "    print('Split MLP first-call/JIT warm-up', flush=True)",
+        "    print(f'first-call/JIT overhead: {first_call:.3f} s\\nTraining split MLP...', flush=True)",
+        "        fit_split_mlp_adam, jax.random.PRNGKey(args.seed), *arrays,"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/src/adam/split_mlp.py",
+      "sha256": "ce366f598842102bda42a26d2b43a68e457963122dc6cf609846a178085220ca",
+      "hits": [
+        "class SplitMLPTrainingResult:",
+        "def fit_split_mlp_adam(",
+        "    result = SplitMLPTrainingResult("
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/sde/experiment_reports.py",
+      "sha256": "c49b46ad9aa10703835aad3d403a167aa755179c12477c61ad7c4479bebcc6d2",
+      "hits": [
+        "            np.poly1d(np.polyfit([_pre_final_timestep[k], _final_timestep[k]], [pre_final_[k, i], final_[k, i]], 1))(t)"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/REVISED ARCHIVE REPORT.tex",
+      "sha256": "677bf4af52e09462be408e32d7e7bf084df4a4c26274d75b4a100fc9c962c117",
+      "hits": [
+        "The ARFF algorithm aims to asymptotically sample from $p_*$ and for fixed samples $\\omega_k, k =1,\\dots,K$ the problem \\eqref{eq:regularized_loss} reduces to a linear least squares problem in $\\hat\\beta_k, k=1,\\dots,K$ which has the normal equations"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/error bound.tex",
+      "sha256": "3537b582614960269331fd4adf3e4462feb971d3dedf7f6ed5431a3b41ee02d4",
+      "hits": [
+        "Here we present the error analysis for AMSDE. Below is the training algorithm for which we wish to derive error bounds."
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/ARCHIVE REPORT.tex",
+      "sha256": "bb21194d4c5e44605e8e58e0663b952089a55adc8eaac6bae243891f62f88a59",
+      "hits": [
+        "The ARFF algorithm aims to asymptotically sample from $p_*$ and for fixed samples $\\omega_k, k =1,\\dots,K$ the problem \\eqref{eq:regularized_loss} reduces to a linear least squares problem in $\\hat\\beta_k, k=1,\\dots,K$ which has the normal equations"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/Paper Supplemental Material/code/notebooks/sde/experiment_reports.py",
+      "sha256": "f7390923b76dda4a32ae5f8e6e70371279f0393cbd1cb7bda5704a6fc3b6e911",
+      "hits": [
+        "            np.poly1d(np.polyfit([_pre_final_timestep[k], _final_timestep[k]], [pre_final_[k, i], final_[k, i]], 1))(t)"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/arXiv_2026/RaulCom_ARFFSDELearning.tex",
+      "sha256": "b80da730e3fad9475178f9e5ce53ef332437cdcec9ae9e5280daddfbeb042c09",
+      "hits": [
+        "\\textcolor{blue}{Classical statistics for discretely observed diffusions provides maximum-likelihood approximations, estimating functions, Bayesian methods, and nonparametric coefficient estimators \\citep{Barron1993, Dietrich2023, dridi2021learningstochasticdynamicalsystems, Gillespie_Alg, Gillespie",
+        "\\subsection{Empirical Error Analysis}",
+        "For the $K$-experiment, performance is measured relative to an empirical asymptotic limit $\\mathrm{NLL}_\\infty$, corresponding to the limit $K \\to \\infty$, which is estimated via regression.",
+        "    \\includegraphics[width=0.45\\linewidth]{arXiv_2026/images/error_analysis/ex7_error_v_N.png}",
+        "    \\includegraphics[width=0.45\\linewidth]{arXiv_2026/images/error_analysis/ex7_error_v_h.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_drift_mse.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_diffusion_mse.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_excess_NLL.png}"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/arXiv_2026/ARFFSDELearning.tex",
+      "sha256": "539974aa0085c93d4e51a3a931df5a9225929fda0041981f02cfb6f8336cf8b0",
+      "hits": [
+        "\\subsection{Empirical Error Analysis}",
+        "For the $K$-experiment, performance is measured relative to an empirical asymptotic limit $\\mathrm{NLL}_\\infty$, corresponding to the limit $K \\to \\infty$, which is estimated via regression.",
+        "    \\includegraphics[width=0.45\\linewidth]{arXiv_2026/images/error_analysis/ex7_error_v_N.png}",
+        "    \\includegraphics[width=0.45\\linewidth]{arXiv_2026/images/error_analysis/ex7_error_v_h.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_drift_mse.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_diffusion_mse.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_excess_NLL.png}"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/arXiv_2026/appendices_part2.tex",
+      "sha256": "02dbf60e0c4c9a2d8e301036afeb3384fc7fb8d77551f152c0cf21aa457ae5a6",
+      "hits": [
+        "For error analysis, true diffusion $\\sigma(x)$ = $\\begin{bmatrix} 0.25x_0^2 + 0.25 & 0 \\\\ 0 & 0.25x_1^2 + 0.25 \\end{bmatrix}$."
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/Teaching Materials/presentation.tex",
+      "sha256": "dcddfa764cf9e317246ef5e6fb4ad4ff00972d499be472c11d8b65b64ab1c116",
+      "hits": [
+        "\\begin{frame}{Error Analysis}"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/Teaching Materials/presentation2.tex",
+      "sha256": "4b7751b6ff0871a21a0b8afb153d16759807bd58b9d6eddcd9df4b6cc928a006",
+      "hits": [
+        "\\begin{frame}{Error Analysis}"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/AISTATS/Rebuttals/DX7w.tex",
+      "sha256": "e20585aa66d12e05f1f5c986ea23b58f6024e435bc27a248fe2aae537a7b7b8d",
+      "hits": [
+        "We will clarify the main contribution, sharpen the error analysis presentation, describe our testing setup more explicitly, strengthen the baseline discussion, and provide confidence intervals and sensitivity analyses in the Supplement."
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_ARFF/reference/sde-identification/SDE_NN(1)/AISTATS/AISTATS_SUBMITTED_PAPER/AISTATS_Submission.tex",
+      "sha256": "5057ad287222af627f284ed0b830e81f19948315a222d30ecf756eaf3ba17cd1",
+      "hits": [
+        "% The ARFF algorithm aims to asymptotically sample from $p_*$ and for fixed samples $\\omega_k, k =1,\\dots,K$ the problem \\eqref{eq:regularized_loss} reduces to a linear least squares problem in $\\hat\\beta_k, k=1,\\dots,K$ which has the normal equations",
+        "% In brief, let \\(\\bar\\beta_n:=\\sum_{k:\\,\\omega_k=\\omega_n}\\hat\\beta_k\\) denote the aggregate amplitude for each basis \\(e^{i\\omega_n\\cdot x}\\). Due to the Tikhonov\u2010induced \\emph{equal-amplitude} property, \\(|\\bar\\beta_n|\\) consistently estimates \\(|\\widehat g(\\omega_n)|\\), which enables near-optima",
+        "% \\cite{UASig-Barron-IEEE-1993,Barron1994}). Thus ARFF asymptotically"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/REVISED ARCHIVE REPORT.tex",
+      "sha256": "677bf4af52e09462be408e32d7e7bf084df4a4c26274d75b4a100fc9c962c117",
+      "hits": [
+        "The ARFF algorithm aims to asymptotically sample from $p_*$ and for fixed samples $\\omega_k, k =1,\\dots,K$ the problem \\eqref{eq:regularized_loss} reduces to a linear least squares problem in $\\hat\\beta_k, k=1,\\dots,K$ which has the normal equations"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/error bound.tex",
+      "sha256": "3537b582614960269331fd4adf3e4462feb971d3dedf7f6ed5431a3b41ee02d4",
+      "hits": [
+        "Here we present the error analysis for AMSDE. Below is the training algorithm for which we wish to derive error bounds."
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/ARCHIVE REPORT.tex",
+      "sha256": "bb21194d4c5e44605e8e58e0663b952089a55adc8eaac6bae243891f62f88a59",
+      "hits": [
+        "The ARFF algorithm aims to asymptotically sample from $p_*$ and for fixed samples $\\omega_k, k =1,\\dots,K$ the problem \\eqref{eq:regularized_loss} reduces to a linear least squares problem in $\\hat\\beta_k, k=1,\\dots,K$ which has the normal equations"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/arXiv_2026/RaulCom_ARFFSDELearning.tex",
+      "sha256": "b80da730e3fad9475178f9e5ce53ef332437cdcec9ae9e5280daddfbeb042c09",
+      "hits": [
+        "\\textcolor{blue}{Classical statistics for discretely observed diffusions provides maximum-likelihood approximations, estimating functions, Bayesian methods, and nonparametric coefficient estimators \\citep{Barron1993, Dietrich2023, dridi2021learningstochasticdynamicalsystems, Gillespie_Alg, Gillespie",
+        "\\subsection{Empirical Error Analysis}",
+        "For the $K$-experiment, performance is measured relative to an empirical asymptotic limit $\\mathrm{NLL}_\\infty$, corresponding to the limit $K \\to \\infty$, which is estimated via regression.",
+        "    \\includegraphics[width=0.45\\linewidth]{arXiv_2026/images/error_analysis/ex7_error_v_N.png}",
+        "    \\includegraphics[width=0.45\\linewidth]{arXiv_2026/images/error_analysis/ex7_error_v_h.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_drift_mse.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_diffusion_mse.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_excess_NLL.png}"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/arXiv_2026/ARFFSDELearning.tex",
+      "sha256": "539974aa0085c93d4e51a3a931df5a9225929fda0041981f02cfb6f8336cf8b0",
+      "hits": [
+        "\\subsection{Empirical Error Analysis}",
+        "For the $K$-experiment, performance is measured relative to an empirical asymptotic limit $\\mathrm{NLL}_\\infty$, corresponding to the limit $K \\to \\infty$, which is estimated via regression.",
+        "    \\includegraphics[width=0.45\\linewidth]{arXiv_2026/images/error_analysis/ex7_error_v_N.png}",
+        "    \\includegraphics[width=0.45\\linewidth]{arXiv_2026/images/error_analysis/ex7_error_v_h.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_drift_mse.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_diffusion_mse.png}",
+        "        \\includegraphics[width=\\linewidth]{arXiv_2026/images/error_analysis/ex8_excess_NLL.png}"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/arXiv_2026/appendices_part2.tex",
+      "sha256": "02dbf60e0c4c9a2d8e301036afeb3384fc7fb8d77551f152c0cf21aa457ae5a6",
+      "hits": [
+        "For error analysis, true diffusion $\\sigma(x)$ = $\\begin{bmatrix} 0.25x_0^2 + 0.25 & 0 \\\\ 0 & 0.25x_1^2 + 0.25 \\end{bmatrix}$."
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/Teaching Materials/presentation.tex",
+      "sha256": "dcddfa764cf9e317246ef5e6fb4ad4ff00972d499be472c11d8b65b64ab1c116",
+      "hits": [
+        "\\begin{frame}{Error Analysis}"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/Teaching Materials/presentation2.tex",
+      "sha256": "4b7751b6ff0871a21a0b8afb153d16759807bd58b9d6eddcd9df4b6cc928a006",
+      "hits": [
+        "\\begin{frame}{Error Analysis}"
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/AISTATS/Rebuttals/DX7w.tex",
+      "sha256": "e20585aa66d12e05f1f5c986ea23b58f6024e435bc27a248fe2aae537a7b7b8d",
+      "hits": [
+        "We will clarify the main contribution, sharpen the error analysis presentation, describe our testing setup more explicitly, strengthen the baseline discussion, and provide confidence intervals and sensitivity analyses in the Supplement."
+      ]
+    },
+    {
+      "path": "/home/kammonaa/projects/SDE_NN_overleaf/AISTATS/AISTATS_SUBMITTED_PAPER/AISTATS_Submission.tex",
+      "sha256": "5057ad287222af627f284ed0b830e81f19948315a222d30ecf756eaf3ba17cd1",
+      "hits": [
+        "% The ARFF algorithm aims to asymptotically sample from $p_*$ and for fixed samples $\\omega_k, k =1,\\dots,K$ the problem \\eqref{eq:regularized_loss} reduces to a linear least squares problem in $\\hat\\beta_k, k=1,\\dots,K$ which has the normal equations",
+        "% In brief, let \\(\\bar\\beta_n:=\\sum_{k:\\,\\omega_k=\\omega_n}\\hat\\beta_k\\) denote the aggregate amplitude for each basis \\(e^{i\\omega_n\\cdot x}\\). Due to the Tikhonov\u2010induced \\emph{equal-amplitude} property, \\(|\\bar\\beta_n|\\) consistently estimates \\(|\\widehat g(\\omega_n)|\\), which enables near-optima",
+        "% \\cite{UASig-Barron-IEEE-1993,Barron1994}). Thus ARFF asymptotically"
+      ]
+    }
+  ]
+}

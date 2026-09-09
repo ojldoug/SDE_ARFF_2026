@@ -1,0 +1,13 @@
+{
+  "projected_resolved_main_seconds": 129729.85864827858,
+  "selected_seeds": [
+    0,
+    6,
+    12,
+    18,
+    24
+  ],
+  "selection_rule": "All seeds if recorded warmup+algorithm total <=12h, otherwise predetermined seeds0,6,12,18,24; no metric-based selection",
+  "status": "COST_PROPOSAL_NOT_DISPATCHED",
+  "limitation": "Parallel times are an estimate. Complete-path Adam warmup and accepted ex8 timing jobs must be included before final runtime dispatch."
+}

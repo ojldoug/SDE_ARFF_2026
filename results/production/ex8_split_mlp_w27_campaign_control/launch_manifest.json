@@ -1,0 +1,240 @@
+{
+  "assignment": "seed modulo4",
+  "dataset_sha256": "a95f5483184d0e8dad39231fc30b18779d600be59c38d5464e22dca03db707c7",
+  "effective_config": {
+    "adam": {
+      "batch_size": 256,
+      "epochs": 300,
+      "learning_rate": 0.0001
+    },
+    "adam_mlp": {
+      "batch_size": 256,
+      "epochs": 300,
+      "learning_rate": 0.001
+    },
+    "arff": {
+      "M_max": 25,
+      "M_min": 25,
+      "delta": 0.2,
+      "gamma": 1.0,
+      "lambda_reg": 0.001,
+      "metropolis_test": false,
+      "n_folds": 5,
+      "resampling": true
+    },
+    "data": {
+      "em_substeps": 1000,
+      "grid_step": null,
+      "n_trajectories": 100000,
+      "observation_lag": 0.0001,
+      "seed": 0,
+      "target_samples": 100000,
+      "trajectory_time": 0.0001
+    },
+    "evaluation": {
+      "covariance_rmse_before_projection": true,
+      "n_runs": 30,
+      "spd_epsilon": 0.001
+    },
+    "fourier_frequencies": 128,
+    "name": "ex8",
+    "split": {
+      "seed": 2026,
+      "test_fraction": 0.1,
+      "train_fraction": 0.8,
+      "validation_fraction": 0.1
+    }
+  },
+  "frozen_sha256": {
+    "data/ex8.npz": "a95f5483184d0e8dad39231fc30b18779d600be59c38d5464e22dca03db707c7",
+    "scripts/run_adam_split_mlp_experiment.py": "9ba76de0a006bea7e11bee152456085f2b3a07a6392efbb8fee69116015796b3",
+    "scripts/run_ex8_mlp_w27.py": "65799f11b6f5a77db8d7b8944bee4f918692860e9d75511fd014f9efbd603b0d",
+    "scripts/run_ex8_split_mlp_w27.py": "2de9ba9d862e0b89e47705d5fa2979aec5efc1abe6c3b4736ff5d5597551573e",
+    "scripts/run_ex8_split_mlp_w27_campaign.py": "30e9f13064cff6277075244303fbaa4f4d5426bcde991f1bcde040f5075f926b",
+    "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/adam/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/adam/fourier.py": "964abfc69b2e054354a2c74d38bf127ebef718b97b0a1da11b08f82e859acbc5",
+    "src/adam/mlp.py": "62dc60d67059ad91c987f271943827c51e6dc49be52ec926abada643f0f18830",
+    "src/adam/split_fourier.py": "c5fbacebea235a5d41494b5ec355ed33472f4187bfdd5f009f2fac4b6429c473",
+    "src/adam/split_mlp.py": "ce366f598842102bda42a26d2b43a68e457963122dc6cf609846a178085220ca",
+    "src/adam/training.py": "446b2ad46c009a77485affd94c67e395b68a205a7c676a42180da4e6ccc40787",
+    "src/arff/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/arff/covariance.py": "94db858e69947728fea119a9205f7b3007f8053b53af26a298ab9734d00f32fc",
+    "src/arff/evaluation.py": "ba6769dd16a40b78f3bbb0c761b20f245a11a7c1283c8352a285377e92226480",
+    "src/arff/regression.py": "e48d15e3701468255d1307467b864e94c672836fde17843a0f5f5827ccc759e7",
+    "src/arff/two_stage.py": "40e392b5bed70afcbadb5679e3afa59230f1a77725d0fa8c4320234f200bad8c",
+    "src/arff/validation_selected.py": "0846a656cd43deff0279bd9f45b3f14d748ffe9433fc4831ac96fd0532be5894",
+    "src/experiments/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/experiments/config.py": "8f8ce3eafa6118df5b32a7b0463895f775a1119360d3f31a9fbfeaa5de629966",
+    "src/experiments/dataset.py": "b83606b9aaea3cdaed277e0568c58bd6ba388a4195ad378ce5c348b17d1e1d77",
+    "src/experiments/definitions.py": "66a99a0024f9257e4872e1eaf25934af67ca6b63ecdd7c19e969765b119113f4",
+    "src/experiments/em_data.py": "69e5ff49316e95b9eeea7cec4d7b6da2e11129c664b0fb754aa1681bfd4d8c97",
+    "src/experiments/mlp_size.py": "a1f8fcb273777a04e9aa00662914b5bfbe59e03dac6756054f13cf28f2b83497",
+    "src/experiments/model_size.py": "21cef5222f8c64e424f763a5dd2f7a98de41d1771f891210e29b2639f982f54a",
+    "src/experiments/simulation.py": "dcef05d054bd3c99529f3525b6fd689e19b242db55bc81e6e978000005edc595",
+    "src/experiments/sir_ssa.py": "6cac9b864765dcee05991182c9888f9498719e0876442d7e453c0a2a0631449b",
+    "src/experiments/timing.py": "adaf843d47c96652a16fdb808d7409ee36e23a841abbb66dfc6c2013fe78c0ea",
+    "src/experiments/wave_data.py": "f65412a9fd35444aa747a5e38a7ce4b5fba742c783a96913b51a57f5950e917f"
+  },
+  "gpus": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "jobs": [
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 0
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 1
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 2
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 3
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 4
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 5
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 6
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 7
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 8
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 9
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 10
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 11
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 12
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 13
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 14
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 15
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 16
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 17
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 18
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 19
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 20
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 21
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 22
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 23
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 24
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 25
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 26
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 27
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 28
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 29
+    }
+  ],
+  "parameters": 1814,
+  "session": "split_mlp_ex8_w27_campaign",
+  "timing_context": "four-GPU concurrent accuracy; non-isolated"
+}

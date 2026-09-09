@@ -1,0 +1,18 @@
+{
+  "arff": {
+    "max_algorithm_time": 8.24039749300573,
+    "mean_algorithm_time": 7.745558781413851,
+    "min_algorithm_time": 7.382961514987983,
+    "new_parallel_runs": 29,
+    "reused_seed": 1,
+    "std_algorithm_time": 0.16993684466645106
+  },
+  "fourier": {
+    "max_algorithm_time": 627.7088555530063,
+    "mean_algorithm_time": 577.2712951054112,
+    "min_algorithm_time": 550.9709765099979,
+    "new_parallel_runs": 29,
+    "reused_seed": 0,
+    "std_algorithm_time": 18.475420763215283
+  }
+}
