@@ -61,6 +61,8 @@ def main():
    if name=='baseline':ax.set_xticks(range(5),[s.replace(' Adam','\nAdam')+'\n'+('1,814' if 'MLP' in s else '1,792')+'\nparameters' for s in LABELS],fontsize=7)
    else:
     ax.set_xscale('log');ax.set_xlabel({'capacity':'Final retained parameter count','N':'Nominal training samples N','h':'Observation lag h'}[name])
+   if name=='N':
+    ax.set_xticks([80000,160000,320000,640000],['80,000','160,000','320,000','640,000']);ax.xaxis.set_minor_locator(matplotlib.ticker.NullLocator())
   if name!='baseline':fig.legend(*axs[0,0].get_legend_handles_labels(),loc='lower center',ncol=3,frameon=False,fontsize=8)
   fig.suptitle({'baseline':'Experiment 8: capacity-matched comparison','capacity':'Experiment 8: performance versus capacity','N':'Experiment 8: sample-count dependence','h':'Experiment 8: bounded observation-lag diagnostic'}[name],fontsize=11)
   fig.tight_layout(rect=(0,.14 if name!='baseline' else .02,1,.95))
