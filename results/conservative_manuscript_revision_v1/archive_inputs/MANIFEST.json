@@ -1,0 +1,147 @@
+{
+  "status": "archive-only public evidence",
+  "files": {
+    "historical_per_seed.csv": {
+      "origin": "results/final_reproduction/resolved_accuracy_v1/per_seed_metrics.csv",
+      "origin_sha256": "c69d4456a76c33926f0acc3e1b93a4c7144ed3cd7cdc9e2a81128161eac59676",
+      "sha256": "9edc321e8e441c68ef88cd16496ceb3294b7908f8f85e92be420b98102bcab4b",
+      "copy_conversion": "CRLF to LF"
+    },
+    "historical_summary.json": {
+      "origin": "results/final_reproduction/resolved_accuracy_v1/summary.json",
+      "origin_sha256": "e6365b01b2624b81c44147fd8f2504cc1ae6bada25045eac3f8c24ab75d5a756",
+      "sha256": "e6365b01b2624b81c44147fd8f2504cc1ae6bada25045eac3f8c24ab75d5a756",
+      "copy_conversion": "none"
+    },
+    "baseline_per_seed.csv": {
+      "origin": "results/final_ex8_publication_bundle/summaries/baseline/per_seed_split_metrics.csv",
+      "origin_sha256": "5d72ec0b3c71d85bfdff04b3c4ddadcfc07e0c4661dc05e2b3eae42a8d09bce0",
+      "sha256": "971e348820dcea7cf768e3691dea4a806f0b27cfe65d3eab9f099cc7f834132f",
+      "copy_conversion": "CRLF to LF"
+    },
+    "baseline_summary.json": {
+      "origin": "results/final_ex8_publication_bundle/summaries/baseline/summary.json",
+      "origin_sha256": "18a9138d8ea8f42f8430d824015fdb123fea64a120522a1e825b594adcff168a",
+      "sha256": "18a9138d8ea8f42f8430d824015fdb123fea64a120522a1e825b594adcff168a",
+      "copy_conversion": "none"
+    },
+    "N_per_seed.csv": {
+      "origin": "results/final_ex8_publication_bundle/summaries/N/per_seed_metrics.csv",
+      "origin_sha256": "254d797e2b137d853b86d96d87a4156d89f1383344a524119dce80e32a9e303d",
+      "sha256": "07429b451bad3990d46b399b652fffe5b4cd943a86c0ee3b3fbefbcb07a6f9bd",
+      "copy_conversion": "CRLF to LF"
+    },
+    "h_per_seed.csv": {
+      "origin": "results/final_ex8_publication_bundle/summaries/h/per_seed_metrics.csv",
+      "origin_sha256": "b983c261694594d415d0ea70e7275f19f022e6a245448b4ddaa3bb21c1455620",
+      "sha256": "def35400f64592eef1451b8ad6fb9661414a8c357e29619236d075ab7ce399a5",
+      "copy_conversion": "CRLF to LF"
+    },
+    "capacity_per_seed.csv": {
+      "origin": "results/final_ex8_publication_bundle/summaries/capacity/per_seed_metrics.csv",
+      "origin_sha256": "d3763a38549ca70a62e2a74b1fca22e0d06892a0f86cac47095fd48b4354a6a2",
+      "sha256": "a43221abcbe49a7a141a4e008d7c7797b776469f42ff1a9f320a64a30b84269c",
+      "copy_conversion": "CRLF to LF"
+    },
+    "sensitivity_spd.csv": {
+      "origin": "results/final_ex8_publication_bundle/figures/arff_raw_spd.csv",
+      "origin_sha256": "be55e6c76491c7519cc294304a0787a517af0f576d29a951255dc4d6e65e4084",
+      "sha256": "7d10d4a617657c4ba99457f62da6ea6100a2d604bb3857bf246cb00761234f85",
+      "copy_conversion": "CRLF to LF"
+    },
+    "lag_ridge_paired.csv": {
+      "origin": "results/ex8_h_lambda_drift_v1/paired_results.csv",
+      "origin_sha256": "f5500478c41e9efdfccd7cf033d7f99a0f60f145019bd3f0a54777853818c889",
+      "sha256": "7ff317180492808bb99ae0954a6ff72bbd4978a147a9260bee32d8e32f80ef9b",
+      "copy_conversion": "CRLF to LF"
+    },
+    "oracle_cpu_per_seed.csv": {
+      "origin": "results/controlled_study_2026/float64_v2/oracle_component_swap/evaluation_v2/per_seed.csv",
+      "origin_sha256": "3822099d262c1db7dfa84730acc707761d2f52b8bd7110bb2954e064327c7c69",
+      "sha256": "b26a2c13bc6897b93d34ac236dc2680d8c3da1ded8f2b8ec1f376c117949f2ee",
+      "copy_conversion": "CRLF to LF"
+    },
+    "oracle_floor_per_seed.csv": {
+      "origin": "results/controlled_study_2026/float64_v2/oracle_component_swap/evaluation_v2/floor_sensitivity_per_seed.csv",
+      "origin_sha256": "72c482f6173bcdabd6640e63082c8a65326c0d7bd3243c6edf61a55d0212d290",
+      "sha256": "80d457b7f742bfc843c3ac61b7f415c7fce17231e070095d5d315eadfd6731e0",
+      "copy_conversion": "CRLF to LF"
+    },
+    "oracle_projection_per_seed.csv": {
+      "origin": "results/controlled_study_2026/float64_v2/oracle_component_swap/evaluation_v2/projection_per_seed.csv",
+      "origin_sha256": "4584dd3fe1b437996aee0f9ac5aa44313ab42a67f0675e42de4f1988177336b8",
+      "sha256": "66132f66cdbf5a570a40c53169ffb7de7a3e3b112535af64a5cbce41d73aef81",
+      "copy_conversion": "CRLF to LF"
+    },
+    "parameter_counts.csv": {
+      "origin": "results/final_ex8_publication_bundle/parameter_counts.csv",
+      "origin_sha256": "6c59b25a5798126fef0fb92ec3df71d137222e0dc3c14c18505e5887625b3c80",
+      "sha256": "c43f8a3bdade05e4214d6e31769ebc1569cb5d8fda572186d2182d7d5a930b42",
+      "copy_conversion": "CRLF to LF"
+    },
+    "fixed_basis_ridge_paired.csv": {
+      "origin": "results/arff_fixed_basis_ridge_diagnostic_v1/paired.csv",
+      "origin_sha256": "48e395cf57cf70e54c5b5508d21211710a37cc4268eeca8d465763ce6b90b860",
+      "sha256": "82c449f27d9185c71c86980d56a3f61df696936cd918708d7a60f189a5760104",
+      "copy_conversion": "CRLF to LF"
+    },
+    "adaptive_ridge_paired.csv": {
+      "origin": "results/arff_B_ridge_intervention_v1/paired_results.csv",
+      "origin_sha256": "e7f1bc6fb7f17ad0c1fcdb4975e33df191ce21e65e21a94eca10c61dcda7e245",
+      "sha256": "5cfc414d3fde63cd58b79d4533bf60a8fc4b77a00dc238a264be756dc3905482",
+      "copy_conversion": "CRLF to LF"
+    },
+    "resampling_paired.csv": {
+      "origin": "results/arff_resampling_isolation_v1/paired_results.csv",
+      "origin_sha256": "b99a47802162e1340474e25189d8c8e93eb6b7e1e316ad75aa953486ab217b04",
+      "sha256": "8a0224319f3ca87b468d324c8413f42e4783d7fb10699c0200b3f83b20f689db",
+      "copy_conversion": "CRLF to LF"
+    },
+    "lag_ridge_per_run.csv": {
+      "origin": "results/ex8_h_lambda_drift_v1/per_run.csv",
+      "origin_sha256": "2b173ac998b929dad7df254255e45201402570569c71eace8284dee75257f551",
+      "sha256": "9e9a00bfdce12f724201b191c44f824ae8551e22f3cce99df4a609bf453f654f",
+      "path_conversion": "absolute artifact column to repository-relative; numerical fields unchanged"
+    },
+    "mechanism_0_M.csv": {
+      "origin": "results/arff_resampling_isolation_v1/jobs/0_M/mechanisms.csv",
+      "origin_sha256": "2c53403baae1cfc39f73b82aac4c781d86bd859e60179d91339e80e571ccffad",
+      "sha256": "fa4e21f74a6901a482224723e29374cbfab9def8b81406bfff9fa0b20709246e",
+      "copy_conversion": "CRLF to LF"
+    },
+    "mechanism_0_MR.csv": {
+      "origin": "results/arff_resampling_isolation_v1/jobs/0_MR/mechanisms.csv",
+      "origin_sha256": "89598a10ef4b749fc0fc6f36157dc30379d784a242c6a36ecf66a0076750769e",
+      "sha256": "ce88a35a6b4f5a979d3e7980326d5c25acdcda70f1d2ddc19ffc498ea42d6b07",
+      "copy_conversion": "CRLF to LF"
+    },
+    "mechanism_1_M.csv": {
+      "origin": "results/arff_resampling_isolation_v1/jobs/1_M/mechanisms.csv",
+      "origin_sha256": "51de2c3245cbe4f91db0be7922873a61cc9a3cf87eebf9f962b42ed851139d54",
+      "sha256": "5bb4d461c62764ffb4f6edb5492ec2d31adbe872724b6022b8741f58f918977e",
+      "copy_conversion": "CRLF to LF"
+    },
+    "mechanism_1_MR.csv": {
+      "origin": "results/arff_resampling_isolation_v1/jobs/1_MR/mechanisms.csv",
+      "origin_sha256": "dae82327c35f2b22309401622db36622bd3c0fa82cdbd5fd159a99f2468ca055",
+      "sha256": "847fade036e7e725f4e2759d42de538f89d22aa9183d0eec7dbdc904575a587a",
+      "copy_conversion": "CRLF to LF"
+    },
+    "mechanism_2_M.csv": {
+      "origin": "results/arff_resampling_isolation_v1/jobs/2_M/mechanisms.csv",
+      "origin_sha256": "2b89a742fb6c941f0bf4749e13b85ec31c0d4e4c46e77e34466e5e102e157597",
+      "sha256": "1fcc3015f9c68f177fc81870bc31f7c28259ff2cfabc6f73e4034100233c8a81",
+      "copy_conversion": "CRLF to LF"
+    },
+    "mechanism_2_MR.csv": {
+      "origin": "results/arff_resampling_isolation_v1/jobs/2_MR/mechanisms.csv",
+      "origin_sha256": "0420fee1e10a7d3572849d5813d6c93b83a4bd894862628b6b6bdb42f171c8e7",
+      "sha256": "c5bef863d78d55e82cca8dbec46dbea93fe14134af4615db3d24a36c8a83050e",
+      "copy_conversion": "CRLF to LF"
+    },
+    "mechanism_selections.csv": {
+      "origin": "six archived resampling-isolation COMPLETE.json files",
+      "sha256": "ba4ce03f66c7e4417065cced80bcbcfa7c7aa03555714a31a92977c8e34b4b13"
+    }
+  }
+}

@@ -1,0 +1,78 @@
+\section{Raw covariance and projection in Experiment 8}\label{app:projection}
+The raw covariance map and the matrix used in NLL are distinct. This illustrative seed-0 diagnostic uses the same prescribed grid as the main coefficient figures. Projection is the existing symmetrization/eigenvalue floor at $10^{-3}$, whereas the smallest true instantaneous eigenvalue is $10^{-8}$. No floor was tuned for the plot.
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/ex8_seed0_projection.pdf}
+\caption{Seed-0 ARFF: raw and projected smallest eigenvalues, projection-change norm, raw/projected off-diagonal entry, and raw nonpositive-eigenvalue mask. Raw/projected eigenvalue and entry pairs have shared scales. Projection does not repair the raw coefficient estimate retroactively. Grid rates are not the production test-set rates.}\end{figure}
+
+\section{Complete sample-size sensitivity and numerical records}\label{app:sensitivity}
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/N.pdf}\caption{Completed Ex8 sample-size study at $K=1024,h=10^{-4}$: ten fitting seeds on nested training data, with shared validation/test states. Means and sample SDs describe fitting variation, not independent dataset variation.}\end{figure}
+The four N points, nine lag points and five capacity points comprise 200,450,250 method/point/seed records, respectively. Their shared 50-record anchor means 800 distinct records, not 900 independent experiments. The 30-seed baseline is separate. Both validation equivalence screens failed; capacity uses the predetermined fallback rather than an established approximation-dominated regime. Full N/h/K and raw-SPD tables follow.
+\small
+\input{tables/N_full}\input{tables/h_full}\input{tables/capacity_full}\input{tables/sensitivity_spd}
+\normalsize
+\subsection{Exploratory lag--drift-ridge intervention}\label{app:lag_ridge}
+On corrected Experiment-8 trajectory data, a bounded full-estimator comparison used $K=1024$, nominal $N=640000$, $h\in\{10^{-4},4\times10^{-4},.002\}$, drift ridge $\lambda_f\in\{.001,.008,.064\}$ and fitting seeds 0--2. The nine $\lambda_f=.001$ runs were reused only after data, configuration and source checks; the other 18 fits used the same folds, internal splits and random streams where the native algorithm permits. The penalty changed in all five out-of-fold nuisance drift fits and the final drift fit. The covariance penalty remained $\lambda_\Sigma=.001$, and each covariance fit used its own arm's out-of-fold residual targets. Metropolis updates, 300 adaptations, internal-validation checkpoint selection and no post-selection refit were retained. The final amplitude fits used 576000 observations and each nuisance fit used 460800. These three fitting seeds share one dataset and are not independent-dataset replications. Earlier exploratory decisions had already used the test set, so this is descriptive evidence, not a fresh confirmatory penalty comparison.
+
+\begin{table}[htbp]\centering\small
+\caption{All nine lag/ridge arms: test-set means over three fitting seeds on shared data. Earlier exploratory decisions used this test set. Covariance RMSE and SPD violations concern raw predictions; NLL uses the unchanged $10^{-3}$ eigenvalue floor. Lower NLL is better, but its absolute level changes with lag.}
+\label{tab:lag_ridge_arms}\resizebox{\linewidth}{!}{\input{tables/lag_ridge_arms}}
+\end{table}
+
+\begin{table}[htbp]\centering\small
+\caption{Every individual paired test change, intervention minus $\lambda_f=.001$ at the same lag and seed. Negative changes improve the corresponding error or NLL. No seed or valid outcome is omitted.}
+\label{tab:lag_ridge_paired}\resizebox{\linewidth}{!}{\input{tables/lag_ridge_paired}}
+\end{table}
+
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/lag_ridge_paired_nll.pdf}
+\caption{Within-lag paired test NLL changes from $\lambda_f=.001$, with one connected line per fitting seed. The zero at .001 is the same-seed reference, so the lag-dependent density offset does not obscure the intervention. This figure does not select a penalty.}
+\label{fig:lag_ridge_nll}\end{figure}
+
+At $h=.002$, $.008$ lowers drift RMSE in all three paired seeds; other drift comparisons are mixed. The larger $.064$ penalty lowers mean drift RMSE at the two shorter lags but worsens one seed at each. Raw covariance RMSE stays near .08 across arms, while raw SPD violations remain common. Paired NLL effects change sign across seeds and lags, except that $.064$ at $h=10^{-4}$ lowers NLL in all three. Final drift checkpoints also change with the penalty; the covariance stage is refitted to each arm's targets. The archived \texttt{per\_run.csv} records all fold/final selected iterations, validation errors, raw minimum eigenvalues and execution scopes. These results do not establish an optimal penalty or a universal benefit, and the ridge intervention was not applied to the production comparisons.
+
+% Proposed appendix after reproducibility appendix. Requires amsmath, graphicx, booktabs.
+% Cross-reference from discussion: Appendix~\ref{app:drift_diagnostic}.
+\section{A bounded diagnostic of drift estimation error}
+\label{app:drift_diagnostic}
+This diagnostic explains possible sources of poor drift recovery without changing the production estimator. It uses the Gaussian surrogate
+\[
+Y=-X+100\sigma(X)\varepsilon,\qquad \varepsilon\sim\mathcal N(0, I_2),
+\]
+with nominal $h=10^{-4}$, not the canonical finite-lag trajectory data.
+The interventions use $N=8192$, fitting subset $n=7373$, $K=1024$ and unnormalized real sine--cosine features. Three algorithm/split repeats share one archived noise pool; they are not three independently generated datasets. Drift MSE averages squared errors over test points and coordinates, and RMSE is its square root per repeat. Expected conditional risk and observed test MSE are distinct quantities.
+
+Condition A freezes frequencies selected with noiseless targets before a noisy amplitude refit. Condition C freezes the first target-independent proposal $\omega_k=0.2Z_k$, $Z_k\sim\mathcal N(0, I_2)$, before target-dependent acceptance. Condition B adapts and selects frequencies using noisy responses. For A/C, exact fixed-design conditional risk separates bias and variance because the frequency choice is independent of the amplitude-fitting noise. That independence does not hold for B.
+
+\begin{table}[ht]
+\centering\small
+\caption{Means over three paired repeats; distinct risk definitions are not interchangeable. A/C compare $\lambda=.001$ to $.064$. B compares baseline to post-hoc / throughout-path ridge. M/MR both use $\lambda=.064$. Values are rounded only for display.}
+\label{tab:drift_diagnostic}
+\begin{tabular}{lrrl}\toprule
+Comparison & Reference & Intervention & Paired outcome\\\midrule
+A: expected conditional MSE & 45.755 & 31.169 & All three improve \\
+C: expected conditional MSE & 6.874 & 4.146 & All three improve \\
+B: observed test MSE & 16.215 & 9.545 / 10.914 & Post / path ridge \\
+M / MR: selected MSE & 10.914 & 6.869 & Two improve, one worsens \\
+M / MR: iteration 300 MSE & 124.595 & 616.539 & All three worsen \\
+\bottomrule\end{tabular}
+\end{table}
+
+For A/C, variance dominates squared bias. Stronger ridge reduces expected and realized error in all six pairs, although the scaled $K=1024$ expected risks remain above their respective $K16$ means (14.607 and 4.017). This is evidence about these bases, not an optimal-ridge rule or a general capacity rate. The normal-equation diagonal shift is $n\lambda$, not $\lambda$.
+
+For B, post-hoc shrinkage on the already selected frequencies reduces observed MSE in all three repeats. Using $.064$ throughout adaptation and checkpoint selection also improves all three relative to baseline, but gives no additional observed benefit over post-hoc shrinkage; repeat 1 is effectively tied (MSE difference $0.000466$). This comparison combines changes to the adaptive path and selection. A noise-independent fixed-basis risk identity cannot be applied to B.
+
+In a separate paired comparison, both arms retain Metropolis updates, $\delta=.2$, $\gamma=1$ and 300 iterations. MR additionally resamples every iteration. The modern update order is proposal, amplitude fit, acceptance, mixed-population refit, optional resampling, and final refit. The earliest strict minimum of noisy internal-validation MSE selects the returned checkpoint; there is no full-data refit. Adding resampling improves two selected models and worsens one. At iteration 300 it worsens all three. The fresh M trajectory is distinct from the archived Bpath trajectory; their close values are not substituted.
+
+\begin{figure}[ht]
+\centering\includegraphics[width=\linewidth]{../figures/mechanism.pdf}
+\caption{All recorded training/held-out losses and frequency RMS for all three repeats. Dashed lines and dots mark selected checkpoints. Curves are unsmoothed; frequency RMS includes location as well as spread. Archived centered RMS also grows. No intermediate true-drift errors are inferred.}
+\label{fig:drift_diagnostic}
+\end{figure}
+
+Training loss decreases overall while held-out noisy loss and frequency spread increase overall; each trajectory has reversals. Selected models have much lower true-drift error than iteration 300. These observations support an overfitting interpretation, but do not prove frequency growth causes it. Noisy checkpoint selection and duplication-induced changes in effective functional regularization remain possible contributors, not isolated causes.
+
+Distinct parent slots are not distinct physical frequencies. Uniform multinomial resampling of 1024 slots already retains only about 647.48 distinct parent slots on average, so observed means near 613 do not establish population collapse. MR's full pre-resampling weights were not archived; ESS alone cannot recover its conditional parent expectation. Higher ESS does not guarantee better recovery.
+
+These results do not establish failure of ESS-triggered resampling, a universal SDE ranking, or an optimal value $.064$. They neither retune the production method nor change production results. The three repeats support these bounded comparisons but do not identify a unique causal mechanism.
+
+\section{Component composition and likelihood calibration}
+Post-hoc Joint-MLP-drift/ARFF-covariance composition inherits the component coefficient errors but improves ARFF NLL only modestly. At fixed projected covariance only the quadratic residual term changes. CPU component-swap evaluations are distinct from stored GPU production metrics; float32 and float64 reductions are separate scopes. Their closely rounded values do not denote independent trained models. The instantaneous-coefficient oracle need not optimize finite-lag Gaussian NLL. Fixed-floor sensitivity does not select a replacement production floor.
+\input{tables/swaps}\input{tables/floors}

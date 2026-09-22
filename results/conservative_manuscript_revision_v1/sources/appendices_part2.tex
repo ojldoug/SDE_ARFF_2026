@@ -1,0 +1,188 @@
+
+% ============================================================
+%  APPENDIX B — Experiment Details
+% ============================================================
+\section{Details for Numerical Experiments}
+\label{app:num_experiments}
+
+This appendix preserves the application data specifications. Ex4 is a historical specification with an unresolved sign/conditioning convention, not an endorsed numerical comparison. Corrected data versions and effective splits are stated explicitly.
+
+\subsection{Experiments 1--4 and 7--8: SDE snapshot generation}
+
+For Experiments 1--3 and 7--8, stored snapshots use fine EM simulation; Ex4 remains withheld. Each sample begins from an initial condition $x_0$ drawn uniformly from a specified domain $\mathcal{D}_{x_0}$. From this initial state, the SDE is evolved for 1000 EM iterations with internal step size $\Delta t = h/1000$, corresponding to a total transition time $h$. Only the initial and final states are retained, yielding training triples $(x_0, x_1, h)$.
+
+Ex8 baseline integration and endpoint differences use float64, with unchanged initial states, normal draws and 80/10/10 split IDs. Estimator arithmetic is float32. Historical Ex1--3,5--7 use 90/10 train/validation obtained from the canonical permutation; their validation results are selected-validation evidence. Lag extensions keep the fine step $10^{-7}$ and change substep count, rather than fixing 1000 substeps for every lag.
+
+Training data parameters are summarized in Tables \ref{tab:polynomial_training_data}-\ref{tab:near_singular_data}.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Summary of the training data for the polynomial experiments 1--3.}
+\label{tab:polynomial_training_data}
+\begin{tabular}{@{}c c c c c c c@{}}
+\toprule
+Exp. & Dim. & True Drift $f(x)$ & True Diffusion $\sigma(x)$ & Step $h$ & $\mathcal{D}_{x_0}$ & \#Pts \\
+\midrule
+1 & 2 &
+\footnotesize $\begin{bmatrix} -16x_0^{3} + 8x_0 - 1.5 \\ -16x_1^{3} + 8x_1 - 1.5 \end{bmatrix}$ &
+\footnotesize $\begin{bmatrix} 0.1x_0 + 0.5 & 0 \\ 0 & 0.1x_1 + 0.5 \end{bmatrix}$ &
+0.01 & $[-1,1]^2$ & 10000 \\
+
+2 & 3 &
+\footnotesize $\begin{bmatrix} -x_0 \\ -x_1 \\ -x_2 \end{bmatrix}$ &
+\footnotesize $\begin{bmatrix} 0.09506 & 0 & 0 \\ 0.04639 & 0.15817 & 0 \\ 0.04338 & 0.07507 & 0.00853 \end{bmatrix}$ &
+0.01 & $[-1,1]^3$ & 10000 \\
+
+3 & 10 &
+\begin{tabular}[c]{@{}c@{}}
+$f(x) = (g(x_0), \ldots, g(x_9))^{\top}$ \\
+$g(t) = -16t^{3} + 8t - 1.5$
+\end{tabular} &
+see below &
+0.01 & $[-1,1]^{10}$ & 100000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+True diffusion for Experiment 3
+{\scriptsize
+\begin{equation*}
+\begin{aligned}
+&\sigma(x) =\\
+&\begin{bmatrix}
+  0.22832 & 0.010865 & 0.090003 & -0.060878 & 0.012992 & -0.009347 & -0.029005 & 0.054890 & -0.095809 & -0.007837 \\[2pt]
+  0.010865 & 0.13756 & 0.003815 & 0.012116 & -0.003058 & 0.014402 & 0.005206 & 0.007598 & 0.049540 & -0.024421 \\[2pt]
+  0.090003 & 0.003815 & 0.27686 & -0.073250 & -0.057378 & 0.077955 & -0.067661 & 0.011554 & -0.123940 & 0.032760 \\[2pt]
+ -0.060878 & 0.012116 & -0.073250 & 0.27916 & 0.020965 & 0.017321 & 0.054022 & -0.077201 & 0.072615 & -0.063557 \\[2pt]
+  0.012992 & -0.003058 & -0.057378 & 0.020965 & 0.22742 & -0.057193 & 0.003315 & -0.013105 & 0.022512 & -0.009778 \\[2pt]
+ -0.009347 & 0.014402 & 0.077955 & 0.017321 & -0.057193 & 0.21696 & -0.023792 & -0.003358 & -0.011393 & -0.012749 \\[2pt]
+ -0.029005 & 0.005206 & -0.067661 & 0.054022 & 0.003315 & -0.023792 & 0.14159 & -0.004788 & 0.053163 & -0.029238 \\[2pt]
+  0.054890 & 0.007598 & 0.011554 & -0.077201 & -0.013105 & -0.003358 & -0.004788 & 0.20365 & -0.021602 & 0.008506 \\[2pt]
+ -0.095809 & 0.049540 & -0.123940 & 0.072615 & 0.022512 & -0.011393 & 0.053163 & -0.021602 & 0.29429 & -0.043131 \\[2pt]
+ -0.007837 & -0.024421 & 0.032760 & -0.063557 & -0.009778 & -0.012749 & -0.029238 & 0.008506 & -0.043131 & 0.19488
+\end{bmatrix}.
+\end{aligned}
+\end{equation*}}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Historical underdamped Langevin specification, retained for author review only: drift sign and conditioning unresolved; numerical comparison withheld.}
+\label{tab:Langevin_training_data}
+\begin{tabular}{@{}c c c c c c c c c@{}}
+\toprule
+Exp. & $v_0$ Dim. & $x_0$ Dim. & \begin{tabular}[c]{@{}c@{}}True Drift\\ $f(x, v)$\end{tabular} &
+\begin{tabular}[c]{@{}c@{}}True Diffusion\\ $\sigma(x, v)$\end{tabular} & Step $h$ & $\mathcal{D}_{v_0}$ & $\mathcal{D}_{x_0}$ & \#Pts \\
+\midrule
+4 & 1 & 1 & $-x^3 - x + 0.5v$ & $\sqrt{0.1}$ & 0.01 & $[-1,1]$ & $[-1,1]$ & 10000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\centering
+\small
+\caption{Summary of the training data for the wide spectral support experiment.}
+\label{tab:wide_spectrum_data}
+\begin{tabular}{@{}c c c c c c c@{}}
+\toprule
+Exp. & Dim. & True Drift $f(x)$ & True Diffusion $\sigma(x)$ & Step $h$ & $\mathcal{D}_x$ & \#Pts \\
+\midrule
+7 & 2 &
+\footnotesize $\begin{bmatrix}
+e^{-|x_0|/0.1} e^{-\frac{1}{2}(x_0^2 + x_1^2)} \\
+e^{-|x_1|/0.2} e^{-\frac{1}{2}(x_0^2 + x_1^2)}
+\end{bmatrix}$ &
+\footnotesize $\begin{bmatrix} 0.1 & 0 \\ 0 & 0.1 \end{bmatrix}$ &
+0.001 & $[-1,1]^2$ & 100000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The historical modified-Ex7 error-analysis specification, whose execution/NLL-infinity chain is not authenticated here, used diffusion $\sigma(x)$ = $\begin{bmatrix} 0.25x_0^2 + 0.25 & 0 \\ 0 & 0.25x_1^2 + 0.25 \end{bmatrix}$.
+
+
+\begin{table}[H]
+\centering
+\small
+\caption{Summary of the training data for the near singular diffusion experiment.}
+\label{tab:near_singular_data}
+\begin{tabular}{@{}c c c c c c c@{}}
+\toprule
+Exp. & Dim. & True Drift $f(x)$ & True Diffusion $\sigma(x)$ & Step $h$ & $\mathcal{D}_x$ & \#Pts \\
+\midrule
+8 & 2 &
+\footnotesize $\begin{bmatrix}-x_0\\-x_1\end{bmatrix}$ &
+\footnotesize
+\begin{tabular}{@{}c@{}}
+$R(\vartheta(x))
+\begin{bmatrix}
+0.0001 & 0\\
+0 & 1
+\end{bmatrix}
+R(\vartheta(x))^\top$ \\[4pt]
+{\scriptsize $R(\vartheta)$: planar rotation matrix} \\[2pt]
+{\scriptsize $\vartheta(x)=3\,\mathrm{atan2}(x_1,x_0)$}
+\end{tabular}
+&
+0.0001 & $[-2,2]^2$ & 100000 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Experiment 5: SIR data generation}
+
+Data for Experiment~5 are generated using Gillespie's stochastic simulation algorithm (SSA) applied to the SIRS jump process described in Section~\ref{sec:computational_experiments}. The system tracks integer-valued populations $(n_0,n_1,n_2)$ corresponding to susceptible, infected, and recovered individuals, with concentrations $\tilde{x}_p = n_p/N$.
+
+The concentration-level rates are $r_1 = 4k_1\tilde{x}_0\tilde{x}_1,
+r_2 = k_2\tilde{x}_1,
+r_3 = k_3\tilde{x}_2,$ and count-process hazards are $Nr_1,Nr_2,Nr_3$, with $N=1024$. An event is selected proportionally. The holding time is sampled as $\Delta \tau = -\log(U_1)/(N(r_1+r_2+r_3))$, where $ U_1\sim\mathrm{Uniform}(0,1)$.
+
+Training data are generated from multiple independent trajectories. Initial concentrations $(\tilde{x}_0,\tilde{x}_1,\tilde{x}_2)$ are sampled uniformly from the two-simplex subject to the constraint that $N\tilde{x}_p$ is integer-valued. \textcolor{black}{Each trajectory is followed to time 4 with absorbing states handled by the documented absorbing-start exclusion.}
+
+Trajectory observations are the piecewise-constant SSA states at prescribed times separated by $\Delta t=.01$, not the first event after each time. Consecutive observations form fixed-lag triples in susceptible/recovered fractions. There are 99719 retained rows from 250 trajectories. Row-wise splitting can share trajectories and therefore is not independent-trajectory generalization. The infected proportion $\tilde{x}_1$ is omitted since $\tilde{x}_0+\tilde{x}_1+\tilde{x}_2=1$.
+
+Training data was generated according to Table~\ref{tab:SIR_training_data}.
+\begin{table}[H]
+\centering
+\small
+\caption{Summary of the training data for the SIR experiment.}
+\label{tab:SIR_training_data}
+\begin{tabular}{@{}c c c c c c c@{}}
+\toprule
+Exp. & $N$ & Parameters $k$ & Max Time (s)& No. Traj. & Sample Step Size $\Delta t$ (s)& Retained \#Pts \\
+\midrule
+5 & 1024 & $k_1,k_2,k_3 = 1,1,0$ & 4 & 250 & 0.01& 99719\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Experiment 6: Stochastic wave equation data generation}
+
+Training data for Experiment 6 are generated by numerically solving the stochastic wave equation described in Section \ref{sec:computational_experiments} on a uniform space-time grid using the staggered-grid scheme in (\ref{eq:wave_scheme}). The grid spacing $h$ defines the staggered spatial/time construction rather than the effective regression lag, and defines the temporal discretization $t_j = jh$ and the spatial discretization $x_i = ih$, and therefore controls the resolution of the numerical solution and the resulting number of training samples. The computed solution is converted using the corrected exact stencil identity, with effective lag $h^2/4$ at initialization and $h^2/2$ thereafter, independent driving normal variances $h^2$ and $2h^2$, and regression factor $g/2$ rather than $g$. The original states/increments are unchanged by the correction of 498 initial lags and 497502 alternating-grid coordinates. The retained data version is \texttt{ex6\_labels\_v2.npz}. The reformulation is described in Section \ref{sec:computational_experiments}. Ex8 baseline integration and endpoint differences use float64, with unchanged initial states, normal draws and 80/10/10 split IDs. Estimator arithmetic is float32. Historical Ex1--3,5--7 use 90/10 train/validation obtained from the canonical permutation; their validation results are selected-validation evidence. Lag extensions keep the fine step $10^{-7}$ and change substep count, rather than fixing 1000 substeps for every lag.
+
+Training data parameters are summarized in Table \ref{tab:SPDE_training_data}.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Summary of the training data for the stochastic wave equation experiment.}
+\label{tab:SPDE_training_data}
+\begin{tabular}{@{}c c c c c c c c c c@{}}
+\toprule
+Exp. & Dim. & $f(x,t,u)$ & $g(x)$ (forcing amplitude) & $u_0(x)$ & $v_0(x)$ & Step $h$ & $\mathcal{D}_x$ & $\mathcal{D}_t$ & Mean \#Pts \\
+\midrule
+6 & 1 &
+\footnotesize $5\sin(4\pi x)$ &
+\footnotesize $\frac{1}{20}\left(1+e^{-150(x-\frac12)^2}\right)$ &
+\footnotesize $\frac{1}{20} e^{-150(x-\frac12)^2}$ &
+\footnotesize $-2 \frac{du_0}{dx}$ &
+0.001 & $[0,1]$ & $[0,2]$ & 995004 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+The Experiment 3 matrix above is displayed to the original decimal precision; exact entries used for evaluation are retained in the accompanying source snapshot of \texttt{src/experiments/definitions.py}.

@@ -1,0 +1,300 @@
+{
+  "status": "validated",
+  "seed": 0,
+  "validation": [
+    {
+      "experiment": "ex1",
+      "method": "arff_historical_corrected",
+      "seed": 0,
+      "population": "validation",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.39528241753578186,
+          "archived": 0.39528241753578186,
+          "difference": 0.0,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 0.026224717497825623,
+          "archived": 0.026224717497825623,
+          "difference": 0.0,
+          "passed": true
+        },
+        "nll": {
+          "computed": -3.2938599586486816,
+          "archived": -3.2938599586486816,
+          "difference": 0.0,
+          "passed": true
+        }
+      }
+    },
+    {
+      "experiment": "ex1",
+      "method": "fourier",
+      "seed": 0,
+      "population": "validation",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.5313522815704346,
+          "archived": 0.5313522815704346,
+          "difference": 0.0,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 0.03185838460922241,
+          "archived": 0.03185838833451271,
+          "difference": -3.725290298461914e-09,
+          "passed": true
+        },
+        "nll": {
+          "computed": -3.296457290649414,
+          "archived": -3.296457290649414,
+          "difference": 0.0,
+          "passed": true
+        }
+      }
+    },
+    {
+      "experiment": "ex1",
+      "method": "mlp_shallow",
+      "seed": 0,
+      "population": "validation",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.6943399310112,
+          "archived": 0.6943398714065552,
+          "difference": 5.960464477539063e-08,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 0.014737006276845932,
+          "archived": 0.014737009070813656,
+          "difference": -2.7939677238464355e-09,
+          "passed": true
+        },
+        "nll": {
+          "computed": -3.283447504043579,
+          "archived": -3.283447265625,
+          "difference": -2.384185791015625e-07,
+          "passed": true
+        }
+      }
+    },
+    {
+      "experiment": "ex1",
+      "method": "mlp_deep",
+      "seed": 0,
+      "population": "validation",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.5994495153427124,
+          "archived": 0.5994495153427124,
+          "difference": 0.0,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 0.028066903352737427,
+          "archived": 0.028066907078027725,
+          "difference": -3.725290298461914e-09,
+          "passed": true
+        },
+        "nll": {
+          "computed": -3.297459125518799,
+          "archived": -3.297459125518799,
+          "difference": 0.0,
+          "passed": true
+        }
+      }
+    },
+    {
+      "experiment": "ex8",
+      "method": "joint_fourier",
+      "seed": 0,
+      "population": "test",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.38598206639289856,
+          "archived": 0.385982096,
+          "difference": -2.960710143717904e-08,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 1.1069415807724,
+          "archived": 1.1069417,
+          "difference": -1.1922760001503718e-07,
+          "passed": true
+        },
+        "nll": {
+          "computed": -8.260194778442383,
+          "archived": -8.26019478,
+          "difference": 1.557618034553343e-09,
+          "passed": true
+        }
+      }
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_fourier",
+      "seed": 0,
+      "population": "test",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.5980885028839111,
+          "archived": 0.5980885028839111,
+          "difference": 0.0,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 0.8828496932983398,
+          "archived": 0.8828497529029846,
+          "difference": -5.960464477539063e-08,
+          "passed": true
+        },
+        "nll": {
+          "computed": -8.259541511535645,
+          "archived": -8.259541511535645,
+          "difference": 0.0,
+          "passed": true
+        }
+      }
+    },
+    {
+      "experiment": "ex8",
+      "method": "arff",
+      "seed": 0,
+      "population": "test",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.9129429459571838,
+          "archived": 0.9129429459571838,
+          "difference": 0.0,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 0.11329804360866547,
+          "archived": 0.11329804360866547,
+          "difference": 0.0,
+          "passed": true
+        },
+        "nll": {
+          "computed": -8.944208145141602,
+          "archived": -8.944207191467285,
+          "difference": -9.5367431640625e-07,
+          "passed": true
+        }
+      }
+    },
+    {
+      "experiment": "ex8",
+      "method": "joint_mlp",
+      "seed": 0,
+      "population": "test",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.21205541491508484,
+          "archived": 0.212055415,
+          "difference": -8.491515823827456e-11,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 0.4352685213088989,
+          "archived": 0.435268551,
+          "difference": -2.9691101077755633e-08,
+          "passed": true
+        },
+        "nll": {
+          "computed": -9.779309272766113,
+          "archived": -9.77931023,
+          "difference": 9.572338868224506e-07,
+          "passed": true
+        }
+      }
+    },
+    {
+      "experiment": "ex8",
+      "method": "split_mlp",
+      "seed": 0,
+      "population": "test",
+      "metrics": {
+        "drift_rmse": {
+          "computed": 0.6494220495223999,
+          "archived": 0.6494220545562083,
+          "difference": -5.033808370136228e-09,
+          "passed": true
+        },
+        "covariance_rmse": {
+          "computed": 0.24042673408985138,
+          "archived": 0.24042673269754014,
+          "difference": 1.3923112385239023e-09,
+          "passed": true
+        },
+        "nll": {
+          "computed": -10.032931327819824,
+          "archived": -10.032931695556641,
+          "difference": 3.6773681699742156e-07,
+          "passed": true
+        }
+      }
+    }
+  ],
+  "training": false,
+  "new_observations": false,
+  "grid_data_sha256": {
+    "ex1_seed0_coefficients.npz": "7eb18f3366573021503f52486c8cb439b697e91af9bafd968c5aeb307d4f267a",
+    "ex8_seed0_coefficients.npz": "f92495b6ad3fcd3cbc1401dd4ab24fe43d73a22ac430a44240699df4eb7317f3"
+  },
+  "source_hashes": {
+    "src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/adam/split_mlp.py": "ce366f598842102bda42a26d2b43a68e457963122dc6cf609846a178085220ca",
+    "src/adam/mlp.py": "62dc60d67059ad91c987f271943827c51e6dc49be52ec926abada643f0f18830",
+    "src/adam/split_fourier.py": "c5fbacebea235a5d41494b5ec355ed33472f4187bfdd5f009f2fac4b6429c473",
+    "src/adam/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/adam/training.py": "446b2ad46c009a77485affd94c67e395b68a205a7c676a42180da4e6ccc40787",
+    "src/adam/fourier.py": "964abfc69b2e054354a2c74d38bf127ebef718b97b0a1da11b08f82e859acbc5",
+    "src/experiments/sir_ssa.py": "6cac9b864765dcee05991182c9888f9498719e0876442d7e453c0a2a0631449b",
+    "src/experiments/dataset.py": "b83606b9aaea3cdaed277e0568c58bd6ba388a4195ad378ce5c348b17d1e1d77",
+    "src/experiments/mlp_size.py": "a1f8fcb273777a04e9aa00662914b5bfbe59e03dac6756054f13cf28f2b83497",
+    "src/experiments/em_data.py": "69e5ff49316e95b9eeea7cec4d7b6da2e11129c664b0fb754aa1681bfd4d8c97",
+    "src/experiments/wave_data.py": "f65412a9fd35444aa747a5e38a7ce4b5fba742c783a96913b51a57f5950e917f",
+    "src/experiments/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/experiments/model_size.py": "21cef5222f8c64e424f763a5dd2f7a98de41d1771f891210e29b2639f982f54a",
+    "src/experiments/definitions.py": "66a99a0024f9257e4872e1eaf25934af67ca6b63ecdd7c19e969765b119113f4",
+    "src/experiments/simulation.py": "dcef05d054bd3c99529f3525b6fd689e19b242db55bc81e6e978000005edc595",
+    "src/experiments/timing.py": "adaf843d47c96652a16fdb808d7409ee36e23a841abbb66dfc6c2013fe78c0ea",
+    "src/experiments/config.py": "8f8ce3eafa6118df5b32a7b0463895f775a1119360d3f31a9fbfeaa5de629966",
+    "src/arff/covariance.py": "94db858e69947728fea119a9205f7b3007f8053b53af26a298ab9734d00f32fc",
+    "src/arff/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "src/arff/evaluation.py": "ba6769dd16a40b78f3bbb0c761b20f245a11a7c1283c8352a285377e92226480",
+    "src/arff/regression.py": "e48d15e3701468255d1307467b864e94c672836fde17843a0f5f5827ccc759e7",
+    "src/arff/two_stage.py": "40e392b5bed70afcbadb5679e3afa59230f1a77725d0fa8c4320234f200bad8c",
+    "src/arff/validation_selected.py": "0846a656cd43deff0279bd9f45b3f14d748ffe9433fc4831ac96fd0532be5894",
+    "GPU/lib/plot_lib.py": "27f62fe8e1067e093dcaddb7590bfb75e6a3dd5d0bce076ec8cbac6023641b6e",
+    "GPU/lib/lib_ARFF_folds2.py": "3b4492f9b6fb301edf5f49c347fbe2ad99c785c01afbceec042d20991ed91867",
+    "GPU/lib/lib_Adam_tanh.py": "0996b13912597526f1aad57eb54f201883d758b98a7ee3ee78cf20569ff13e9c",
+    "GPU/lib/lib_Adam_FF.py": "4db460441e8005f6e35acc2261338965400d40a797791546feee66eeb168e68d",
+    "GPU/lib/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "GPU/lib/lib_ARFF.py": "996e37ab39440d6ffe9c13f5e37bc2196963f5707c6207653158903ebdb79e48",
+    "GPU/lib/lib_ARFF_folds.py": "06e01e0850045f9a6ee190f72396274f74ba46a6af437c879f660c8b1928fc50",
+    "GPU/lib/.ipynb_checkpoints/lib_Adam_FF-checkpoint.py": "4db460441e8005f6e35acc2261338965400d40a797791546feee66eeb168e68d",
+    "GPU/lib/.ipynb_checkpoints/lib_ARFF_folds2-checkpoint.py": "568a8a9dc2e4e18914c3cb96f43c3c93acd2e244794fbbde9e4b8b8a901230f1",
+    "GPU/lib/.ipynb_checkpoints/plot_lib-checkpoint.py": "27f62fe8e1067e093dcaddb7590bfb75e6a3dd5d0bce076ec8cbac6023641b6e",
+    "GPU/lib/.ipynb_checkpoints/lib_ARFF_folds-checkpoint.py": "06e01e0850045f9a6ee190f72396274f74ba46a6af437c879f660c8b1928fc50",
+    "GPU/lib/.ipynb_checkpoints/lib_Adam_tanh-checkpoint.py": "0996b13912597526f1aad57eb54f201883d758b98a7ee3ee78cf20569ff13e9c",
+    "GPU/lib/.ipynb_checkpoints/lib_ARFF-checkpoint.py": "9684e490bee5fd9acdfe101acdaa04839a961cac2ca554051be54f5492145cda"
+  },
+  "checkpoint_hashes": {
+    "results/final_reproduction/production/accuracy/ex1/arff_historical_corrected/seed_0_artifacts.npz": "f6563bf0bdeb527db401e2908694b282d12e6ea16f52594272a6b22eb190d872",
+    "results/final_reproduction/production/accuracy/ex1/fourier/seed_0_artifacts.npz": "0698e181a2f3417ce4a7be39b4edd886df0549cd8792b274cd392cae3cf22160",
+    "results/final_reproduction/production/accuracy/ex1/mlp_shallow/seed_0_artifacts.npz": "e13c6b62ee68afe3a2d4c19a6f18dd190cc1955af1544aa11fbaa892cab50e80",
+    "results/final_reproduction/production/accuracy/ex1/mlp_deep/seed_0_artifacts.npz": "94e993e0a7d5b05745d78d989011dca57cff9ce29956fcf67da1557d86de701e",
+    "results/controlled_study_2026/float64_v2/production/baseline/K_128_N_80000/joint_fourier/seed_0/artifact.npz": "7a57b20644c58c1df510aaf6973688b909e30124ff2dc4b14e30535b5c32f59f",
+    "results/controlled_study_2026/float64_v2/production/baseline/K_128_N_80000/split_fourier/seed_0/artifact.npz": "3c56ee91608b5f4e0c31e81af204bfac4da345b25ef454a4ab6d6af517009827",
+    "results/controlled_study_2026/float64_v2/production/baseline/K_128_N_80000/arff/seed_0/artifact.npz": "87106b927ab6d3e1bb58329543796c8495b50ac50dbae83ca6eb16feba69f629",
+    "results/controlled_study_2026/float64_v2/production/baseline/K_128_N_80000/joint_mlp/seed_0/artifact.npz": "87e282d2c9fdaca3c211713acf03490adeaf0f6ef4bac8948e0fefd799e6272a",
+    "results/controlled_study_2026/float64_v2/production/baseline/K_128_N_80000/split_mlp/seed_0/artifact.npz": "edc4a8bea6a7e26c90598cc082db3e60e9d4bdefe6fe87d527e39b3a304792c2"
+  },
+  "dataset_hashes": {
+    "data/ex1.npz": "59be2ccebc12fcae77d2fd0413cf667c8f3524571165c896d7da234e6d967580",
+    "data/ex8_float64_v2.npz": "6fb009e3d6fa5f241cb1a15f9a9815cbd16ea19c3a9e4ca546ae99bdae091a72"
+  }
+}

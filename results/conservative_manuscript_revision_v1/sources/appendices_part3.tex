@@ -1,0 +1,72 @@
+
+% ============================================================
+%  APPENDIX C — Reproducibility
+% ============================================================
+\section{Reproducibility and Implementation Details}
+\label{app:reproducibility}
+
+
+
+
+\subsection{Fixed training settings}
+
+
+
+\begin{table}[H]
+\caption{Historical-compatible ARFF settings for retained applications, and modern Ex8 settings. All use $\gamma=1$ and five-fold cross-fitting; inner loop variants are distinguished in the text.}
+\label{tab:hyperparams}
+\centering
+\begin{tabular}{cccccccc}
+\hline
+Experiment & $\log_2(K)$ & $\delta$ & $\lambda$ & $M_{\min}$ & $M_{\max}$ & Resampling & Metropolis \\ \hline
+1 & 8 & 0.05 & 1.00E-03 & 30 & 1000 & True & False \\
+2 & 7 & 0.01 & 1.00E-05 & 20 & 1000 & True & False \\
+3 & 10 & 0.01 & 1.00E-02 & 50 & 1000 & True & False \\
+
+5 & 8 & 0.1  & 2.00E-03 & 20 & 1000 & True & False \\
+6 & 9 & 0.3  & 1.00E-03 & 50 & 1000 & True & False \\
+7 & 9 & 0.5  & 1.00E-02 & 50 & 1000 & False & True \\
+8 & 7 & 0.2 & 1.00E-03 & 300 & 300 & False & True \\ \hline
+% 1 (CPU) & 8 & 0.5 & 1.00E-02 & 30 & 1000 & True & False \\
+% 2 (CPU) & 7 & 0.1 & 1.00E-03 & 20 & 1000 & True & False \\ \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Adam hyperparameters.
+Historical deep = two hidden layers of width $K/2$; Ex8 both MLPs = two layers of width 27. Historical column is $\log_2 K$; Ex8 MLP row explicitly gives width.}
+\label{tab:adam_hyperparams}
+\centering
+\begin{tabular}{ccccc}
+\hline
+Experiment & $\log_2(K)$ & $\log_2($Batch Size$)$ & Learning Rate & Epochs \\ \hline
+1 & 8  & 9  & 1.00E-03 & 800 \\
+2 & 7  & 8  & 1.00E-04 & 100 \\
+3 & 10 & 10 & 1.00E-04 & 300 \\
+
+5 & 8  & 8  & 1.00E-04 & 100 \\
+6 & 9  & 9  & 1.00E-03 & 600 \\
+7 & 9 & 9 & 1.00E-04 & 300 \\
+8 Fourier & 7 & 8 & 1.00E-04 & 300 \\
+8 MLP & \multicolumn{1}{c}{width 27} & 8 & 1.00E-03 & 300 \\ \hline
+% 1 (CPU) & 8 & 6 & 1.00E-03 & 200 \\
+% 2 (CPU) & 7 & 6 & 1.00E-03 & 200 \\ \hline
+\end{tabular}
+\end{table}
+
+
+
+\subsection{Selection, information and covariance conventions}
+Historical ARFF uses resampling before mutation when enabled, a key-based internal 10\% holdout, earliest strict-minimum ties and zero-based adaptation indexing. The five-point float32 moving sum and historical stopping check precede retention of the terminal candidate. There is no full-data refit. Ex8 instead uses Algorithm~\ref{alg:ARFF}, 300 fixed adaptations, no resampling and one-based post-adaptation selection. In all applications the auxiliary drift fits construct OOF targets.
+
+Historical Adam keeps the legacy initializer and epoch-indexed shuffling keys, retaining the earliest outer-validation NLL minimum without refitting. Shallow tanh has width $K$, deep has two layers of width $K/2$. For Ex3 the historical symmetric diffusion factor is $LL^\top$, so covariance is $(LL^\top)^2$; this is not the modern Ex8 covariance $LL^\top$. Historical diagonal covariance uses softplus outputs. Coefficient comparisons always use $\Sigma=\sigma\sigma^\top$.
+
+Ex8 joint and split Fourier models have 1792 retained parameters each; two-layer width-27 MLP models have 1814. Fourier amplitudes initialize as $.01$ times standard normals and frequencies as standard normals for Adam. MLP uses Glorot-uniform weights, zero biases and covariance final-layer weight scaling $.01$. Full covariance factor diagonals use softplus plus $10^{-8}$. Adam moments are $(.9,.999)$ and epsilon $10^{-7}$. Joint checkpoints minimize external-validation NLL; split drift minimizes validation MSE and split covariance validation NLL. Joint/split pairs share initialization family, not identical key consumption across seven fits versus one.
+
+Outer Ex8 training has 80000 observations; ARFF final amplitudes use 72000 and each OOF nuisance amplitude fit 57600. Adam final models use 80000 and each nuisance model 64000. Historical 90/10 splits use the canonical permutation, with all recorded rows retained. Final parameter counts exclude auxiliary models; two-stage timing includes their fits.
+
+\subsection{System, timing and reproducibility}
+Accuracy campaigns ran concurrently across four NVIDIA RTX A6000 GPUs. Per-artifact source/data hashes and environment metadata identify each execution; no single stale package-version table is substituted for these records. Compilation/warm-up, algorithm time, final metric evaluation and serialization are separate scopes. Non-isolated algorithm times are not a publication-quality speed comparison. No new timing run was used for this revision.
+
+\subsection{Coefficient-figure reconstruction}
+All new coefficient figures use already selected seed-0 checkpoints, declared illustrative before evaluation. Reconstruction on the original Ex1 validation and Ex8 test populations passed archived drift RMSE, raw covariance RMSE and NLL checks with $\mathrm{rtol}=10^{-5}$ and $\mathrm{atol}=10^{-6}$ on the original GPU backend. No tolerances or checkpoints changed after evaluation. Ex1 uses 201 points on each coordinate slice through zero; Ex8 uses 100-by-100 cell centres on $[-2,2]^2$, excluding the angular singularity at zero. Coordinates, predictions and source hashes accompany the figures. Their diagnostics do not replace the 30-seed archived metrics.

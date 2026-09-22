@@ -1,0 +1,18 @@
+\begin{table}[ht]\centering\scriptsize\caption{Component-swap CPU evaluations: mean $\pm$ sample SD over 30 seeds. $Q$ is the quadratic term, $D$ the half log-determinant; Gaussian constant $\log(2\pi)=1.837877$. Table~\ref{tab:ex8} instead contains stored production-GPU scores. The float32/float64 blocks agree at four significant digits; paired differences below show their distinct reductions. Identical-oracle roundoff SDs are displayed as zero.}\label{tab:swaps}\begin{tabular}{lrrr}\toprule Combination & $Q$ & $D$ & NLL\\\midrule
+\multicolumn{4}{l}{\emph{CPU predictions; float32 projection/likelihood, floor $10^{-3}$}}\\
+MLP drift + ARFF cov. & $0.8886\pm 0.0722$ & $-11.64\pm 0.02354$ & $-8.916\pm 0.07438$\\
+ARFF drift + ARFF cov. & $0.9074\pm 0.07024$ & $-11.64\pm 0.02354$ & $-8.897\pm 0.07317$\\
+True drift + ARFF cov. & $0.8884\pm 0.07218$ & $-11.64\pm 0.02354$ & $-8.916\pm 0.07434$\\
+\multicolumn{4}{l}{\emph{CPU predictions; float64 spectral likelihood, floor $10^{-3}$}}\\
+MLP drift + ARFF cov. & $0.8886\pm 0.0722$ & $-11.64\pm 0.02354$ & $-8.916\pm 0.07438$\\
+ARFF drift + ARFF cov. & $0.9074\pm 0.07024$ & $-11.64\pm 0.02354$ & $-8.897\pm 0.07317$\\
+True drift + ARFF cov. & $0.8884\pm 0.07218$ & $-11.64\pm 0.02354$ & $-8.916\pm 0.07434$\\
+\multicolumn{4}{l}{\emph{CPU diagnostic; float64, unprojected instantaneous true covariance}}\\
+True instantaneous pair & $1.603\times10^{4}\pm 0$ & $-18.42\pm 0$ & $1.602\times10^{4}\pm 0$\\
+ARFF drift + true cov. & $1.98\times10^{4}\pm 1947$ & $-18.42\pm 0$ & $1.978\times10^{4}\pm 1947$\\
+MLP drift + true cov. & $1.609\times10^{4}\pm 32.45$ & $-18.42\pm 0$ & $1.608\times10^{4}\pm 32.45$\\
+\midrule\multicolumn{4}{l}{\emph{Paired CPU float32 minus float64 differences (not new evaluations)}}\\
+ARFF drift + ARFF cov. & $-1.609\times10^{-8}\pm 2.323\times10^{-7}$ & $3.116\times10^{-7}\pm 4.146\times10^{-7}$ & $4.112\times10^{-7}\pm 4.87\times10^{-7}$\\
+MLP drift + ARFF cov. & $-2.246\times10^{-8}\pm 2.17\times10^{-7}$ & $3.116\times10^{-7}\pm 4.146\times10^{-7}$ & $5.281\times10^{-7}\pm 3.902\times10^{-7}$\\
+True drift + ARFF cov. & $-2.537\times10^{-8}\pm 2.306\times10^{-7}$ & $3.116\times10^{-7}\pm 4.146\times10^{-7}$ & $4.795\times10^{-7}\pm 4.794\times10^{-7}$\\
+\bottomrule\end{tabular}\end{table}

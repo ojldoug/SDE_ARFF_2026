@@ -1,0 +1,896 @@
+\documentclass{article}
+
+\usepackage{geometry}
+\usepackage{amsmath}     % For aligned environments and advanced math formatting
+\usepackage{amssymb}     % For additional math symbols
+\usepackage{mathtools}   % Enhances amsmath capabilities
+\usepackage{algorithm}
+\usepackage{algorithmic}
+%\usepackage{algpseudocode}
+
+\usepackage{float}       % For [H] specifier in the algorithm environment
+\usepackage{threeparttable} % For footnotes in tables
+\usepackage{graphicx}    % For rotating text
+\usepackage{adjustbox}   % For adjusting box sizes and positions
+\usepackage{subcaption}
+\usepackage{xcolor}
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{longtable,microtype,placeins}
+\setlength{\emergencystretch}{2em}
+\newcommand{\diag}{\operatorname{diag}}
+\newcommand{\softplus}{\operatorname{softplus}}
+\usepackage{hyperref}
+\providecommand{\FloatBarrier}{} % no-op; all floats use [H]
+
+% natbib for arXiv-compatible bibliography
+\usepackage[numbers]{natbib}
+\renewcommand{\bibname}{References}
+
+% Green editorial suggestions for discussion with colleagues
+\newcommand{\greennote}[1]{{\color{green!60!black}\textbf{[Suggestion:} #1\textbf{]}}}
+
+% Extra macros used in appendices (from supplement)
+\newcommand{\E}{\mathbb{E}}
+\DeclareMathOperator{\tr}{tr}
+
+\geometry{
+ a4paper,
+ total={170mm,257mm},
+ left=20mm,
+ top=20mm,
+}
+
+\setlength{\parindent}{0pt} % Sets paragraph indentation to 0 points
+%\setlength{\parskip}{0.5em}
+
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+% \providecommand{\abs}[1]{\left\lvert#1\right\rvert}
+\newcommand{\omegaVector}{\boldsymbol{\omega}}
+\newcommand{\omegaRV}{\boldsymbol{\Omega}}
+\newcommand{\xVector}{\boldsymbol{x}}
+\newcommand{\xRV}{\boldsymbol{X}}
+\newcommand{\bVector}{\boldsymbol{b}}
+\newcommand{\ampl}{a}
+\def\BFBH{\boldsymbol{a}}
+\newcommand{\rwInc}{\boldsymbol{\nu}}
+\newcommand{\cset}{\mathbb{C}}
+\newcommand{\C}{\mathbb{C}}
+\def\BARS{\mathbf{S}}
+\newcommand{\nset}{\mathbb{N}}
+\newcommand{\rset}{\mathbb{R}}
+\def\R{\mathbb{R}}
+\def\E{\mathbb{E}}
+\def\BFO{\boldsymbol{\omega}}
+\def\DATAM{{\rho}}
+\def\rmD{{\mathrm{d}}}
+\providecommand{\freqv}{\ensuremath{\boldsymbol{\omega}}}
+\providecommand{\freq}{\ensuremath{\omega}}
+\DeclareMathOperator*{\argmax}{arg\,max}
+\DeclareMathOperator*{\argmin}{arg\,min}
+\def\Ll{\mathcal{L}}
+\def\ID{\mathbf{I}}
+\def\IM{\mathrm{i}}
+\providecommand{\weightv}{\ensuremath{\hat{\boldsymbol{\beta}}}}
+\providecommand{\weight}{\ensuremath{\hat{\beta}}}
+\providecommand{\T}{\mathrm{T}}    % Transpose symbol
+\def\ALPHAEX{\gamma}             % what used to be exponent
+\providecommand{\algAM}{\ensuremath{\mathrm{AM}}}
+\providecommand{\algAMR}{\ensuremath{\mathrm{AMR}}}
+\providecommand{\algAMRmod}{\ensuremath{\mathrm{AMRv2}}}
+\providecommand{\algRWR}{\ensuremath{\mathrm{RWR}}}
+
+\title{Two-Stage Drift and Covariance Regression for SDE Learning
+with Adaptive Random Fourier Features}
+\author{Owen Douglas, Aku Kammonen, Anamika Pandey, Raul Tempone }
+\date{Review draft --- September 2026; author decisions remain open}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+Learning stochastic dynamics from limited observations is a central challenge in data-driven modelling of It\^{o} SDEs. We present a sequential procedure for estimating drift and diffusion covariance from snapshot triples $(x_0,x_1,h)$. Conditional first and second moments of the short-time Gaussian model motivate two multi-output Fourier-feature regressions with closed-form ridge amplitude solves and adaptive frequencies. Out-of-fold drift predictions construct covariance targets, while validation selects each retained model. Restricted ridge regression is not an exact decomposition of joint finite-sample likelihood optimization. Applications include polynomial systems, a stochastic SIR mean-field limit, a wave-derived regression, broad-spectrum drift and near-singular covariance. Historical-protocol examples provide validation-selected evidence; a corrected near-singular benchmark compares five approximately parameter-matched estimators on independent test observations. ARFF has the smallest raw covariance error there, but joint MLP has substantially smaller drift error and neural alternatives achieve lower Gaussian negative log-likelihood. Raw covariance validity and projected likelihood are reported separately. Completed sample-size, lag and capacity studies characterize sensitivity without establishing universal convergence rates or speed advantages.
+
+\end{abstract}
+
+
+
+\section{Introduction}
+Identifying stochastic dynamics from limited and noisy observations is a central challenge across science and engineering. Stochastic differential equations (SDEs) provide flexible models for noisy, multiscale systems in physics \cite{risken1996fokker,vankampen2007stochastic}, finance \cite{Yacine_finance,james2000interest}, and biology \cite{Schwartz_biology}.
+
+\textcolor{black}{Classical statistics for discretely observed diffusions provides maximum-likelihood approximations, estimating functions, Bayesian methods, and nonparametric coefficient estimators \citep{Yacine_finance,Sorensen2009}. These methods are powerful, but often require model-specific transition-density approximations, asymptotic regimes, or nontrivial numerical integration. Our setting emphasises scattered snapshot triples, flexible multivariate covariance regression, and computational training through adaptive random features.}
+
+Recent machine learning approaches aim to relax these limitations by fitting drift and diffusion directly from data.
+Neural SDEs \cite{neural_SDEs} and SDE-Net \cite{SDE_Net} parametrise the coefficients with neural networks, while \cite{Dietrich2023,dridi2021learningstochasticdynamicalsystems} proposed likelihood-based training under Euler--Maruyama discretisation.
+Gaussian-process and related nonparametric formulations have also been explored \cite{Li2021UnifiedRFF}, and neural SDE variants \cite{neural_SDEs,SDE_Net,Dietrich2023,dridi2021learningstochasticdynamicalsystems} are promising; however, neural networks typically rely on gradient-based training (e.g., Adam), which motivates seeking a simpler alternative.
+
+Random Fourier features (RFF) \cite{RR2007RandomFF,Li2021UnifiedRFF} offer a contrasting approach:
+functions are represented with randomised trigonometric bases, and training reduces to closed-form least squares.
+Recent works have further advanced the theoretical understanding and extensions of RFF:
+Szabó \& Sriperumbudur study derivative approximations via RFF~\citep{pmlr-v89-szabo19a},
+Li et al.\ propose quadrature-based Fourier features for scalable Gaussian process regression~\citep{pmlr-v238-li24o},
+and Yao et al.\ introduce bootstrap error estimation techniques for RFFs~\citep{pmlr-v206-yao23a}.
+Adaptive variants (ARFF) \cite{kammonen2020adaptiverandomfourierfeatures,Kammonen2025Adaptive,huang2025convergenceadaptiveresamplingrandom}
+adapt frequency populations through random-walk proposals and optional resampling, motivated by population Fourier approximation bounds. The ARFF approach was first proposed in \cite{kammonen2020adaptiverandomfourierfeatures}, where the Fourier frequencies are adapted using a Metropolis-based sampling. This built upon earlier RFF works such as  \cite{RR2007RandomFF, NIPS2008RR, Barron1993, Barron1994}, where authors attempted to identify optimal frequency sampling distributions or feature weights. Later, \cite{Kammonen2025Adaptive} enhanced this idea by adding a resampling step, inspired by particle-filtering, whose published experiments study sensitivity to proposal lengths and acceptance exponents; this does not establish a uniform benefit in SDE regression.
+ \textcolor{black}{The present manuscript substantially revises and extends our earlier ARFF-for-SDE-learning preprint~\cite{douglas2025arffsde} by sharpening the drift–diffusion split, adding near-singular covariance diagnostics, and expanding the empirical analysis.}
+
+
+
+% Our key idea is that the Gaussian negative log-likelihood induced by Euler--Maruyama discretisation admits a decomposition into two regression problems: one for drift increments and one for diffusion covariances.
+% This reduction allows us to replace backpropagation-based training with ARFF loops consisting only of resampling, random-walk updates in frequency space, and closed-form least-squares solves---yielding a simple alternative to gradient descent for learning SDEs from snapshot data. \greennote{Importantly, we observe experimentally that the benefits of this decomposition are not tied to the ARFF optimiser itself: even when trained with the same optimiser (Adam), the split formulation can improve training behavior compared with direct optimisation of the joint likelihood.}
+%  {\color{red}the green suggestion is good but above need some rewording:}\\
+% {\color{black}Our key idea is that, for the Gaussian negative log-likelihood induced by Euler--Maruyama discretisation, fixing the diffusion reduces the loss to a least-squares regression for the drift, and the resulting pointwise likelihood minimisers for the diffusion provide regression targets for learning the diffusion covariance.
+This sequential formulation makes the two coefficient-learning tasks explicit. For fixed frequencies, all output amplitudes are fitted jointly in a linear ridge solve, confining nonlinear search to the frequency population. The drift stage does not invert a learned covariance, and the second stage estimates covariance entries rather than a nonunique diffusion factor. These conveniences do not eliminate noisy-target variance, feature conditioning or raw covariance indefiniteness.
+
+\paragraph{Contributions}
+(i) We derive the unrestricted conditional targets induced by the Gaussian observation model and distinguish them from the restricted regression surrogates.
+(ii) We implement a two-stage ARFF procedure with out-of-fold covariance targets, validation-selected checkpoints and explicit raw-covariance/likelihood evaluation.
+(iii) We provide operation counts and applications to polynomial, epidemic, spectrally broad and wave-derived systems, retaining their actual protocols and mixed outcomes.
+(iv) We compare joint and split Adam with ARFF on a corrected near-singular benchmark and report completed descriptive sensitivity studies. These compare complete estimators; they do not isolate a causal advantage of frequency adaptation or establish universal speed, accuracy or convergence-rate superiority.
+
+\paragraph{Paper outline}
+Section~\ref{sec:ARFFalgorithm_updating} reviews ARFF.
+Section~\ref{sec:mathprobset} formulates the likelihood-based learning problem,
+and Section~\ref{sec:training_algorithm} presents the proposed ARFF training procedure.
+Section~\ref{sec:computational_experiments} describes the benchmark setup,
+and Section~\ref{sec:results} reports the experimental results.
+Section~\ref{sec:summary} concludes with a discussion of findings and future directions.
+Experiment specifications are provided in Appendix~\ref{app:num_experiments}, and reproducibility information in Appendix~\ref{app:reproducibility}.
+
+
+\section{Adaptive Random Fourier Features Training Algorithm}
+\label{sec:ARFFalgorithm_updating}
+
+Consider the data $(x_n, y_n)\in\mathbb{R}^D\times\mathbb{R}^{D'},\qquad n=1,\dots,N,$
+where the inputs $x_n$ are drawn i.i.d.\ from an unknown population distribution $\rho$, and there exists a target function $g:\mathbb{R}^D\to\mathbb{R}^{D'}$ such that $y_n=g(x_n) + \xi_{n},$ where $\xi_{n}$ denotes possible measurement noise. Fourier feature models approximate a target function $g$ by representing it in the finite-dimensional space
+\[
+\mathcal N_K=\{\beta(x)=\Phi_\Omega(x)B:\ B\in\mathbb R^{2K\times D'}\},\quad
+\Phi_\Omega(x)=[\cos(x\Omega),\sin(x\Omega)].
+\]
+For a fixed set of frequencies $\{\omega_k\}_{k=1}^K$, the coefficients $\hat{\beta}_k$ are obtained by solving a regularised least-squares problem, producing an empirical approximation $\beta \approx g$. At the population level this is
+\begin{equation}
+\label{eq:regularised_loss}
+\min_{\beta\in\mathcal{N}_K}
+\Bigl\{\,
+\E_{\rho}[\,\|y-\beta(x)\|^2\,]
+\,+\,
+\lambda\|B\|_F^2
+\Bigr\},
+\end{equation}
+where $\lambda>0$ is a Tikhonov regularisation parameter and $\|\cdot\|$ denotes the Euclidean norm. In practice one minimises its empirical version, which is attained by replacing $\rho$ with $\hat{\rho}$ which denotes the empirical distribution of $\{(x_n, y_n)\}_{n=1}^N$.
+
+\paragraph{Optimal sampling density}
+The population random-feature analysis motivates frequency adaptation. Under the scalar theorem's integrability and spectral-moment assumptions, iid frequencies with density $p$ obey \citep[Theorem 2.1]{kammonen2020adaptiverandomfourierfeatures}
+\[
+\E_{\omega_{1:K}}\min_\beta\{\E|\beta(X)-Y|^2+\lambda\|\hat\beta\|^2\}
+\le \frac{1+\lambda}{K}\E_{\omega\sim p}\frac{|\widehat g(\omega)|^2}{(2\pi)^D p(\omega)^2}
++\E|Y-g(X)|^2.
+\]
+The spectral term is minimized by $p_*(\omega)\propto|\widehat g(\omega)|$ when defined; pooling vector outputs motivates the corresponding norm. This is a frequency-averaged population result, including irreducible noise, not a guarantee for a finite-data, adapted and validation-selected estimator. The ideal density motivates proposals; convergence of the implemented population to it is not asserted.
+
+For a fixed frequency population, real multi-output amplitudes solve
+\begin{equation}\label{eq:normal_equations_ARFF}
+ (S^\top S+n\lambda I)B=S^\top Y,\qquad S_{i,:}=\Phi_\Omega(x_i),
+\end{equation}
+where $n$ is the actual fitting subset size and $S$ has $2K$ unnormalized columns, ordered cosine block then sine block. This minimizes $n^{-1}\|SB-Y\|_F^2+\lambda\|B\|_F^2$. It is not asserted equivalent to unconstrained complex regression followed by taking real parts.
+
+The Metropolis-inspired procedure \citep{kammonen2020adaptiverandomfourierfeatures} favors proposals with larger pooled amplitudes; optional resampling \citep{Kammonen2025Adaptive} redistributes frequency slots. The noisy-data convergence analysis \citep{huang2025convergenceadaptiveresamplingrandom} includes quadratic and quartic penalties and separate assumptions; it does not directly certify the ridge-only procedure here. Algorithm~\ref{alg:ARFF} specifies modern Experiment 8. Historical applications retain the distinct stopping/resampling rules in Appendix~\ref{app:reproducibility}.
+
+\begin{algorithm}[H]\small
+\caption{Modern validation-selected ARFF regression (Experiment 8)}\label{alg:ARFF}
+\textbf{Input:} regression pool $(x_i,y_i)$; $K,\lambda,\delta,\gamma$, 300 adaptations.
+\begin{enumerate}
+\item Split the pool into a seeded 10\% internal validation set $V$ and fitting set $F$. All amplitude solves use only $F$ and $n=|F|$ in \eqref{eq:normal_equations_ARFF}. Initialize frequencies at zero and solve amplitudes.
+\item At each adaptation propose $\omega'_k=\omega_k+\delta Z_k$, $Z_k\sim\mathcal N(0,I_D)$, and solve proposed amplitudes $B'$ jointly. Define
+\[
+a_k=\left(\sum_{j=1}^{D'}(B_{kj}^2+B_{K+k,j}^2)\right)^{1/2},\quad
+\bar a_k=\max(a_k,\tau),\quad\bar a'_k=\max(a'_k,\tau),
+\]
+where $\tau$ is the amplitude dtype's smallest positive normal number. Accept each proposed frequency \emph{with probability}
+$\alpha_k=\min\{1,(\bar a'_k/\bar a_k)^\gamma\}$: the code compares the ratio to an independent uniform $U_k\in[0,1)$. Guarding both norms makes two zero norms give ratio one.
+\item Refit amplitudes for the accepted/rejected mixed frequency population on $F$. Compute $\operatorname{MSE}_V=(|V|D')^{-1}\sum_{i\in V}\|\Phi_\Omega(x_i)B-y_i\|^2$ and retain the first strict minimum.
+\item Return the selected model with no post-selection refit. Only post-adaptation iterations 1--300 are candidates; nonfinite losses become infinity and a fit without a finite candidate fails.
+\end{enumerate}
+The baseline uses $K=128,\lambda=.001,\delta=.2,\gamma=1$, Metropolis on and resampling off. $M_{\min}=M_{\max}=300$ disables early stopping.
+\end{algorithm}
+
+\section{Mathematical Problem Setting}\label{sec:mathprobset}
+This work aims to identify an SDE model that approximates the observed dynamics of a system from one-step transition data (snapshot triples $(x_0,x_1,h)$).
+ The assumed form of the SDE is an It\^{o} diffusion process
+\begin{equation}
+\label{eq:ito diffusion SDE}
+    \mathrm{d}x_t = f(x_t) \, \mathrm{d}t + \sigma(x_t) \, \mathrm{d}W_t,
+\end{equation}
+where $x_t \in \mathbb{R}^D$ is the system state at time $t$, $f: \mathbb{R}^D \to \mathbb{R}^D$ is the drift function, and $\sigma: \mathbb{R}^D \to \mathbb{R}^{D \times D}$ is the diffusion function. These functions are assumed to satisfy appropriate regularity conditions (see Chapter~5 in \cite{BerntSDE}) that ensure the existence of a solution to Eq.~\eqref{eq:ito diffusion SDE}.
+ The process $W_t$ is a D-dimensional Wiener process with independent increments, such that $W_{t} - W_{s} \sim \mathcal{N}(0, (t-s)I_D)$ for $0\leq s < t$.
+
+Training data consist of finite-lag transitions of the system, in the form $\mathcal{D} = \{(x_0^{(n)}, x_1^{(n)}, h^{(n)})\}_{n=1}^N,$
+where $x_0^{(n)}$ is the initial point and $x_1^{(n)}$ the state after a small time increment $h^{(n)} > 0$.
+
+\subsection*{Euler--Maruyama Approximation and Transition Density}
+
+Using the Euler--Maruyama (EM) scheme, the forward evolution of the SDE over a time step $h>0$ can be approximated as $x_1 \approx x_0 + h f(x_0) + \sigma(x_0)\,\delta W$, $\delta W \sim \mathcal{N}(0, h I_D).$
+Consequently, the conditional distribution of $x_1$ given $x_0$ and $h$ is approximated by $x_1 \mid x_0,h \approx \mathcal{N}\!\big(x_0 + h f(x_0),\, h\Sigma(x_0)\big)$,
+where $\Sigma(x_0) = \sigma(x_0)\sigma(x_0)^\top$.
+This law is exact for a frozen one-step EM update. For the multiple-substep SDE observations used here it is a Gaussian quasi-likelihood, not an exact transition density.
+
+\subsection*{Learning Objective}
+
+We introduce real Fourier models $f_\theta(x)=\Phi_\Omega(x)B_f$ and $\widehat\Sigma_{\theta'}(x)=\Phi_{\Omega'}(x)B_\Sigma$. The second output is the lower-triangular vectorization of covariance (or its diagonal in diagonal experiments); reversing this vectorization gives a symmetric matrix, not a guarantee of positive definiteness. For full covariance there are $q=D(D+1)/2$ outputs. Frequencies and amplitudes of drift and covariance are distinct.
+
+Following \cite{Dietrich2023,dridi2021learningstochasticdynamicalsystems},
+the negative log-likelihood for one sample is
+\begin{equation}
+\label{eq:loss}
+    \mathcal{L}(\theta, \theta' \mid x_0, x_1, h) =
+    \frac{1}{2} (x_1 - x_0 - h f_\theta(x_0))^\top (h\Sigma_{\theta'}(x_0))^{-1} (x_1 - x_0 - h f_\theta(x_0))
+    + \frac{1}{2} \log|h\Sigma_{\theta'}(x_0)| + \frac{D}{2} \log(2\pi).
+\end{equation}
+where $\|v\|^2_{M} := v^\top M v$ for any symmetric positive definite matrix $M$ and $\log|\cdot|$ denotes the log-determinant.
+The population loss is
+\begin{equation}
+\label{eq:total_loss}
+\mathcal{L}_{\text{pop}}(\theta, \theta')
+= \E_{\rho}\!\big[\mathcal{L}(\theta,\theta' \mid x_0,x_1,h)\big],
+\end{equation}
+with $\rho$ the true distribution of snapshot triples.
+In practice, $\rho$ is unknown and we minimise the empirical loss
+$\mathcal{L}_{\text{emp}}$ obtained by replacing $\rho$ with the
+empirical distribution $\hat{\rho}$ of $\mathcal{D}$.
+
+Minimisation with respect to the diffusion $\sigma$ is equivalent
+to minimisation over the covariance $\Sigma=\sigma\sigma^\top$.
+Since the mapping $\sigma \mapsto \Sigma$ is many-to-one, structural
+assumptions are required for identifiability. For example, the SPD principal square root is one convention, while a lower-triangular factor with positive diagonal is fixed by Cholesky decomposition. Symmetry alone does not identify the principal root.
+
+\textcolor{black}{Throughout the manuscript, $\sigma$ denotes a diffusion factor and
+$\Sigma=\sigma\sigma^\top$ denotes the associated covariance.
+Algorithm~\ref{alg:ARFF_SDE} learns $\Sigma$ directly through
+residual covariance targets. Whenever errors or visualizations are
+reported, we state explicitly whether the quantity shown is
+$\sigma$ or $\Sigma$.}
+
+\section{Drift and Diffusion Training Algorithm}\label{sec:training_algorithm}
+
+
+
+
+
+
+
+{\color{black}
+This section presents the proposed drift and diffusion training
+procedure. Under the Gaussian Euler--Maruyama observation model, the
+drift and diffusion covariance are characterised by the conditional
+mean of the scaled increments and the conditional second moment of the
+residuals, respectively. These identities motivate the regression
+surrogates used in Alg.~\ref{alg:ARFF_SDE}.
+}
+
+For a symmetric matrix $A$, the relation $A \succ 0$ means $A$ is  positive definite, and $A \succeq 0$ means positive semidefinite. For a vector $v$ and $M \succ 0$, we write $\|v\|_M^2 := v^\top M v$.
+
+\subsection{Drift learning objective}
+\label{sec:drift_reduction}
+
+
+{\color{black}
+This subsection derives the population drift target induced by the
+Gaussian Euler--Maruyama likelihood and relates it to the regression
+surrogate used in Alg.~\ref{alg:ARFF_SDE}.
+
+Conditionally on $x_0=x$, assume $h>0$ almost surely, $0<\E[h\mid x]<\infty$, $\E[\|x_1-x_0\|^2/h\mid x]<\infty$ and $\E[|\log h|\mid x]<\infty$. These make the pointwise Gaussian objective finite for each finite drift and SPD covariance. Statements about an integrated population loss additionally require these conditional terms to be integrable over $x$. For the unweighted increment identity require $\E[\|(x_1-x_0)/h\|\mid x]<\infty$, for example finite $\E[h^{-1/2}\mid x]$ in the frozen Gaussian model.
+
+Assume that the fixed covariance field satisfies
+\[
+\Sigma_{\tilde\theta'}(x)\succ0
+\]
+for all $x$ (or almost surely with respect to $\rho$).
+
+Define
+\[
+y:=\frac{x_1-x_0}{h},
+\qquad
+A(x):=\Sigma_{\tilde\theta'}(x)^{-1}.
+\]
+
+For fixed diffusion parameters $\theta'=\tilde\theta'$, the quadratic part
+of the population negative log-likelihood is
+\[
+Q(f)
+=
+\frac12
+\E_{\rho}\!\left[
+h\,(y-f(x_0))^\top
+A(x_0)
+(y-f(x_0))
+\right].
+\]
+
+Since $A(x_0)\succ0$ almost surely, the unrestricted minimiser satisfies
+\[
+f^*(x)
+=
+\frac{\E_{\rho}[hy\mid x_0=x]}
+     {\E_{\rho}[h\mid x_0=x]}.
+\]
+
+If \(h\) is deterministic, or if the conditional expectation
+\[
+\E_{\rho}[y\mid x_0=x,\,h]
+\]
+is independent of \(h\), then
+\[
+f^*(x)=\E_{\rho}[y\mid x_0=x].
+\]
+
+Under the frozen-coefficient one-step Euler--Maruyama model,
+\[
+\E_{\rho}[y\mid x_0=x,h]=f(x),
+\]
+and therefore
+\[
+f^*(x)=f(x).
+\]
+
+Thus, under the Euler--Maruyama observation model, the weighted and
+unweighted population targets coincide.
+}
+
+
+
+{\color{black} \paragraph{Empirical surrogate}
+Replacing population expectations by empirical averages yields the
+ordinary ridge-regression problem
+\[
+\min_{f\in\mathcal N_K}
+\left\{
+\frac{1}{N}
+\sum_{n=1}^{N}
+\left\|
+Y_n-f(x_0^{(n)})
+\right\|_2^2
++
+\lambda
+\sum_{k=1}^{K}
+\|\hat{\beta}_k\|_2^2
+\right\},
+\]
+where
+\[
+Y_n=\frac{x_1^{(n)}-x_0^{(n)}}{h_n}.
+\]
+
+This objective is not, in general, the exact finite-sample minimizer
+of the Gaussian negative log-likelihood.
+
+\paragraph{Exact fixed-covariance likelihood.}
+For fixed covariance parameters $\theta'=\tilde\theta'$, the exact
+finite-sample Gaussian likelihood yields the generalized least-squares
+problem
+\[
+\min_{f\in\mathcal N_K}
+\left\{
+\frac1N
+\sum_{n=1}^{N}
+h_n
+\bigl(
+Y_n-f(x_0^{(n)})
+\bigr)^\top
+\Sigma_{\tilde\theta'}(x_0^{(n)})^{-1}
+\bigl(
+Y_n-f(x_0^{(n)})
+\bigr)
++
+\lambda
+\sum_{k=1}^{K}
+\|\hat\beta_k\|_2^2
+\right\}.
+\]
+
+Thus, the exact finite-sample likelihood corresponds to a
+covariance-weighted generalized least-squares problem, whereas
+Algorithm~\ref{alg:ARFF_SDE} employs ordinary ridge regression.
+Under the frozen Euler--Maruyama model the unrestricted targets agree; restricted regularized solutions need not. For feature columns $\phi_n$ and $W_n=h_n\Sigma(x_n)^{-1}$, the displayed penalized GLS objective satisfies
+\[
+\sum_n\phi_n\phi_n^\top B W_n+N\lambda B=\sum_n\phi_nY_n^\top W_n.
+\]
+Ordinary ridge replaces the weights with identity matrices. This distinction remains even when the population drift identity is exact.
+}
+
+\subsection{Diffusion minimiser: pointwise characterisation and plug-in targets}
+\label{sec:diffusion_minimiser}
+
+Fix $x_0 \in \R^D$ and a drift $f_\theta$. For one observation $(x_1,h)$, define the residual
+\[
+r := x_1 - x_0 - h\,f_\theta(x_0).
+\]
+As a function of the covariance $\Sigma \in \R^{D\times D}$ with $\Sigma \succ 0$, the (centered) negative log-likelihood contribution is
+\begin{equation}
+\label{eq:diff_ll_single}
+\ell(\Sigma; x_0, x_1, h)
+= \tfrac{1}{2}\, r^\top (h \Sigma)^{-1} r \;+\; \tfrac{1}{2}\,\log|h \Sigma| \;+\; \mathrm{const}.
+\end{equation}
+Conditioning on $x_0$ and taking expectation over $(x_1,h)\mid x_0$ yields the pointwise population objective
+\begin{equation}
+\label{eq:diff_obj_pointwise}
+\mathcal{L}(\Sigma; x_0)
+= \tfrac{1}{2}\,\tr\!\big(\Sigma^{-1} C(x_0)\big) \;+\; \tfrac{1}{2}\,\log|\Sigma| \;+\; \mathrm{const},
+\qquad
+C(x_0) := \E\!\left[h^{-1} r r^\top \mid x_0\right].
+\end{equation}
+
+
+
+{\color{black}
+Let
+\[
+\mathbb S_{++}^{D}
+:=
+\{A\in\mathbb R^{D\times D}:
+A=A^\top,\;
+A\succ0\}
+\]
+denote the set of symmetric positive definite matrices.
+
+\paragraph{Proposition (Pointwise minimiser and uniqueness)}
+Assume $C(x_0)\succ0$. Consider
+\[
+\mathcal{L}(\Sigma;x_0)
+=
+\frac12\tr\!\bigl(\Sigma^{-1}C(x_0)\bigr)
++
+\frac12\log\det\Sigma,
+\qquad
+\Sigma\in\mathbb S_{++}^D.
+\]
+Under the precision parametrisation $P=\Sigma^{-1}$, define
+\[
+\widetilde{\mathcal L}(P;x_0)
+:=
+\mathcal L(P^{-1};x_0)
+=
+\frac12\tr\!\bigl(PC(x_0)\bigr)
+-
+\frac12\log\det P,
+\qquad
+P\in\mathbb S_{++}^D.
+\]
+The function $\widetilde{\mathcal L}(P;x_0)$ is strictly convex in
+$P$. Consequently, its unique minimiser is
+\[
+P^*=C(x_0)^{-1},
+\]
+and the unique covariance minimiser is
+\[
+\Sigma^*(x_0)=C(x_0).
+\]
+
+\emph{Proof.}
+The mapping $\Sigma\mapsto P=\Sigma^{-1}$ is a bijection on
+$\mathbb S_{++}^D$. Hence minimising
+$\mathcal L(\Sigma;x_0)$ over $\Sigma\in\mathbb S_{++}^D$
+is equivalent to minimising
+$\widetilde{\mathcal L}(P;x_0)$ over
+$P\in\mathbb S_{++}^D$.
+
+The term $P\mapsto\tr(PC(x_0))$ is linear, while
+$P\mapsto-\log\det P$ is strictly convex on
+$\mathbb S_{++}^D$
+\citep{boyd2004convex}.
+Therefore $\widetilde{\mathcal L}(P;x_0)$ is strictly convex.
+
+Its gradient is
+\[
+\nabla_P\widetilde{\mathcal L}(P;x_0)
+=
+\frac12C(x_0)-\frac12P^{-1},
+\]
+where $P$ is symmetric. The unique stationary point satisfies
+\[
+P^{-1}=C(x_0),
+\]
+and therefore
+\[
+P^*=C(x_0)^{-1}.
+\]
+Returning to the covariance variable gives
+\[
+\Sigma^*(x_0)=C(x_0).
+\]
+\hfill$\square$
+}
+
+
+
+
+
+{\color{black}\paragraph{Remark on singular conditional covariance}
+If $C(x_0)\succeq0$ is singular, the objective generally has no
+finite minimiser over $\mathbb S_{++}^D$. Indeed, covariance
+eigenvalues corresponding to null directions of $C(x_0)$ may approach
+zero without increasing the trace term, while the log-determinant term
+tends to $-\infty$. A well-posed SPD estimate therefore requires an
+eigenvalue floor, ridge regularisation, or an appropriate structural
+constraint.
+
+For example, one may regularise the target by
+\[
+C_\varepsilon(x_0)=C(x_0)+\varepsilon I,
+\qquad \varepsilon>0,
+\]
+or constrain the admissible covariance matrices by
+\[
+\Sigma-\varepsilon I\succeq0.
+\]}
+
+
+{\color{black} \paragraph{Empirical targets and ARFF regression}
+In data, each $x_0^{(n)}$ is typically observed once. We therefore
+define the plug-in residual target
+\[
+\Sigma^{*}_{(n)}
+:=
+h_n^{-1}r_nr_n^\top,
+\qquad
+r_n
+=
+x_1^{(n)}-x_0^{(n)}
+-h_nf_\theta\!\bigl(x_0^{(n)}\bigr).
+\]
+For a fitted drift held fixed under its nuisance-training sigma-field $\mathcal G$ and conditionally independent of the evaluated observation, the target estimates the residual conditional moment (not necessarily the true instantaneous covariance):
+\[
+\E\!\left[\Sigma^{*}_{(n)}\mid x_0^{(n)},\mathcal G\right]
+=
+C_{f_\theta}(x_0^{(n)}\mid\mathcal G).
+\]
+In the implemented procedure each target uses a drift model fitted and selected without that observation's fold. For iid snapshots this supports conditioning on the fitted nuisance model; dependent trajectories or grid observations require additional independence assumptions. Cross-fitting does not remove drift error or finite-lag bias.}
+
+Since Alg.~\ref{alg:ARFF} handles vector outputs, we vectorise by stacking the lower--triangular entries:
+\[
+\widehat{\Sigma}^{*}_{(n)} \in \R^{q}, \quad q = D(D{+}1)/2.
+\]
+With a Fourier-feature hypothesis class $\mathcal{N}_{K'}$ for each component and Tikhonov parameter $\lambda_\Sigma \ge 0$, we solve the (decoupled) ridge regressions
+\[
+\min_{\widehat\Sigma_{\theta'} \in \mathcal{N}_{K'}} \;
+\left\{\frac{1}{N}\sum_{n=1}^{N} \Big\| \widehat{\Sigma}^{*}_{(n)} - \widehat{\Sigma}_{\theta'}\!\bigl(x^{(n)}_0\bigr) \Big\|^2
+\;+\; \lambda_\Sigma \sum_{k=1}^{K'} \|\hat\beta'_k\|^2\right\},
+\]
+followed by reconstruction of the symmetric matrix $\Sigma_{\theta'}(x)$ from its vectorised form.
+
+\paragraph{Structural parametrisations}
+Direct entry regression is distinct from fitting an SPD factor by Gaussian NLL. Unweighted lower-triangular regression counts an off-diagonal once, whereas full Frobenius error counts it twice. Neither is a restricted-class likelihood projection in general. Adam baselines use their specified diagonal/factor covariance constructions; ARFF reconstructs raw covariance entries and applies the explicit evaluation projection below only where needed.
+
+\paragraph{Drift--diffusion coupling}
+Let $\mathcal G$ be the sigma-field generated by a fitted nuisance model $g$ and its training information. Assume an evaluated observation is independent of $\mathcal G$ conditional on $x_0=x$, with the preceding integrability conditions. For the frozen one-step law, $r=h(f-g)(x)+\sqrt h\sigma(x)\xi$ gives
+\[
+\E[h^{-1}rr^\top\mid x,\mathcal G]
+=\Sigma(x)+\E[h\mid x,\mathcal G](f-g)(x)(f-g)(x)^\top.
+\]
+The independence assumption yields $\E[h\mid x,\mathcal G]=\E[h\mid x]$. For fixed lag the coefficient is $h$. Averaging over fitted models averages their error outer products, not only their mean error. Finite-lag observations introduce transition-moment bias as well; cross-fitting removes same-observation fitting but does not by itself eliminate dependence in trajectory or wave-grid data. Residual outer products are PSD of rank at most one, not generally SPD.
+
+Alg.~\ref{alg:ARFF_SDE} summarises the resulting two-stage training procedure.
+
+\begin{algorithm}[H]\small
+\caption{Two-stage ARFF SDE learning with five-fold cross-fitting}\label{alg:ARFF_SDE}
+\textbf{Input:} outer-training triples, partitioned into five fixed folds $I_k$.
+\begin{enumerate}
+\item For each fold $I_k$, fit and select a drift model $f^{(-k)}$ on the other four folds using Algorithm~\ref{alg:ARFF}, with targets $(x_1-x_0)/h$. Predict only the excluded fold.
+\item For each training row $n$, form $r_n=x_{1,n}-x_{0,n}-h_nf^{(-k(n))}(x_{0,n})$ and $T_n=\operatorname{vec}_\ell(r_nr_n^\top/h_n)$ (diagonal entries for diagonal models).
+\item Fit a separate final drift model on the full outer-training pool and a covariance model on that pool with targets $T_n$. Each call still uses Algorithm~\ref{alg:ARFF}'s internal holdout: ``full training pool'' does not mean amplitudes use every row. There is no post-selection refit.
+\item Freeze selected models, then evaluate. Use raw covariance for coefficient RMSE and raw-SPD diagnostics; symmetrize and floor eigenvalues where SPD covariance is required for NLL.
+\end{enumerate}
+There are seven regressions. At baseline Ex8 $N_{\rm train}=80000$, final amplitude fits use 72000 rows and each nuisance fit 57600. Historical applications replace the inner adaptation/stopping loop by their documented compatibility variant, while retaining OOF targets.
+\end{algorithm}
+
+\subsection{Split vs joint training}
+\label{sec:split_vs_joint}
+
+Existing SDE learning approaches employ joint gradient-based optimisation of the likelihood \eqref{eq:total_loss} \cite{Dietrich2023,dridi2021learningstochasticdynamicalsystems}. In contrast, Alg.~\ref{alg:ARFF_SDE} adopts a split regression-based formulation. This leads to two main fundamental learning differences: (i) dependence on the inverse covariance, and (ii) enforcement of positive definite covariance.
+
+\paragraph{Dependence on the inverse covariance.}
+In joint likelihood-based training, the loss depends explicitly on the precision matrix $(h\Sigma_\theta(x))^{-1}$. Evaluation requires covariance-weighted residuals, implemented through solves or factor operations rather than necessarily forming an inverse. When $\Sigma_\theta(x)$ is close to singular, the precision matrix becomes ill-conditioned, amplifying errors and leading to unstable behaviour.
+
+In contrast, the split formulation avoids any explicit dependence on the inverse covariance. The \textcolor{black}{covariance}  is learned via regression on empirical covariance targets constructed from residuals, reducing fitting to regularized linear amplitude solves and frequency search. Correlated features and finite precision can still make these solves ill-conditioned. Split Adam also retains a Gaussian likelihood in its covariance stage; it is not the same objective as entrywise ARFF regression.
+
+\paragraph{Positive definite covariance.}
+Joint training enforces positive definiteness structurally through its parametrisation, typically via a Cholesky-type factorisation. A positive-diagonal factor gives SPD covariance in exact arithmetic; finite precision and global simulation well-posedness require separate consideration.
+
+In the split formulation, the empirical covariance targets are inherently positive semidefinite, providing well-behaved training data. However, positive definiteness is not enforced pointwise in the learned function, and the resulting covariance field may fail to be positive definite away from the training data.
+
+\paragraph{Implications.}
+These differences separate coefficient regression from covariance validity and likelihood calibration. For ARFF NLL we symmetrize and replace eigenvalues by $\max(\lambda_i,\varepsilon)$: $\varepsilon=10^{-3}$ in Ex8, $10^{-2}$ in Ex3, and $10^{-6}$ in Ex1,2,5,6,7. Raw covariance RMSE and eigenvalue diagnostics precede projection. The true Ex8 minimum eigenvalue is $10^{-8}$, so the NLL floor is a material modelling convention, not an invisible numerical detail.
+
+These effects are investigated empirically in Section~\ref{sec:results}.
+
+
+\subsection{Error sources in drift and covariance training}\label{sec:error_decomposition}
+The learned transition model has several distinct error sources. Keeping them separate is useful even when no combined rate theorem applies.
+\paragraph{Discretization and observation lag}
+The frozen Gaussian law approximates a finite-lag transition. Small-time conditional moments have expansions under suitable regularity and moment assumptions \citep{BerntSDE,kloeden1992numerical}; a uniform $O(h)$ NLL bound does not follow automatically, particularly for nearly singular covariance.
+\paragraph{Approximation}
+The regression targets remain
+\[
+g_f(x)=\E[(x_1-x_0)/h\mid x_0=x],\qquad
+g_\Sigma(x)=\operatorname{vec}_\ell\E[rr^\top/h\mid x_0=x,\mathcal G].
+\]
+Population Fourier approximation depends on spectral integrability, iid frequency sampling and the target class. The frequency-averaged bound above is not a finite-data $O(K^{-1})$ guarantee for adapted checkpoints. For example, $-x$ on all of $\mathbb R^2$ does not itself meet an $L^1$ assumption.
+\paragraph{Sampling and optimization}
+Finite-data uncertainty depends on noise, design conditioning, dimension and regularization \citep{gyorfi2002distribution,wainwright2019high}. Decreasing lag increases scaled-increment noise. Frequency adaptation and noisy checkpoint selection make a generic $O(N^{-1/2})$ excess-NLL statement unjustified here. Dense ridge solves also have numerical errors \citep{golub2013matrix,trefethen1997numerical}; they do not remove statistical variance.
+\paragraph{Drift--covariance coupling}
+The conditional identity in Section~\ref{sec:diffusion_minimiser} retains a positive drift-error outer-product term. Projection and likelihood weighting introduce additional distinctions between raw coefficient error and finite-lag NLL. We do not add the separate heuristic orders into a proved excess-NLL bound. The empirical sensitivity studies below describe completed observations rather than verify such a bound.
+
+\subsection{Computational complexity}
+
+Algorithm~\ref{alg:ARFF_SDE} comprises five nuisance drift fits, one final drift fit and one covariance fit. Each starts with an amplitude solve and repeats adaptation, validation and possible checkpoint retention. Modern proposal/acceptance requires both proposed and mixed-population solves; historical resampling order differs.
+
+For $n$ actual fitting observations, $p=2K$ real features, input dimension $D$ and $q$ outputs, feature construction costs $O(npD)$ \citep{RR2007RandomFF}. Forming the Gram matrix and right-hand side and solving the dense system costs
+\[
+O(np^2+p^3+npq+p^2q),\qquad\text{memory }O(np+p^2+pq).
+\]
+Here $q=D$ for drift, $D(D+1)/2$ for full covariance and $D$ for diagonal covariance. Norm pooling and optional resampling add work but are not the dominant dense solve. With fixed $p$ the data-size dependence is linear; increasing capacity changes the quadratic/cubic terms and memory. Iterative solvers could change this cost model but are not used in these comparisons and no iterative-runtime claim is made.
+
+Algorithm timing includes all seven fits, initialization, splits, target construction and validation; compilation/warm-up, final evaluation and serialization are separate. Concurrent accuracy campaigns are not isolated timing measurements and do not support a speed ranking.
+
+\section{Computational Experiments}
+\label{sec:computational_experiments}%~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+This section presents computational experiments comparing Alg.~\ref{alg:ARFF_SDE} with the Adam optimiser for learning SDEs. The test suite includes both synthetic systems and established benchmarks. Experiments~1--3 consider polynomial systems of increasing dimensionality and structural complexity; Experiments 4--6 describe benchmark problems following \cite{Dietrich2023}; and Experiments 7-8 are designed to probe challenging regimes for drift and diffusion learning. A summary of all experiments is given in Table~\ref{tab:experiment_summary}.
+
+\begin{table}[H]
+\centering
+\small
+\caption{Application overview: stored observation counts (before train/validation splitting), dimension and structure. Ex4 is retained as an unresolved historical specification only.}
+\begin{tabular}{c c c c c}
+\hline
+Exp. & System & Dim. & \#Pts & Key Structure \\
+\hline
+1 & Polynomial & 2  & 10000  & cubic drift, diagonal diffusion \\
+2 & Polynomial & 3  & 10000  & linear drift, lower-triangular diffusion \\
+3 & Polynomial & 10 & 100000 & cubic drift, symmetric diffusion \\
+4 & Langevin (withheld) & 1 & 10000 & sign/conditioning unresolved \\
+5 & SIR        & 2  & 99719& mean-field epidemic model \\
+6 & Wave       & 1  & 995004 & stochastic wave equation \\
+7 & Wide-spec  & 2  & 100000 & wide spectral support \\
+8 & Near-sing. & 2  & 100000 & rotated near-singular covariance \\
+\hline
+\end{tabular}
+\label{tab:experiment_summary}
+\end{table}
+
+Experiments 1--3 and 5--7 use the documented historical 90\%/10\% train/validation protocol. Ex8 uses fixed 80\%/10\%/10\% train/validation/test indices on corrected data; Ex4 has no reported validated comparison. Fitting seeds vary initialization, stochastic fitting and internal holdouts on fixed data, not independently regenerated datasets. For Experiments 1-4 and 7-8, snapshot data are generated via EM with fine time discretisation, followed by subsampling to obtain transition pairs $(x_0,x_1,h)$. Experiments 5 and 6 use problem-specific data generation procedures. The following subsections describe the underlying models and learning setups for each experiment. Precise data-generation procedures and parameter settings are provided in Appendix~\ref{app:num_experiments}.
+
+\subsection{Experiments 1 to 3: Polynomial}
+The first set of experiments evaluates the performance on data generated from polynomial drift and diffusion functions, with varying dimensionality and structural complexity. These experiments span dimensions 2, 3, and 10, with varying polynomial degrees and diffusion structures.
+
+
+\subsection{Underdamped Langevin Equations: Experiment 4}
+\paragraph{Author-review note: comparison withheld.}
+The following application description is retained to preserve its scientific purpose. The historical drift sign (including the velocity term) and whether the response is conditioned on pre-step or updated position remain unresolved. No Ex4 numerical comparison is endorsed here. The frozen-update Gaussian statement below is conditional on that update, not an exact finite-lag transition law. This note requires an author decision before submission.
+
+This experiment considers the underdamped Langevin equation, a second-order SDE commonly used in physics to model stochastic particle dynamics. In this second-order system, noise is applied only to the velocity variables $v_t$ as follows
+\begin{equation}
+\begin{aligned}
+    \mathrm{d}x_t &= v_t \, \mathrm{d}t, \\
+    \mathrm{d}v_t &= f(x_t, v_t) \, \mathrm{d}t + \sigma(x_t, v_t) \, \mathrm{d}W_t.
+\end{aligned}
+\label{eq:langevin}
+\end{equation}
+In this setting, the marginal distribution of $x_t$ is no longer Gaussian, requiring a modified loss function to approximate the drift $f$ and diffusion $\sigma$. Equation (\ref{eq:langevin}) can be approximated via the (symplectic) EM scheme
+\begin{equation}
+\begin{aligned}
+    x_1 &= x_0 + v_0 h, \\
+    v_1 &= v_0 + f(x_1, v_0) h + \sigma(x_1, v_0) \delta W_0.
+\end{aligned}
+\label{eq:langevin_EM}
+\end{equation}
+We assume access to only snapshot data $((x_0, v_0), (x_1, v_1), h)$; hence,  $x_1$ in (\ref{eq:langevin_EM}) can be considered a fixed parameter for the functions $f$ and $\sigma$ over a time span of $h$. Then, $v_1$ is again normally distributed, conditioned on $x_1$, $v_0$ and step size $h$. Thus, the following loss function can be minimised to learn $f_\theta$ and $\Sigma_{\theta'}$
+\begin{align*}
+    \mathcal{L}(\theta, \theta' \mid x_1, v_0, v_1, h) =\
+    &\frac{1}{2} (v_1 - v_0 - h f_\theta(x_1, v_0))^\top (h\Sigma_{\theta'}(x_1, v_0))^{-1} (v_1 - v_0 - h f_\theta(x_1, v_0)) \\
+    &+ \frac{1}{2} \log |h\Sigma_{\theta'}(x_1, v_0)| + \frac{D}{2} \log(2\pi).
+\end{align*}
+
+
+\subsection{Experiment 5: Stochastic SIR Model}
+This section explores the ability of the model to learn the mean-field SDE from data generated from fine-scale particle simulations.  We consider an epidemic Susceptible-Infected-Recovered-Susceptible (SIRS) model \cite{Dietrich2023} derived from Gillespie's stochastic simulation algorithm (SSA) \cite{Gillespie_Alg} that is used to simulate a well-stirred, spatially homogeneous system. For the SIRS model, SSA tracks three integer-valued stochastic variables: the number of susceptible individuals, $n_0$, the number of infected individuals, $n_1$, and the number of recovered individuals, $n_2$.  Their concentrations are calculated as $\tilde{x}_p = n_p/N$, for $p = 0, 1, 2$, where $N$ is the total population size.
+
+Define concentration-level rates $r_1 = 4k_1\tilde{x}_0\tilde{x}_1$, $r_2 = k_2\tilde{x}_1$, and $r_3 = k_3\tilde{x}_2$. The count-process hazards are $Nr_1,Nr_2,Nr_3$ with $N=1024$; an event $I+S\to I+I$, $I\to R$, or $R\to S$ is selected proportionally, and its waiting time has total rate $N(r_1+r_2+r_3)$. The values of $n_p$ are updated accordingly. In our experiments, we set $k_1,k_2,k_3=1,1,0$, which reduces the model to the classical SIR case.
+
+SSA simulates individual events in a Markov jump process. For a large population size $N$, the mean-field population behavior can be modelled using a system of Langevin-type SDEs \cite{Gillespie_SDE}
+\begin{equation*}
+\begin{gathered}
+    \mathrm{d}\tilde{x}_0 = (-r_1 + r_3)\mathrm{d}t - \sqrt{\frac{r_1}{N}} \mathrm{d}W_1(t) + \sqrt{\frac{r_3}{N}} \mathrm{d}W_3(t), \\
+    \mathrm{d}\tilde{x}_1 = (r_1 - r_2)\mathrm{d}t + \sqrt{\frac{r_1}{N}} \mathrm{d}W_1(t) - \sqrt{\frac{r_2}{N}} \mathrm{d}W_2(t), \\
+    \mathrm{d}\tilde{x}_2 = (r_2 - r_3)\mathrm{d}t + \sqrt{\frac{r_2}{N}} \mathrm{d}W_2(t) - \sqrt{\frac{r_3}{N}} \mathrm{d}W_3(t),
+\end{gathered}
+\label{eq:SIR_SDE}
+\end{equation*}
+
+where $W_p(t)$ are independent Wiener processes such that $dW_p(t) \sim \mathcal{N}(0,dt)$. For the SIR model, this formulation simplifies to a system with drift and diffusion functions:
+\begin{equation}
+f(x) =
+\begin{bmatrix}
+-r_1 \\
+r_2
+\end{bmatrix}, \quad
+\sigma(x) =
+\begin{bmatrix}
+\sqrt{\frac{r_1}{N}} & 0 \\
+0 & \sqrt{\frac{r_2}{N}}
+\end{bmatrix}.
+\label{eq:SIR_drift_diff}
+\end{equation}
+\textcolor{black}{Data points are obtained by sampling trajectories generated using SSA and can be applied to Algorithm \ref{alg:ARFF_SDE} to learn drift and diffusion functions that approximate (\ref{eq:SIR_drift_diff}) for large $N$.}
+
+
+
+
+\subsection{Experiment 6: Stochastic Wave Equation}
+
+Stochastic partial differential equations extend SDEs to infinite-dimensional spaces, capturing system dynamics where finite-size effects remain significant. SPDE discretization must account for spatial as well as temporal noise structure \cite{walsh2006numerical}. However, certain SPDEs can be reformulated into existing numerical schemes while preserving critical dynamics. This work revisits one such example from \cite{Dietrich2023}; a stochastic wave equation with deterministic driving $f(x)$ and stochastic forcing $g(x)$, given by
+
+\begin{equation}
+\begin{gathered}
+    \mathrm{d}(\partial_t u) = (\partial_{xx}u+f(x))\,\mathrm{d}t+g(x)\,\mathrm{d}W_t, \quad x \in \mathbb{R},\ t > 0, \\
+    u(x, 0) = u_{0}(x), \quad \frac{\partial u}{\partial t}(x, 0) = v_{0}(x), \quad x \in \mathbb{R}.
+\end{gathered}
+\label{eq:wave_eq}
+\end{equation}
+
+
+The stored staggered-grid scheme yields a wave-derived regression with mesh $\Delta=.001$, forcing $f(s)=5\sin(4\pi s)$, and $g(s)=.05[1+e^{-150(s-.5)^2}]$. The exact stored-stencil identity is
+\begin{equation}\label{eq:wave_scheme}
+ r_{j,\ell}=\tfrac12(u_{j+1,\ell}+u_{j-1,\ell})-\tfrac12(u_{j,\ell-1}+u_{j,\ell+1})
+ =h_j f(s_{j,\ell})+\tfrac14g(s_{j,\ell})W_{j,\ell},
+\end{equation}
+where $h_1=\Delta^2/4$, $h_{j\ge2}=\Delta^2/2$, and independent driving normals have variances $\Delta^2$ initially and $2\Delta^2$ subsequently. Therefore the effective regression factor is $g/2$, and covariance is $(g/2)^2$. Initial displacement is $.05e^{-150(s-.5)^2}$ and initial velocity its derivative multiplied by $-2$. The original spatial/time domain is $[0,1]\times[0,2]$.
+
+The label-only correction changes 498 initialization-row lags and 497502 alternating-grid coordinates; states and increments are unchanged. All 995004 observations are retained. The corrected dataset is \texttt{ex6\_labels\_v2.npz}.
+The first input coordinate remains the historical integration-buffer coordinate, not a new physical-time interpretation. Forcing is autonomous. The correction applies to this stored discretization only. Shared grid/simulation structure prevents interpreting the 30 fitting seeds as independent data replication.
+
+
+This manuscript only considers the autonomous case, where $f$ and $\sigma$ do not depend on time.
+
+\subsection{Experiment 7: 2D drift with wide spectral support}
+
+In this experiment, we consider a two-dimensional SDE with drift defined componentwise as
+
+\begin{equation*}
+f(x_0,x_1) =
+\begin{bmatrix}
+\exp(-|x_0|/a)\,\exp\!\bigl(-\tfrac{1}{2}(x_0^2+x_1^2)\bigr)\\[4pt]
+\exp(-|x_1|/b)\,\exp\!\bigl(-\tfrac{1}{2}(x_0^2+x_1^2)\bigr)
+\end{bmatrix},
+\end{equation*}
+
+with parameters $a=0.1$, $b=0.2$, and diffusion $\sigma(x)=0.1\,I$.
+The structure combines slow exponential decay in each coordinate with a Gaussian envelope, leading to Fourier transforms with relatively wide spectral support compared to purely Gaussian drifts. The isotropic diffusion simplifies covariance structure, allowing this example to emphasize broad-spectrum drift recovery; it does not isolate the causal effect of frequency adaptation.
+
+\subsection{Experiment 8: Near-singular diffusion benchmark}
+\label{sec:near_singular}
+
+To investigate the effect of drift--diffusion splitting on likelihood-based
+SDE learning, we construct a benchmark SDE with a rotated near-singular
+diffusion factor. The drift is linear and the diffusion factor is
+\begin{equation}
+\label{eq:near_singular_setup}
+f(x)=
+\begin{bmatrix}
+-x_0\\
+-x_1
+\end{bmatrix},
+\qquad
+\sigma(x)
+=
+R(\vartheta(x))
+\begin{bmatrix}
+\varepsilon & 0\\
+0 & 1
+\end{bmatrix}
+R(\vartheta(x))^\top,
+\qquad
+\vartheta(x)=k\,\operatorname{atan2}(x_1,x_0),
+\end{equation}
+where $\varepsilon=10^{-4}$, $k=3$, and
+\[
+R(\vartheta)
+=
+\begin{bmatrix}
+\cos\vartheta & -\sin\vartheta\\
+\sin\vartheta & \cos\vartheta
+\end{bmatrix}.
+\]
+The corresponding covariance is
+\[
+\Sigma(x)
+=
+\sigma(x)\sigma(x)^\top
+=
+R(\vartheta(x))
+\begin{bmatrix}
+\varepsilon^2 & 0\\
+0 & 1
+\end{bmatrix}
+R(\vartheta(x))^\top.
+\]
+Thus $\Sigma(x)$ has eigenvalues $\varepsilon^2$ and $1$, while its principal
+directions rotate with $x$.
+
+The corrected benchmark uses $100000$ independent endpoint pairs with initial states uniform on $[-2,2]^2$, lag $10^{-4}$ and 1000 fine EM substeps of $10^{-7}$. Float64 state updates and endpoint differences correct a confirmed float32 rounding defect, preserving initial states, underlying normal draws and split identities. Estimator arithmetic remains float32.
+
+We compare ARFF, joint/split Fourier Adam and joint/split two-hidden-layer tanh MLP Adam. All Fourier models use $K=128$ (1792 final parameters); both MLPs use width 27 (1814). Split Adam uses drift MSE followed by residual Gaussian NLL for a covariance-factor model, with five-fold OOF drift targets. Its covariance objective differs from ARFF entry regression. Matching final parameter counts does not equalize objectives, fitting subsets or discarded nuisance-fit cost.
+
+\section{Results}\label{sec:results}
+Experiments 1--3 and 5--7 compare historical-compatible ARFF, trainable Fourier Adam, and shallow/deep tanh Adam where completed. Ex3 contains only ARFF and shallow MLP. Their historical capacities and covariance parametrizations are not matched to the modern Ex8 family. No new hyperparameters were optimized for this revision.
+
+For each population we report the mean and sample SD over all 30 fitting seeds. Drift RMSE averages squared error over observations and drift coordinates; raw covariance RMSE averages over observations and all matrix entries, including both off-diagonals. NLL includes the Gaussian constant, observation lag and log-determinant, without dimension normalization. Histories/checkpoints are selected using training/internal or outer validation only. Historical outer-validation results are descriptive and selection-influenced; Ex8 test observations are disjoint from fitting and checkpoint selection. Seed variability on fixed data is not independent-dataset uncertainty.
+
+\subsection{Polynomial applications: Experiments 1--3}
+\begin{table}[htbp]\centering\small\caption{Experiment 1: nonlinear polynomial drift and state-dependent diagonal covariance. Outer-validation mean $\pm$ sample SD, 30 fitting seeds. Covariance error is raw.}\label{tab:ex1}\resizebox{\linewidth}{!}{\input{tables/ex1}}\end{table}
+\begin{table}[htbp]\centering\small\caption{Experiment 2: linear drift and constant lower-triangular factor. Outer-validation mean $\pm$ sample SD, 30 fitting seeds. Covariance error is raw.}\label{tab:ex2}\resizebox{\linewidth}{!}{\input{tables/ex2}}\end{table}
+\begin{table}[htbp]\centering\small\caption{Experiment 3: ten-dimensional cubic drift and full covariance. Outer-validation mean $\pm$ sample SD, 30 fitting seeds. Covariance error is raw.}\label{tab:ex3}\resizebox{\linewidth}{!}{\input{tables/ex3}}\end{table}
+In Ex1, ARFF has lower drift error than these baselines; shallow MLP has lower covariance error and deep MLP slightly lower NLL. Figure~\ref{fig:ex1coeff} shows fixed seed-0 functions rather than a selected best-looking run. These illustrative slices do not replace all-seed errors or test generalization. In Ex2, the Fourier drift error remains much larger than its historical manuscript value. In Ex3 all 30 shallow fits select epoch 118 and yield drift RMSE near 2.428; this poor outcome is retained rather than attributed to an established unique cause.
+
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/ex1_seed0_recovery.pdf}\caption{Experiment 1: true and learned coefficients on prescribed coordinate slices with 201 points in $[-1,1]$. All four already selected seed-0 models are shown. Seed 0 is illustrative, not representative or best. Covariance is raw $\Sigma$, not its factor or projected estimate. The historical evaluation protocol is validation-selected.}\label{fig:ex1coeff}\end{figure}
+\FloatBarrier
+\subsection{Epidemic, wave-derived and broad-spectrum applications: Experiments 5--7}
+\begin{table}[htbp]\centering\small\caption{Experiment 5: fixed-lag SSA, population 1024. Outer-validation mean $\pm$ sample SD over 30 fitting seeds. Raw covariance RMSE.}\label{tab:ex5}\resizebox{\linewidth}{!}{\input{tables/ex5}}\end{table}
+\begin{table}[htbp]\centering\small\caption{Experiment 6: corrected wave labels, effective covariance $(g/2)^2$. Outer-validation mean $\pm$ sample SD over 30 fitting seeds. Raw covariance RMSE.}\label{tab:ex6}\resizebox{\linewidth}{!}{\input{tables/ex6}}\end{table}
+\begin{table}[htbp]\centering\small\caption{Experiment 7: drift with broad spectral support. Outer-validation mean $\pm$ sample SD over 30 fitting seeds. Raw covariance RMSE.}\label{tab:ex7}\resizebox{\linewidth}{!}{\input{tables/ex7}}\end{table}
+The SIR coefficients describe a diffusion approximation to a jump process; row-wise validation can share trajectories with fitting. Favorable raw errors and NLL coexist with ARFF raw-SPD violations in 29/30 Ex5 runs. Ex6 uses the corrected labels without changing state trajectories, but poor neural drift recovery remains. Ex7 has competitive ARFF drift recovery, while deep MLP has slightly lower mean drift error and shallow MLP lower covariance error. These applications demonstrate different strengths and limitations, not a universal winner.
+
+\begin{table}[htbp]\centering\small\caption{Raw ARFF covariance validity. Historical rows use outer validation; Ex8 uses independent test. Minimum eigenvalue is the worst across seeds and points; floor is used for NLL only.}\resizebox{\linewidth}{!}{\input{tables/spd}}\end{table}
+
+Historical-to-current numerical differences are not all explained. Established changes include OOF covariance targets, operational SPD handling, fixed-lag SSA, Ex6 labels, and Ex8 float64 integration. Metric populations, covariance-factor conventions and unrecovered historical execution chains also differ. These corrections do not prove the cause of every discrepancy, including Ex1/Ex2 drift, Ex3 near-identical poor fits, Ex6 recovery and Ex7 NLL differences. The detailed reconciliation is retained in the reproducibility record.
+\FloatBarrier
+\subsection{Experiment 8: near-singular diffusion benchmark}
+\begin{table}[htbp]\centering\small\caption{Corrected Ex8: independent-test mean $\pm$ sample SD, all 30 fitting seeds. Raw covariance RMSE; ARFF NLL uses floor $10^{-3}$.}\label{tab:ex8}\resizebox{\linewidth}{!}{\input{tables/ex8}}\end{table}
+
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/baseline.pdf}\caption{Corrected Ex8, all 30 seeds. Boxes show quartiles and median, points individual fitting seeds, diamonds means. Final parameter counts exclude discarded cross-fit models. Covariance error is raw.}\label{fig:ex8distribution}\end{figure}
+
+ARFF has the lowest mean raw covariance error (0.1141) but much poorer drift (0.9665) than Joint MLP (0.1593). Split MLP has lower NLL than ARFF and Joint MLP. Splitting improves mean covariance error for both Adam families but worsens drift in this benchmark. All 30 ARFF models have raw-SPD violations; the mean test rate is 45.48\% and the minimum raw eigenvalue is approximately $-0.2573$. Projection changes the evaluated covariance; low raw coefficient RMSE alone does not guarantee likelihood calibration or validity.
+
+Figures~\ref{fig:ex8drift}--\ref{fig:ex8cov} preserve the original true-versus-learned scientific comparison on corrected models. Their common 100-by-100 cell-centre grid covers $[-2,2]^2$ without the angular singularity at the origin. Each method uses its already selected seed-0 checkpoint, fixed before these evaluations. Shared scales include every method, with no silent clipping. These are deterministic function illustrations, not new stochastic test data; their grid diagnostics do not replace Table~\ref{tab:ex8}.
+
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/ex8_seed0_drift.pdf}\caption{Corrected Ex8 illustrative seed-0 drift. Rows show $f_1$, its signed error, $f_2$, and its signed error; columns are truth and all five estimators. Each row shares a color scale. The true zero-error column is shown explicitly. No checkpoint or seed was chosen from appearance or test performance.}\label{fig:ex8drift}\end{figure}
+
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/ex8_seed0_raw_covariance.pdf}\caption{Corrected Ex8 illustrative seed-0 raw covariance. Rows are $\Sigma_{11},\Sigma_{12},\Sigma_{22}$; columns are truth and all five estimators. Shared scales can make lower-amplitude structure less prominent but do not hide larger errors. These are covariance entries, not diffusion-factor entries. Raw estimates are not projected; the separate projection diagnostic appears in Appendix~\ref{app:projection}.}\label{fig:ex8cov}\end{figure}
+
+\FloatBarrier
+\subsection{Empirical Error Analysis}
+These completed Ex8 studies replace unsupported historical scaling displays as \emph{different descriptive experiments}. They do not reproduce the historical modified-Ex7 quadratic-covariance or $\mathrm{NLL}_\infty$ procedure, whose execution chain remains incomplete. No rate reference line is fitted. Ten predetermined fitting seeds share nested training data and fixed 10000-point validation/test sets; lag observations are Brownian-coupled.
+\subsubsection{Dependence on sample size \texorpdfstring{$N$}{N}}
+At $K=1024,h=10^{-4}$, increasing $N$ from 80000 to 640000 lowers ARFF drift RMSE from 0.9297 to 0.4763 and Joint MLP from 0.1389 to 0.06136. The full curves are in Appendix~\ref{app:sensitivity}. Neither a universal rate nor saturation is established.
+\subsubsection{Dependence on observation lag \texorpdfstring{$h$}{h}}
+All nine lags from $2.5\times10^{-5}$ to .002 are retained. Larger-lag points were admitted only under the prescribed discrete linear-drift relative-bias tolerance $10^{-3}$, not method rankings. ARFF drift continues improving while its raw covariance error remains near .08; split-method drift is non-monotone and Joint MLP relatively insensitive. This criterion bounds drift bias, not covariance finite-lag error.
+An exploratory, three-seed ARFF intervention at three of these lags changes only the drift ridge penalty in the five nuisance fits and final drift fit; the covariance penalty stays at .001. Its paired outcomes, including mixed NLL changes, are reported in Appendix~\ref{app:lag_ridge}. The intervention does not replace the ten-seed lag study or its production setting.
+
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/h.pdf}\caption{Ex8 test sensitivity to lag at $N=640000,K=1024$, mean $\pm$ sample SD over ten fitting seeds. $\mathrm{NLL}-\log h$ removes the two-dimensional density-scale term, not transition-shape differences. The .002 endpoint satisfies the pre-existing oracle bias tolerance, not a fitted optimum.}\label{fig:hmodern}\end{figure}
+
+\subsubsection{Dependence on feature dimension \texorpdfstring{$K$}{K}}
+Phase-1 validation equivalence failed for both sample size and lag; the preregistered fallback $N=640000,h=10^{-4}$ defines this capacity comparison. It is not an established capacity-dominated regime. ARFF raw covariance improves across capacity but drift is non-monotone and changes little between endpoints. Fourier drift deteriorates at larger widths; Joint MLP generally improves before a small high-width reversal, whereas Split MLP drift worsens across these points. These outcomes do not support an empirical $O(1/K)$ claim.
+
+\begin{figure}[htbp]\centering\includegraphics[width=\linewidth]{../figures/capacity.pdf}\caption{Descriptive Ex8 test performance versus Fourier width $K$ at fixed $N=640000,h=10^{-4}$, ten seeds. $K=64,128,256,512,1024$ gives Fourier parameter counts 896,1792,3584,7168,14336; matched two-layer MLP widths 18,27,39,57,81 give counts 887,1814,3554,7244,14180. No asymptotic rate is asserted.}\label{fig:kmodern}\end{figure}
+
+\section{Summary and Discussion}\label{sec:summary}
+This work develops a conditional-moment motivated two-stage ARFF procedure for SDE coefficient learning. Its practical appeal is the explicit separation of drift and covariance targets and linear multi-output amplitude solves for fixed frequencies. The polynomial, epidemic, wave-derived and spectrally broad applications demonstrate its scope while retaining historical protocol differences. The corrected independent-test near-singular comparison shows strong raw covariance recovery but poorer drift than Joint MLP and inferior NLL to neural alternatives. There is no single ranking across these quantities.
+
+Five-fold cross-fitting is implemented, not future work. It excludes each observation from its own nuisance fit and selection but does not remove drift error, finite-lag bias or dependent-data issues. Raw covariance may be indefinite; projection is explicit and distinct from coefficient recovery. Descriptive N/h/K evidence does not establish rate bounds or capacity dominance.
+
+Separate shared-noise surrogate studies illuminate fixed-basis variance, ridge shrinkage and mixed selected-checkpoint resampling outcomes (Appendix~\ref{app:drift_diagnostic}). They neither establish a unique mechanism nor change the production ridge. Hybrid component and floor diagnostics also distinguish covariance recovery from likelihood calibration; the instantaneous-coefficient oracle is not the true finite-lag likelihood optimum.
+
+Extending transition approximations or assessing longer-time dynamics remains scientifically interesting, but the current evidence concerns coefficient recovery and Gaussian scoring. We make no trajectory-fidelity or isolated-runtime superiority claim. Ex4's unresolved convention is retained as an author-review issue rather than silently repaired. Public-release details and unresolved historical execution differences are documented separately.
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+% ============================================================
+%  Appendices: former supplementary materials integrated below
+% ============================================================
+\appendix
+\input{appendices_part2}
+\input{appendices_part3}
+\input{supplementary_diagnostics}
+
+\end{document}

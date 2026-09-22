@@ -1,0 +1,6 @@
+K,fourier_parameters,mlp_hidden_width,mlp_hidden_layers,mlp_parameters
+64,896,18,2,887
+128,1792,27,2,1814
+256,3584,39,2,3554
+512,7168,57,2,7244
+1024,14336,81,2,14180
