@@ -6,7 +6,7 @@ From the destination machine (replace `SOURCE_HOST` and paths with your authoriz
 
 ```sh
 mkdir -p /independent/storage/sde-v1
-rsync --partial --progress SOURCE_HOST:/path/to/artifact_exports/independent_reproduction_v1.tar /independent/storage/sde-v1/
+rsync --partial --progress SOURCE_HOST:/home/kammonaa/projects/SDE_ARFF/artifact_exports/independent_reproduction_v1.tar /independent/storage/sde-v1/
 # Use the versioned verification script from this repository on the destination:
 bash scripts/verify_artifact_backup.sh /independent/storage/sde-v1/independent_reproduction_v1.tar > /independent/storage/sde-v1/VERIFIED.txt
 ```
@@ -20,3 +20,5 @@ python scripts/package_independent_reproduction.py verify-tar --archive /indepen
 ```
 
 Only after destination checksum success may the copy be called a verified backup. Public hosting remains a separate decision.
+
+Closure check (22 September 2026): the source bundle checksum was rechecked. No destination verification receipt or public hosting identifier is recorded in the release records. `SOURCE_HOST` must be the author's authorized SSH endpoint for KW61146; destination storage must be on another system. This procedure was prepared, not executed.

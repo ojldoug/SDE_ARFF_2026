@@ -159,3 +159,7 @@ python scripts/package_independent_reproduction.py verify-tar --archive /new/pat
 Both commands verify hashes; bundle creation refuses existing output. `verify-tar` streams every unique payload, checks all internal hardlinks and refuses unexpected/missing members without extraction. The release tar's complete payload was verified this way. Do not run `inventory` to verify a release: it deliberately creates a new file list from the current tree, so changes would define a different version. Manifest and tar checksums are in BUNDLE.json. Future versions should use new names.
 
 The original packaging verification record is preserved as historical evidence. Actual subsequent run results are in `../bounded_reproduction_verification_v1/OUTCOME.json`; self-reconstruction passed, archived-reference agreement failed. The off-server backup procedure is in [BACKUP.md](BACKUP.md).
+
+## Current verification boundary
+
+The packaging-time records above are preserved. See [REPRODUCTION_STATUS.md](../../REPRODUCTION_STATUS.md) and [REPRODUCING.md](../../REPRODUCING.md) for the closed subsequent investigation: original settings varied between fresh processes; the optional autotune-disabled policy repeated in two full corrected Ex8 ARFF K128/N80000/seed-0 runs but failed historical agreement at the original tolerances. Data generation remains unverified. No production defaults or paper results changed.

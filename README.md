@@ -19,29 +19,17 @@ The compact archive inputs and prevalidated seed-0 coefficient maps needed for t
 
 The review compares corrected modern Experiment 8 on an independent test split with historical-compatible applications whose displayed results were selected on validation. The exploratory lag/ridge supplement is a separate, three-seed intervention. Rebuilding its archived metrics does not repeat training.
 
-## Independent numerical reproduction
+## Reproduction status: four distinct routes
 
-Three routes have different requirements:
+| Route | Verified scope and limits |
+|---|---|
+| Archived manuscript rebuild | Compact Git aggregates and saved coefficient maps rebuild tables, figures and PDF without model evaluation or fitting. |
+| Supplied historical checkpoint evaluation | Previously selected Ex1/Ex8 seed-0 models passed archived-metric reconstruction checks. Requires the external bundle; this does not verify fresh training or every checkpoint. |
+| Fresh training, original execution settings | Corrected Ex8 ARFF K128/N80000/seed 0 completed all seven fits in an isolated environment. Two fresh processes differed; one recovered the archive and one failed. Strict fresh-process repeatability is **not established**. |
+| Optional autotune-disabled execution | Three minimal processes and two complete seven-fit processes passed bounded repeatability checks. Scientific outputs of the two full runs were bit-identical, but **neither matched the historical archive** at rtol=1e-5, atol=1e-6. Not a production default or general determinism guarantee. |
 
-1. **Archived-result rebuild:** the quick start above uses compact Git inputs only; already checked.
-2. **Exact checkpoint evaluation:** restore the external v1 bundle, verify every input, then use `scripts/evaluate_reproduction_checkpoint.py` (defaults and flags in the route guide). Checkpoints are necessary for evaluating the published models, not for fresh fitting.
-3. **Data generation and fresh training:** `scripts/reproduction_generate.py` and `scripts/reproduction_route.py` inspect the accepted recipes/configurations by default. Explicit `--execute` with a new output directory is required to run. No training campaign was executed to prepare this package.
+Both training checks used packaged corrected data, not newly generated data. Data generation, other configurations, other methods and other hardware remain unverified by these checks. Historical discrepancies are not fully explained; paper numbers and failed comparisons are preserved.
 
-See [the ordered route guide](docs/independent_reproduction_v1/ROUTES.md), [file-level hashes/availability](docs/independent_reproduction_v1/artifact_manifest.json), and [verification record](docs/independent_reproduction_v1/VERIFICATION.json). Example after restoring the bundle:
+[REPRODUCING.md](REPRODUCING.md) contains the evidence map, tested command, exact runtime and protocol. [REPRODUCTION_STATUS.md](REPRODUCTION_STATUS.md) summarizes closure and release tasks. The [ordered route guide](docs/independent_reproduction_v1/ROUTES.md) covers data preparation and individual runners; its inspect-only commands do not train unless explicitly passed `--execute`.
 
-```sh
-.venv/bin/python scripts/package_independent_reproduction.py verify
-.venv/bin/python scripts/reproduction_route.py baseline --method arff --seed 0
-```
-
-The latter inspects; it does not train. The bundle is prepared locally for durable hosting, **not publicly downloadable yet**. No off-server backup is verified. Original historical search budgets remain incomplete. These limitations do not prevent archive-only rebuilding, but full independent numerical reproduction is not claimed.
-
-## Bounded numerical verification (22 September 2026)
-
-At commit `4c5dc6b54af216ebba49477874c955d259d4140f`, a clean restored checkout and new venv completed **one corrected Ex8 ARFF K128/N80000/seed-0 full fit** on an idle A6000. Input/source/config hashes and native validation passed; reloading the new checkpoint reproduced its own metrics. **Agreement with the archived seed-0 fit failed rtol=1e-5/atol=1e-6**, including covariance selection 299→294. No retry or tolerance change was made. This used packaged data, not fresh data generation, and does not verify the full experiments.
-
-[Outcome, numerical differences and execution records](docs/bounded_reproduction_verification_v1/REPORT.md). [Off-server transfer and checksum procedure](docs/independent_reproduction_v1/BACKUP.md); no independent backup is yet verified.
-
-## Optional prospective repeatability policy
-
-A bounded [autotuning-disabled verification](docs/autotune0_policy_v1/REPORT.md) passed three minimal fresh-process checks and two complete Ex8 ARFF K128/N80000/seed-0 fits with bit-identical scientific outputs. This uses `--xla_gpu_autotune_level=0` and fresh per-process compilation caches on the recorded A6000/software stack. Neither fit agrees with the historical archive at the original tolerance. The report provides an opt-in command; production defaults and manuscript results are unchanged. This does not establish general determinism or whole-study reproduction.
+The 6.50 GiB external bundle is prepared locally, **not publicly hosted**. No independently verified off-server backup is recorded. Obtain it from the custodians and follow the [checksum and transfer instructions](docs/independent_reproduction_v1/BACKUP.md). A fresh clone alone supports the archived rebuild, not saved-model evaluation or fitting. No further numerical runs are part of this documentation closure.
