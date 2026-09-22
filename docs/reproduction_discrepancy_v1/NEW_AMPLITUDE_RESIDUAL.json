@@ -1,0 +1,7 @@
+{
+  "new_saved_amplitude_residual": {
+    "absolute_frobenius": 1.101862892154778,
+    "relative_rhs": 2.295877040951735e-06,
+    "normwise_backward_error": 1.1077720862882423e-08
+  }
+}

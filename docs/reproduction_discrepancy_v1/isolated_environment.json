@@ -1,0 +1,356 @@
+{
+  "executable": "isolated venv/bin/python",
+  "python": "3.11.15 (main, Jun 11 2026, 15:20:16) [GCC 14.3.0]",
+  "packages": {
+    "lark": "1.3.1",
+    "executing": "2.2.1",
+    "jupyterlab_server": "2.28.0",
+    "httpx": "0.28.1",
+    "rfc3987-syntax": "1.1.0",
+    "certifi": "2026.7.22",
+    "requests": "2.34.2",
+    "joblib": "1.5.3",
+    "soupsieve": "2.9.2",
+    "debugpy": "1.8.21",
+    "python-json-logger": "4.2.0",
+    "contourpy": "1.3.3",
+    "widgetsnbextension": "4.0.16",
+    "nbformat": "5.11.1",
+    "jupyter_server": "2.20.0",
+    "jaxlib": "0.10.2",
+    "dill": "0.4.1",
+    "nvidia-cuda-cccl": "13.3.3.4.1",
+    "pyparsing": "3.3.2",
+    "jupyter_builder": "1.2.2",
+    "matplotlib-inline": "0.2.2",
+    "fonttools": "4.63.0",
+    "jax-cuda13-pjrt": "0.10.2",
+    "MarkupSafe": "3.0.3",
+    "nvidia-cublas": "13.6.1.10",
+    "setuptools": "79.0.1",
+    "pure_eval": "0.2.3",
+    "pexpect": "4.9.0",
+    "traitlets": "5.16.1",
+    "beautifulsoup4": "4.15.0",
+    "jupyter": "1.1.1",
+    "jsonschema": "4.26.0",
+    "jupyter-lsp": "2.3.1",
+    "nvidia-cuda-crt": "13.3.73",
+    "notebook_shim": "0.2.4",
+    "pycparser": "3.0",
+    "nvidia-nvshmem-cu13": "3.7.2",
+    "rfc3986-validator": "0.1.1",
+    "scipy": "1.17.1",
+    "pillow": "12.3.0",
+    "opt_einsum": "3.4.0",
+    "nvidia-cusolver": "12.2.6.9",
+    "idna": "3.19",
+    "nvidia-nvjitlink": "13.3.33",
+    "nvidia-cusparse": "12.8.2.51",
+    "fqdn": "1.5.1",
+    "webcolors": "25.10.0",
+    "rfc3339-validator": "0.1.4",
+    "psutil": "7.2.2",
+    "ipykernel": "7.3.0",
+    "python-dateutil": "2.9.0.post0",
+    "terminado": "0.18.1",
+    "jupyter_core": "5.9.1",
+    "Jinja2": "3.1.6",
+    "Cython": "3.3.0",
+    "nvidia-cudnn-cu13": "9.24.0.43",
+    "PyYAML": "6.0.3",
+    "comm": "0.2.3",
+    "pandocfilters": "1.5.1",
+    "urllib3": "2.7.0",
+    "fastjsonschema": "2.22.2",
+    "six": "1.17.0",
+    "notebook": "7.6.2",
+    "typing_extensions": "4.16.0",
+    "defusedxml": "0.7.1",
+    "h5py": "3.16.0",
+    "nest-asyncio2": "1.7.2",
+    "nbconvert": "7.17.1",
+    "overrides": "7.7.0",
+    "packaging": "26.3",
+    "argon2-cffi-bindings": "26.1.0",
+    "nvidia-nccl-cu13": "2.31.2",
+    "nvidia-nvvm": "13.3.73",
+    "attrs": "26.1.0",
+    "jupyter_client": "8.9.1",
+    "jedi": "0.20.0",
+    "anyio": "4.14.2",
+    "nvidia-cuda-nvrtc": "13.3.33",
+    "ipython_pygments_lexers": "1.1.1",
+    "argon2-cffi": "25.1.0",
+    "prompt_toolkit": "3.0.53",
+    "jupyterlab_widgets": "3.0.17",
+    "tqdm": "4.70.0",
+    "charset-normalizer": "3.5.1",
+    "jax": "0.10.2",
+    "tornado": "6.5.8",
+    "h11": "0.16.0",
+    "json5": "0.15.0",
+    "jupyterlab": "4.6.3",
+    "async-lru": "2.3.0",
+    "ml_dtypes": "0.6.0",
+    "ipython": "9.16.1",
+    "ptyprocess": "0.7.0",
+    "websocket-client": "1.9.0",
+    "stack-data": "0.6.3",
+    "jsonpointer": "3.1.1",
+    "mistune": "3.3.4",
+    "pandas": "3.0.5",
+    "optax": "0.2.8",
+    "webencodings": "0.6.1",
+    "absl-py": "2.5.0",
+    "babel": "2.18.0",
+    "nvidia-cuda-nvcc": "13.3.73",
+    "tzdata": "2026.3",
+    "nvidia-cuda-runtime": "13.3.29",
+    "matplotlib": "3.11.1",
+    "cycler": "0.12.1",
+    "kiwisolver": "1.5.0",
+    "jupyterlab_pygments": "0.3.0",
+    "prometheus_client": "0.26.0",
+    "parso": "0.8.7",
+    "arrow": "1.4.0",
+    "numpy": "2.4.6",
+    "httpcore": "1.0.9",
+    "jax-cuda13-plugin": "0.10.2",
+    "jupyter-events": "0.12.1",
+    "rpds-py": "2026.6.3",
+    "isoduration": "20.11.0",
+    "Pygments": "2.21.0",
+    "referencing": "0.37.0",
+    "uri-template": "1.3.0",
+    "cffi": "2.1.1",
+    "wcwidth": "0.8.2",
+    "ipywidgets": "8.1.9",
+    "jsonschema-specifications": "2025.9.1",
+    "jupyter_server_terminals": "0.5.4",
+    "pyzmq": "27.2.0",
+    "nbclient": "0.11.0",
+    "nvidia-cufft": "12.3.0.29",
+    "pip": "24.0",
+    "nvidia-cuda-cupti": "13.3.75",
+    "Send2Trash": "2.1.0",
+    "asttokens": "3.0.2",
+    "tinycss2": "1.5.1",
+    "platformdirs": "4.11.4",
+    "jupyter-console": "6.6.3",
+    "bleach": "6.4.0"
+  },
+  "jax_backend": "gpu",
+  "devices": [
+    "cuda:0"
+  ],
+  "jax_x64": false,
+  "matmul_precision": "None",
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "0",
+    "JAX_PLATFORMS": "cuda",
+    "JAX_ENABLE_X64": "false",
+    "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "1"
+  },
+  "input_hashes": {
+    "x": "141119cde2c9bb3df3402ec7157ba67bcf9fef06d6ccb83efcaa10110d7e8c53",
+    "y": "67b9948b3273eb071261a6909d51496a58c3692df7b7a3c98d5232ea9ee55870",
+    "omega": "737220af3b4f61bb7b15cff935bcc6f64ea7cd59e4fc2594563eedc630294769",
+    "features": "efd9df02c6cb3060956b207fcda891101bfb2f0c7ce709824e2223ce9fab649c"
+  },
+  "source_sha256": "e48d15e3701468255d1307467b864e94c672836fde17843a0f5f5827ccc759e7",
+  "array_hashes": {
+    "amp_0": "f53576eef5c85b5c80f8e945634e29742b032378bf7db3731093941f5312404f",
+    "amp_1": "f53576eef5c85b5c80f8e945634e29742b032378bf7db3731093941f5312404f",
+    "gram": "b778ac79f485e0480f8e9c373f083d76e193a5998eda807de1e6eb6c174de51f",
+    "rhs": "e8915d1ed1812892abee49c28ad7922a4fa445027080617c9f3e9ccae4edd2c4",
+    "regularized_gram": "ddc634cfb6d3c34ded54e3d41e3f63fee1d49357def78315777e185aba6a71ed",
+    "omega": "737220af3b4f61bb7b15cff935bcc6f64ea7cd59e4fc2594563eedc630294769",
+    "pred_0": "cd82bd46c726bebe8b5c23bc19ea89fc77017735da0010a5e46c322e478c035e",
+    "pred_1": "cd82bd46c726bebe8b5c23bc19ea89fc77017735da0010a5e46c322e478c035e",
+    "pred_archived": "cd82bd46c726bebe8b5c23bc19ea89fc77017735da0010a5e46c322e478c035e"
+  },
+  "residuals": {
+    "archived": {
+      "absolute_frobenius": 1.31921481416745,
+      "relative_rhs": 2.7487585120572434e-06,
+      "normwise_backward_error": 1.3262881261117174e-08
+    },
+    "repeat_0": {
+      "absolute_frobenius": 1.31921481416745,
+      "relative_rhs": 2.7487585120572434e-06,
+      "normwise_backward_error": 1.3262881261117174e-08
+    },
+    "repeat_1": {
+      "absolute_frobenius": 1.31921481416745,
+      "relative_rhs": 2.7487585120572434e-06,
+      "normwise_backward_error": 1.3262881261117174e-08
+    }
+  },
+  "elapsed_seconds": 14.451526358025149,
+  "solve_calls": 2,
+  "loaded_libraries": [
+    {
+      "path": "_hybrid.so",
+      "sha256": "f3926efba8d32a67d4e3ca7e4a85c949711abf46b6c45eb69e7f92961c4aa050"
+    },
+    {
+      "path": "_linalg.so",
+      "sha256": "6a03b243ca19988d19a56cf791b737b0ede1607ba36cb33b767ac531d7d201ff"
+    },
+    {
+      "path": "_prng.so",
+      "sha256": "8a52ba81eb9e0ab1f8ff6d067c50faab4b8ca02c5aca91deaeac039fc695ea9a"
+    },
+    {
+      "path": "_rnn.so",
+      "sha256": "ce91f9e7019d23d1c4e4276d5af353164b34f1deaf4c5e124b73ef40508cf178"
+    },
+    {
+      "path": "_solver.so",
+      "sha256": "ef78b948c7a3508b023f4acb9810ebf191c6fd9bd0d2ceb5ae912b1f57ff29eb"
+    },
+    {
+      "path": "_sparse.so",
+      "sha256": "9726cda0c66040497877d1ece32a117d3c6ee7dbb2a9df65558bfa30f8e3e6c8"
+    },
+    {
+      "path": "_triton.so",
+      "sha256": "00542189768298322d918089940f0ffe2bd0851345688572590f79d6b4af8b03"
+    },
+    {
+      "path": "_versions.so",
+      "sha256": "06f4b67cfe84b3ecf46e838299ebd6a83b372d4488f7958fea549dd18b3612b8"
+    },
+    {
+      "path": "cuda_plugin_extension.so",
+      "sha256": "4eb4bbee2c67ad980a79b209e3fc032239ed08005e2dbaf2127eae06cb1809c0"
+    },
+    {
+      "path": "xla_cuda_plugin.so",
+      "sha256": "4443b8c89bd43923dcb895efc95058c65682de1724ec5a66854a96d4731e4228"
+    },
+    {
+      "path": "_hlo.so",
+      "sha256": "473341d9f9920bab08579c55a22ed3685aa27c66832ed74b94dab6889d76319c"
+    },
+    {
+      "path": "_ifrt_proxy.so",
+      "sha256": "723ee74d8e0e6c8683790fff020b119ff12c644d0e99d99687380bbc6a760cbc"
+    },
+    {
+      "path": "_jax.so",
+      "sha256": "1b8ba599253bddc480606ab30d6a47731ac9fe3be4e6082dec7a85e82778857f"
+    },
+    {
+      "path": "_pretty_printer.so",
+      "sha256": "8537c42ac508a1dd9ad86abdf17309a965038870cebc3f4c3bce11291d54f6af"
+    },
+    {
+      "path": "_profile_data.so",
+      "sha256": "3e4ea925c368c2c3ca2b4f9a0ac592151f6861b09d972e7ad2f668e3268e0d06"
+    },
+    {
+      "path": "_profiler.so",
+      "sha256": "ac96310a006b06b0fda9805b5405473e672ccdad1202152de3ab9ceb614c55b7"
+    },
+    {
+      "path": "_xla.so",
+      "sha256": "778c71a86d99db76d28581832090fb0bbab672df52d7ade5ab5387982ccf5922"
+    },
+    {
+      "path": "_lapack.so",
+      "sha256": "645d4851029fa192e140702058213f5dfb7007f9bd240cab820b96d9cbcb0fd9"
+    },
+    {
+      "path": "_sparse.so",
+      "sha256": "7adc1cf842db6cc94f1400811cefff8755641e28618d2c643b84b8bb7fbca787"
+    },
+    {
+      "path": "cpu_feature_guard.so",
+      "sha256": "e6007e8ebe1c3646a87a49c908c56ec8268e1a1913af28e04a26e9edaf1e24ca"
+    },
+    {
+      "path": "libjax_common.so",
+      "sha256": "2e0ff3956f5d8e24368171568cc9f8a2465bd875f33ff427ce2b418fbb735f85"
+    },
+    {
+      "path": "_chlo.so",
+      "sha256": "b45ae0ea65dcbaa8bb4942371746d2eb192d663c350297905fb10c49b2491b7e"
+    },
+    {
+      "path": "_jax_mlir_ext.so",
+      "sha256": "3faceccdafb4c9ccc1cef2a389514c51b262e876cc1042f2d391b3feae404c11"
+    },
+    {
+      "path": "_mlir.so",
+      "sha256": "1848fc206571069622e2e60276dd9d2925eec464e382d8bc2d35cdf3d0fd7a3e"
+    },
+    {
+      "path": "_mlirHlo.so",
+      "sha256": "f9e3c418d7f8f973aaee39890568804a9bb31d880f84b67366470fe36f90e2f2"
+    },
+    {
+      "path": "_mosaic_gpu_ext.so",
+      "sha256": "ea8668a8db694ce2eb177ba840fdecd5e65f026e2761ef385817a2182bb27af8"
+    },
+    {
+      "path": "_sdy.so",
+      "sha256": "64aefc94462b77c289bc9876994178d3a296776747647071d362c589d94187ea"
+    },
+    {
+      "path": "_sdyMpmd.so",
+      "sha256": "61abc8ab286098fd57983bef1adbc1321422b100346fe3a36f6d38ec05ebc152"
+    },
+    {
+      "path": "_stablehlo.so",
+      "sha256": "4e442434d9853e738cf3ea3a02f1c5f71078de94e9e2283c9b9fdf70878daaed"
+    },
+    {
+      "path": "_tpu_ext.so",
+      "sha256": "bd6c712e0ac782595ed0700bead9ac15cd931a2c3171e86b027595acb8956863"
+    },
+    {
+      "path": "_triton_ext.so",
+      "sha256": "d417a255316edbbc8dbde46fe423d471b899e4a608e0a76213c053d92185c766"
+    },
+    {
+      "path": "utils.so",
+      "sha256": "f65cc48f2a2a9a128d15f8736d38f93169faffc8fb70216c2952c620de74c3d9"
+    },
+    {
+      "path": "weakref_lru_cache.so",
+      "sha256": "b66bdd345f96602dd2ccd9a87339c523baa4d1507918ea951dc4e41e20a677e1"
+    },
+    {
+      "path": "libcublas.so.13",
+      "sha256": "f7e672d9ee04cf9d9ad20d901d204ec5a020e9e9a1c940771dfcc019a281f539"
+    },
+    {
+      "path": "libcublasLt.so.13",
+      "sha256": "bf8a49bd6dd9d8e07c6e361ea44967079e68ea3485e0e412ed801745da605fb6"
+    },
+    {
+      "path": "libcudart.so.13",
+      "sha256": "9f92e4c3f7e14d0fed69ef876a45d4255a2dc88cb552a673a90ce881c26282fe"
+    },
+    {
+      "path": "libcusolver.so.12",
+      "sha256": "b0825c65a735cc2eba019194103043b7db05e4e54ef79b788071c20b5582864f"
+    },
+    {
+      "path": "libcudnn.so.9",
+      "sha256": "0f43113ec6b171f93236560541f3b95104fed2516b19000a0e7047a5cc12f8ee"
+    },
+    {
+      "path": "libcudnn_graph.so.9",
+      "sha256": "2e8a0e4e66c0c8f9dc273c486698614c0561832626fadf76a8a37b94d0e2f895"
+    },
+    {
+      "path": "libcuda.so.595.84",
+      "sha256": "c147185c80a0270d635db626537fc9223b2ad1764f86cb12fd116d26e08b175d"
+    }
+  ]
+}

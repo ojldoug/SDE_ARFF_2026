@@ -1,0 +1,9 @@
+{
+  "scripts/check_reproduction_fixed_basis.py": "217a9490c6fd6c8073c84bebd1cc5ac47897b5c43742a9248373d27cb47d7b75",
+  "scripts/summarize_reproduction_discrepancy.py": "45f31e2b39ff30ed74c9d4897bd75424d73869da9782b9e07a98e69fcd72344e",
+  "docs/bounded_reproduction_verification_v1/COMPARISON.json": "800fdb4f7d0b8e840857cbc6ae48de52b522b2e503e3d338d6672723fcb3d960",
+  "docs/bounded_reproduction_verification_v1/REPORT.md": "35c1c8e0039bebea8dd702399b5c70dbf0f1ab5ec9c3877906a592890b2c89db",
+  "docs/independent_reproduction_v1/BUNDLE.json": "7e85af8ade042b7bcacd6a46315ff1ded75e80dc58304e07781c04ed44e1f914",
+  "src/arff/regression.py": "e48d15e3701468255d1307467b864e94c672836fde17843a0f5f5827ccc759e7",
+  "src/arff/validation_selected.py": "0846a656cd43deff0279bd9f45b3f14d748ffe9433fc4831ac96fd0532be5894"
+}
