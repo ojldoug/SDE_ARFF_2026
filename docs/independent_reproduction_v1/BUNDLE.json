@@ -1,0 +1,12 @@
+{
+  "version": "independent_reproduction_v1",
+  "filename": "independent_reproduction_v1.tar",
+  "local_location_relative_to_repository": "../artifact_exports/independent_reproduction_v1.tar",
+  "bytes": 6978959360,
+  "sha256": "54c939eb8d8add8ca92e3aa1c5906cc7379803124dd642ac426d69b9a06a51a4",
+  "payload_files": 29009,
+  "manifest_sha256": "b35605f009995abfc43dab7c8df6a1c6e56955149f249d3b363a47027942ba3e",
+  "public_url": null,
+  "hosting_status": "Local package prepared; destination/license/access/upload authorization remains required",
+  "backup_status": "No verified off-KW61146 copy; existing September-20 backup is same-server and predates latest studies"
+}

@@ -18,3 +18,20 @@ The resulting PDF is `/tmp/sde-review-output/review/manuscript.pdf`; `REBUILD_CH
 The compact archive inputs and prevalidated seed-0 coefficient maps needed for the review rebuild are in Git. Full datasets and per-seed model checkpoints are not. For saved-checkpoint reevaluation or training, place authenticated files under the expected `data/` and `results/` layouts, or pass their roots to `scripts/verify_review_external.py`. Their hashes and the missing distribution route are documented in [REPRODUCING.md](REPRODUCING.md). No download link is asserted.
 
 The review compares corrected modern Experiment 8 on an independent test split with historical-compatible applications whose displayed results were selected on validation. The exploratory lag/ridge supplement is a separate, three-seed intervention. Rebuilding its archived metrics does not repeat training.
+
+## Independent numerical reproduction
+
+Three routes have different requirements:
+
+1. **Archived-result rebuild:** the quick start above uses compact Git inputs only; already checked.
+2. **Exact checkpoint evaluation:** restore the external v1 bundle, verify every input, then use `scripts/evaluate_reproduction_checkpoint.py` (defaults and flags in the route guide). Checkpoints are necessary for evaluating the published models, not for fresh fitting.
+3. **Data generation and fresh training:** `scripts/reproduction_generate.py` and `scripts/reproduction_route.py` inspect the accepted recipes/configurations by default. Explicit `--execute` with a new output directory is required to run. No training campaign was executed to prepare this package.
+
+See [the ordered route guide](docs/independent_reproduction_v1/ROUTES.md), [file-level hashes/availability](docs/independent_reproduction_v1/artifact_manifest.json), and [verification record](docs/independent_reproduction_v1/VERIFICATION.json). Example after restoring the bundle:
+
+```sh
+.venv/bin/python scripts/package_independent_reproduction.py verify
+.venv/bin/python scripts/reproduction_route.py baseline --method arff --seed 0
+```
+
+The latter inspects; it does not train. The bundle is prepared locally for durable hosting, **not publicly downloadable yet**. No off-server backup is verified. Original historical search budgets remain incomplete. These limitations do not prevent archive-only rebuilding, but full independent numerical reproduction is not claimed.

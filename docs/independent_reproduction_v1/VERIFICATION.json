@@ -1,0 +1,235 @@
+{
+  "source_base_commit": "4e62557e5f9074e63843af9ef2d4bdd43549baab",
+  "isolation": "Git archive into separate checkout-shaped directory; external payload files restored as read-only inputs via hardlinks, no directory symlinks to working source. Existing Python environment reused.",
+  "environment": "Python 3.11 arff-sde; pip check passed; fresh pip install not executed",
+  "archived_rebuild": "Prior accepted 24 hash / 17 table-group / 10 figure rebuild reused; no new inference",
+  "routes": [
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "baseline"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "regime",
+        "--K",
+        "1024",
+        "--N",
+        "640000"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "final-h",
+        "--K",
+        "1024",
+        "--N",
+        "640000",
+        "--h",
+        ".002"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "historical"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "lag-ridge",
+        "--h",
+        ".002",
+        "--drift-lambda",
+        ".008"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "fixed-basis"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "adaptive-ridge"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "resampling"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "-B",
+        "scripts/reproduction_route.py",
+        "coefficient-grids"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "scripts/reproduction_generate.py",
+        "original"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "scripts/reproduction_generate.py",
+        "ex8-float64"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "scripts/reproduction_generate.py",
+        "coupled-lags"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "scripts/reproduction_generate.py",
+        "regime-v1"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "scripts/reproduction_generate.py",
+        "regime-v2"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "scripts/reproduction_generate.py",
+        "final-h"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    },
+    {
+      "command": [
+        "python",
+        "scripts/reproduction_generate.py",
+        "surrogate"
+      ],
+      "exit_code": 0,
+      "stderr": ""
+    }
+  ],
+  "last_checks": [
+    {
+      "route": "baseline",
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "route": "historical",
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "route": "fixed-basis",
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "route": "adaptive-ridge",
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "route": "resampling",
+      "returncode": 0,
+      "stderr": ""
+    },
+    {
+      "route": "checkpoint metadata only",
+      "returncode": 0,
+      "stderr": ""
+    }
+  ],
+  "package_tests": "stdlib unittest: deduplicated tar roundtrip and invalid-checksum/overwrite refusal passed",
+  "executed_training": false,
+  "executed_predictions": false,
+  "executed_data_generation": false,
+  "remaining_execution_boundary": "--execute branches inspected only; complete native training must be verified separately",
+  "privacy": "Private feedback/correspondence/manuscript snapshots excluded. Only noncomputational private-document preservation checks omitted by diagnostic adapter; numerical guards retained.",
+  "backup_evidence": "Existing backup README says Mac/Synology destination was not mounted and transfer was pending; no independent destination or verification receipt located.",
+  "tar_payload_verification": "Verified tar payload: 29009 files",
+  "surrogate_metadata_inspection": "Passed; no model predictions",
+  "packaging_defects_found_and_fixed": [
+    "Inherited directory-symlink views were missing from initial file traversal; final inventory follows and materializes their payloads.",
+    "Old diagnostic guards included private manuscript preservation checks; adapter excludes only noncomputational document checks and private payloads.",
+    "First bundle attempt refused hashes of in-progress helper scripts inherited through view symlinks; helper scripts were excluded from the immutable scientific payload and remain in Git. No accepted numerical input changed."
+  ],
+  "original_generator_git_ancestry": {
+    "commit": "2288344cb4f36ceb35216621941597982eef36c1",
+    "experiments": [
+      "ex1",
+      "ex2",
+      "ex3",
+      "ex5",
+      "ex6",
+      "ex7",
+      "ex8"
+    ],
+    "is_ancestor_of_release_base": true,
+    "full_clone_required_for_git_show": true
+  }
+}
