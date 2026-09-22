@@ -1,0 +1,125 @@
+{
+  "processes": 2,
+  "comparisons": [
+    {
+      "initial_amp": {
+        "bitwise_equal": true,
+        "within_original_tolerance": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "omega": {
+        "bitwise_equal": true,
+        "within_original_tolerance": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "amp": {
+        "bitwise_equal": false,
+        "within_original_tolerance": false,
+        "max_abs": 0.00272977352142334,
+        "rms": 0.0004884714503404486
+      },
+      "nextkey": {
+        "bitwise_equal": true,
+        "within_original_tolerance": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "features": {
+        "bitwise_equal": false,
+        "within_original_tolerance": false,
+        "max_abs": 0.0006608739495277405,
+        "rms": 6.297603302628241e-05
+      },
+      "gram": {
+        "bitwise_equal": false,
+        "within_original_tolerance": false,
+        "max_abs": 6.477783203125,
+        "rms": 0.9101258634881803
+      },
+      "rhs": {
+        "bitwise_equal": false,
+        "within_original_tolerance": false,
+        "max_abs": 11.8115234375,
+        "rms": 2.2018623272298763
+      },
+      "ridge_shift": {
+        "bitwise_equal": true,
+        "within_original_tolerance": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "predictions": {
+        "bitwise_equal": false,
+        "within_original_tolerance": false,
+        "max_abs": 0.006225228309631348,
+        "rms": 0.0019211706380232603
+      }
+    }
+  ],
+  "checkpoint_comparisons": [
+    {
+      "amp_archived": {
+        "bitwise_equal": false,
+        "within_original_tolerance": false,
+        "max_abs": 0.00272977352142334,
+        "rms": 0.0004884714503404486
+      },
+      "amp_new": {
+        "bitwise_equal": false,
+        "within_original_tolerance": false,
+        "max_abs": 0.002729058265686035,
+        "rms": 0.0004892958635291241
+      }
+    },
+    {
+      "amp_archived": {
+        "bitwise_equal": true,
+        "within_original_tolerance": true,
+        "max_abs": 0.0,
+        "rms": 0.0
+      },
+      "amp_new": {
+        "bitwise_equal": false,
+        "within_original_tolerance": false,
+        "max_abs": 0.00012221932411193848,
+        "rms": 2.2597527082690425e-05
+      }
+    }
+  ],
+  "identities": {
+    "gpu": true,
+    "fixture_sha256": true,
+    "source_sha256": true,
+    "affinity": true,
+    "environment": true,
+    "jax_config": true,
+    "loaded_libraries": true,
+    "cache_inventories": true
+  },
+  "program_hashes": [
+    {
+      "lowered.txt": "15cf4d8dcfefdc0c7037865f8d15a5c8575e4dd289bb2fce2cb3367b13849157",
+      "optimized.txt": "4d30764022f377bae19158dbd0c4d8a4ad27a828740d2edbea88970b192b0ec9"
+    },
+    {
+      "lowered.txt": "15cf4d8dcfefdc0c7037865f8d15a5c8575e4dd289bb2fce2cb3367b13849157",
+      "optimized.txt": "8d42d3d00574032230047a2585ae40067807bb37f096fa7636c6773aea5f218e"
+    }
+  ],
+  "runtime_fingerprints": [
+    "6336326337656636663363366330316434333138396534333132343039626533",
+    "3837326466316134633264363134323333343436376163306633346364356365"
+  ],
+  "preserved_files": {
+    "../minimal_fold0_repeatability_v1/process_0/arrays.npz": "d62fdce15702eb29e9fca30d001dcac86d6eace489567159519dafd2c47bde1c",
+    "../minimal_fold0_repeatability_v1/process_0/record.json": "d28260f52b3df956114b9b8898cad26406e4985e7ff8e2d6cf72b46ea7100c8c",
+    "../minimal_fold0_repeatability_v1/process_0/lowered.txt": "15cf4d8dcfefdc0c7037865f8d15a5c8575e4dd289bb2fce2cb3367b13849157",
+    "../minimal_fold0_repeatability_v1/process_0/optimized.txt": "4d30764022f377bae19158dbd0c4d8a4ad27a828740d2edbea88970b192b0ec9",
+    "../minimal_fold0_repeatability_v1/process_1/arrays.npz": "e9ee4073b9fe40a1497067bb7e160f78361ce79b4b4d107808e939e7c809ced2",
+    "../minimal_fold0_repeatability_v1/process_1/record.json": "09d9fe4dcb9580430ad7f5cbfae56bfa88d49681251b84636b5cc60d23f3b03d",
+    "../minimal_fold0_repeatability_v1/process_1/lowered.txt": "15cf4d8dcfefdc0c7037865f8d15a5c8575e4dd289bb2fce2cb3367b13849157",
+    "../minimal_fold0_repeatability_v1/process_1/optimized.txt": "8d42d3d00574032230047a2585ae40067807bb37f096fa7636c6773aea5f218e"
+  }
+}

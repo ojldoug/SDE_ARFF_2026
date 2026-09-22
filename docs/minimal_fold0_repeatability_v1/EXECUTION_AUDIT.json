@@ -1,0 +1,51 @@
+{
+  "gpu_previous": "NVIDIA RTX A6000, GPU-d2cfc73c-186a-6651-e9f1-c6d93a00f0b2, 595.84",
+  "gpu_repeat": "NVIDIA RTX A6000, GPU-d2cfc73c-186a-6651-e9f1-c6d93a00f0b2, 595.84",
+  "gpu_identity_equal": true,
+  "recorded_environment_equal": true,
+  "module_path_differences": {
+    "__main__": [
+      "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1/supervisor.py",
+      "/home/kammonaa/projects/SDE_ARFF/current_pipeline_repeat_v1/supervisor.py"
+    ]
+  },
+  "checkout_open_sets_equal": true,
+  "previous_command": [
+    "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1/venv/bin/python",
+    "-B",
+    "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1/supervisor.py",
+    "child",
+    "--workspace",
+    "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1",
+    "--forbidden-tree",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026",
+    "--lock-dir",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/results/production/ex8_campaign_control",
+    "--gpu",
+    "0"
+  ],
+  "repeat_command": [
+    "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1/venv/bin/python",
+    "-B",
+    "/home/kammonaa/projects/SDE_ARFF/current_pipeline_repeat_v1/supervisor.py",
+    "child",
+    "--workspace",
+    "/home/kammonaa/projects/SDE_ARFF/current_pipeline_repeat_v1",
+    "--resources",
+    "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1",
+    "--forbidden-tree",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026",
+    "--lock-dir",
+    "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/results/production/ex8_campaign_control",
+    "--gpu",
+    "0"
+  ],
+  "historical_missing": [
+    "loaded native library bytes",
+    "full inherited environment including LD_LIBRARY_PATH/LD_PRELOAD/CUBLAS_WORKSPACE_CONFIG",
+    "effective JAX configuration and compilation cache contents",
+    "optimized executable identity",
+    "CPU affinity",
+    "GPU clocks/power/other-host-workload state"
+  ]
+}

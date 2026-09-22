@@ -1,0 +1,12 @@
+{
+  "docs/bounded_reproduction_verification_v1/COMPARISON.json": "800fdb4f7d0b8e840857cbc6ae48de52b522b2e503e3d338d6672723fcb3d960",
+  "docs/current_pipeline_repeat_v1/COMPARISON.json": "1b508fcd8f4f3ce6faa6f004d4de64375e3213307c9a1d17c5f71df6a051dfd9",
+  "docs/bounded_reproduction_verification_v1/REPORT.md": "35c1c8e0039bebea8dd702399b5c70dbf0f1ab5ec9c3877906a592890b2c89db",
+  "docs/current_pipeline_repeat_v1/REPORT.md": "346518cebbb3e29e3f8aa55dededb8add25c8d796dabea4968d5ad82c73cb116",
+  "scripts/minimal_fold0_reproducer.py": "6aadf4e436be97c33419c8418bffc13325fb93ca24c30794424fa82601bd06cc",
+  "scripts/run_minimal_fold0_check.py": "9073ff6d4ed3e905ef0f92582ad91acf823f0e2f323be6329436a178ccc99fcd",
+  "scripts/extract_minimal_fold0_fixture.py": "d83639bf45f3d82bccdd542f1297d958ed583fda7ce4e22f6a5647ff602e2419",
+  "scripts/summarize_minimal_fold0.py": "1fbeae32b199d41f8f6670191ce911ec1b26dbcf87e37138bc174a292f6e704d",
+  "../minimal_fold0_repeatability_v1/fixture.npz": "fd71907f7be2889af9ad6d6ce082e6a5c6f729b9a692bdf69640288e5e366985",
+  "../minimal_fold0_repeatability_v1/COMPLETE.json": "c252f19db0d3a69c79e4295df799f4c54662c1a06d64a6d99ce3f7fc63a88190"
+}

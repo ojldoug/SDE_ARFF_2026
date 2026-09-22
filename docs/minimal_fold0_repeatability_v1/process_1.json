@@ -1,0 +1,421 @@
+{
+  "gpu": "GPU-d2cfc73c-186a-6651-e9f1-c6d93a00f0b2, NVIDIA RTX A6000, 595.84",
+  "pid": 1383940,
+  "cwd": "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1/checkout",
+  "python": "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1/venv/bin/python",
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+    31,
+    32,
+    33,
+    34,
+    35,
+    36,
+    37,
+    38,
+    39,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63
+  ],
+  "fixture_sha256": "fd71907f7be2889af9ad6d6ce082e6a5c6f729b9a692bdf69640288e5e366985",
+  "source_sha256": "e48d15e3701468255d1307467b864e94c672836fde17843a0f5f5827ccc759e7",
+  "array_hashes": {
+    "initial_amp": "00d8f53a185ac41cdc8fcc3e7762ff78c50f03a0402233cdf838f339faacfb32",
+    "omega": "5cb23796d010a22f6af0b132c7911be382ce740138a14a1d8e6218e235839f14",
+    "amp": "846d97bb68c019a216fda334e0a6ba82f4fc925e26ea23942a8d8e3145aa28c5",
+    "nextkey": "c0750de6338caa90536fcc59044df84f2160cd73944569964f891669412726d1",
+    "features": "6d82e4dfbd76367633f8ac1e494c4ed859c687a431654180c911810ca9dd21c5",
+    "gram": "441cd519270d707a32be768e0572a4be2df6a940ceeecfccab0735e2e0fbd4d1",
+    "rhs": "625d59c1e74a7ed17e5f9e7958b0f2eede8f55a4bcb27628a5f34736166ea1ab",
+    "ridge_shift": "b98303d96ac159f0238501fd6118541c37156bd0a050ba0db0f47f3cbc1cdf3a",
+    "predictions": "408ce48a995b2441e3fb472a1cb76c99b12dcfa4af2d0855b79db86862f6d008"
+  },
+  "program_hashes": {
+    "lowered.txt": "15cf4d8dcfefdc0c7037865f8d15a5c8575e4dd289bb2fce2cb3367b13849157",
+    "optimized.txt": "8d42d3d00574032230047a2585ae40067807bb37f096fa7636c6773aea5f218e"
+  },
+  "runtime_fingerprint": "3837326466316134633264363134323333343436376163306633346364356365",
+  "jax_config": {
+    "jax2tf_associative_scan_reductions": "False",
+    "jax2tf_default_native_serialization": "True",
+    "jax_serialization_version": "0",
+    "jax_export_calling_convention_version": "10",
+    "jax_export_ignore_forward_compatibility": "False",
+    "jax_platforms": "cuda",
+    "jax_pjrt_client_create_options": "None",
+    "jax_enable_checks": "False",
+    "jax_debug_key_reuse": "False",
+    "jax_check_tracer_leaks": "False",
+    "jax_check_static_indices": "False",
+    "jax_captured_constants_warn_bytes": "2000000000",
+    "jax_captured_constants_report_frames": "0",
+    "jax_debug_leaked_clients_on_clear_backends": "False",
+    "jax_debug_nans": "False",
+    "jax_debug_infs": "False",
+    "jax_log_compiles": "False",
+    "jax_explain_cache_misses": "False",
+    "jax_log_checkpoint_residuals": "False",
+    "jax_scan3": "False",
+    "jax_remat3": "False",
+    "jax_custom_vjp3": "False",
+    "jax_distributed_debug": "False",
+    "jax_random_seed_offset": "0",
+    "jax_legacy_prng_key": "allow",
+    "jax_enable_custom_prng": "False",
+    "jax_default_prng_impl": "threefry2x32",
+    "jax_threefry_partitionable": "True",
+    "jax_threefry_gpu_kernel_lowering": "False",
+    "jax_use_direct_linearize": "True",
+    "jax_use_simplified_jaxpr_constants": "False",
+    "jax_embedded_constants_max_bytes": "32",
+    "jax_remove_size_one_mesh_axis_from_type": "False",
+    "check_vma": "False",
+    "jax_softmax_custom_jvp": "False",
+    "jax_raise_persistent_cache_errors": "False",
+    "jax_persistent_cache_min_compile_time_secs": "1.0",
+    "jax_persistent_cache_min_entry_size_bytes": "0",
+    "jax_persistent_cache_enable_xla_caches": "xla_gpu_per_fusion_autotune_cache_dir",
+    "jax_compilation_cache_include_metadata_in_key": "False",
+    "jax_hlo_source_file_canonicalization_regex": "None",
+    "jax_source_url_schema": "None",
+    "jax_include_full_tracebacks_in_locations": "True",
+    "jax_traceback_in_locations_limit": "100",
+    "jax_share_binary_between_hosts": "False",
+    "jax_share_binary_between_hosts_timeout_ms": "1200000",
+    "jax_enable_pgle": "False",
+    "jax_pgle_profiling_runs": "3",
+    "jax_pgle_aggregation_percentile": "90",
+    "jax_enable_compilation_cache": "True",
+    "jax_compilation_cache_dir": "None",
+    "jax_compilation_cache_check_contents": "False",
+    "jax_compilation_cache_expect_pgle": "False",
+    "jax_compilation_cache_max_size": "-1",
+    "jax_remove_custom_partitioning_ptr_from_cache_key": "False",
+    "jax_explicit_x64_dtypes": "1",
+    "jax_numpy_dtype_promotion": "standard",
+    "jax_disallow_mesh_context_manager": "False",
+    "jax_error_checking_behavior_nan": "ignore",
+    "jax_error_checking_behavior_divide": "ignore",
+    "jax_error_checking_behavior_oob": "ignore",
+    "jax_enable_x64": "False",
+    "jax_default_device": "None",
+    "jax_disable_jit": "False",
+    "jax_numpy_rank_promotion": "allow",
+    "jax_auto_pcast": "True",
+    "jax_default_matmul_precision": "None",
+    "jax_allow_f16_reductions": "True",
+    "jax_traceback_filtering": "auto",
+    "jax_use_emit_pipeline_primitive": "False",
+    "jax_bcoo_cusparse_lowering": "False",
+    "eager_constant_folding": "False",
+    "jax_compiler_enable_remat_pass": "True",
+    "jax_no_tracing": "False",
+    "jax_no_execution": "False",
+    "jax_disable_vmap_shmap_error": "False",
+    "jax_mutable_array_checks": "True",
+    "jax_refs_to_pins": "False",
+    "jax_disable_bwd_checks": "False",
+    "jax_experimental_unsafe_xla_runtime_errors": "False",
+    "jax_xla_profile_version": "0",
+    "jax_transfer_guard_host_to_device": "None",
+    "jax_transfer_guard_device_to_device": "None",
+    "jax_transfer_guard_device_to_host": "None",
+    "jax_transfer_guard": "None",
+    "jax_array_garbage_collection_guard": "None",
+    "jax_thread_guard": "False",
+    "jax_send_traceback_to_runtime": "off",
+    "jax_debug_log_modules": "",
+    "jax_logging_level": "NOTSET",
+    "jax_use_shardy_partitioner": "True",
+    "jax_use_magma": "auto",
+    "jax_exec_time_optimization_effort": "0.0",
+    "jax_memory_fitting_effort": "0.0",
+    "jax_optimization_level": "UNKNOWN",
+    "jax_memory_fitting_level": "O2",
+    "jax_cpu_collectives_implementation": "gloo",
+    "jax_high_dynamic_range_gumbel": "False",
+    "jax_dump_ir_to": "",
+    "jax_include_debug_info_in_dumps": "True",
+    "jax_dump_ir_modes": "stablehlo",
+    "jax_ragged_dot_use_ragged_dot_instruction": "True",
+    "jax_ragged_dot_use_gpu_pallas_triton_lowering": "False",
+    "jax_pallas_verbose_errors": "False",
+    "jax_pallas_enable_debug_checks": "False",
+    "jax_pallas_use_mosaic_gpu": "True",
+    "jax_mosaic_allow_hlo": "False",
+    "jax_pallas_poison_buffers": "False",
+    "jax_check_proxy_envs": "True",
+    "jax_enable_recoverability": "False",
+    "jax_enable_preemption_service": "True",
+    "jax_xla_backend": "",
+    "jax_backend_target": "",
+    "jax_platform_name": "",
+    "jax_cuda_visible_devices": "all",
+    "jax_rocm_visible_devices": "all",
+    "jax_oneapi_visible_devices": "all",
+    "mock_num_gpu_processes": "0",
+    "jax_mock_gpu_topology": "",
+    "jax_cpu_enable_async_dispatch": "True",
+    "jax_force_dcn_cross_host_transfers": "False",
+    "jax_sort_devices_by_process_index": "True",
+    "jax_cross_host_transfer_socket_address": "",
+    "jax_cross_host_transport_addresses": "",
+    "jax_cross_host_transfer_timeout_seconds": "None",
+    "jax_cross_host_transfer_transfer_size": "None",
+    "jax_num_cpu_devices": "-1",
+    "jax_cpu_get_local_topology_timeout_minutes": "2",
+    "jax_cpu_get_global_topology_timeout_minutes": "5",
+    "jax_pprint_use_color": "True",
+    "jax_tracer_error_num_traceback_frames": "5",
+    "jax_disable_most_optimizations": "False",
+    "jax_compiler_detailed_logging_min_ops": "10"
+  },
+  "environment": {
+    "CONDA_EXE": "/home/kammonaa/miniconda3/bin/conda",
+    "CONDA_PREFIX": "/home/kammonaa/miniconda3",
+    "CONDA_PROMPT_MODIFIER": "(base) ",
+    "CONDA_SHLVL": "1",
+    "CONDA_PYTHON_EXE": "/home/kammonaa/miniconda3/bin/python",
+    "LD_LIBRARY_PATH": "/usr/local/cuda-12.6/lib64",
+    "CONDA_DEFAULT_ENV": "base",
+    "CUDA_VISIBLE_DEVICES": "0",
+    "JAX_PLATFORMS": "cuda",
+    "JAX_ENABLE_X64": "false",
+    "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "1",
+    "TF_CPP_MIN_LOG_LEVEL": "1"
+  },
+  "loaded_libraries": [
+    {
+      "name": "_hybrid.so",
+      "sha256": "f3926efba8d32a67d4e3ca7e4a85c949711abf46b6c45eb69e7f92961c4aa050"
+    },
+    {
+      "name": "_linalg.so",
+      "sha256": "6a03b243ca19988d19a56cf791b737b0ede1607ba36cb33b767ac531d7d201ff"
+    },
+    {
+      "name": "_prng.so",
+      "sha256": "8a52ba81eb9e0ab1f8ff6d067c50faab4b8ca02c5aca91deaeac039fc695ea9a"
+    },
+    {
+      "name": "_rnn.so",
+      "sha256": "ce91f9e7019d23d1c4e4276d5af353164b34f1deaf4c5e124b73ef40508cf178"
+    },
+    {
+      "name": "_solver.so",
+      "sha256": "ef78b948c7a3508b023f4acb9810ebf191c6fd9bd0d2ceb5ae912b1f57ff29eb"
+    },
+    {
+      "name": "_sparse.so",
+      "sha256": "9726cda0c66040497877d1ece32a117d3c6ee7dbb2a9df65558bfa30f8e3e6c8"
+    },
+    {
+      "name": "_triton.so",
+      "sha256": "00542189768298322d918089940f0ffe2bd0851345688572590f79d6b4af8b03"
+    },
+    {
+      "name": "_versions.so",
+      "sha256": "06f4b67cfe84b3ecf46e838299ebd6a83b372d4488f7958fea549dd18b3612b8"
+    },
+    {
+      "name": "cuda_plugin_extension.so",
+      "sha256": "4eb4bbee2c67ad980a79b209e3fc032239ed08005e2dbaf2127eae06cb1809c0"
+    },
+    {
+      "name": "xla_cuda_plugin.so",
+      "sha256": "4443b8c89bd43923dcb895efc95058c65682de1724ec5a66854a96d4731e4228"
+    },
+    {
+      "name": "_hlo.so",
+      "sha256": "473341d9f9920bab08579c55a22ed3685aa27c66832ed74b94dab6889d76319c"
+    },
+    {
+      "name": "_ifrt_proxy.so",
+      "sha256": "723ee74d8e0e6c8683790fff020b119ff12c644d0e99d99687380bbc6a760cbc"
+    },
+    {
+      "name": "_jax.so",
+      "sha256": "1b8ba599253bddc480606ab30d6a47731ac9fe3be4e6082dec7a85e82778857f"
+    },
+    {
+      "name": "_pretty_printer.so",
+      "sha256": "8537c42ac508a1dd9ad86abdf17309a965038870cebc3f4c3bce11291d54f6af"
+    },
+    {
+      "name": "_profile_data.so",
+      "sha256": "3e4ea925c368c2c3ca2b4f9a0ac592151f6861b09d972e7ad2f668e3268e0d06"
+    },
+    {
+      "name": "_profiler.so",
+      "sha256": "ac96310a006b06b0fda9805b5405473e672ccdad1202152de3ab9ceb614c55b7"
+    },
+    {
+      "name": "_xla.so",
+      "sha256": "778c71a86d99db76d28581832090fb0bbab672df52d7ade5ab5387982ccf5922"
+    },
+    {
+      "name": "_lapack.so",
+      "sha256": "645d4851029fa192e140702058213f5dfb7007f9bd240cab820b96d9cbcb0fd9"
+    },
+    {
+      "name": "_sparse.so",
+      "sha256": "7adc1cf842db6cc94f1400811cefff8755641e28618d2c643b84b8bb7fbca787"
+    },
+    {
+      "name": "cpu_feature_guard.so",
+      "sha256": "e6007e8ebe1c3646a87a49c908c56ec8268e1a1913af28e04a26e9edaf1e24ca"
+    },
+    {
+      "name": "libjax_common.so",
+      "sha256": "2e0ff3956f5d8e24368171568cc9f8a2465bd875f33ff427ce2b418fbb735f85"
+    },
+    {
+      "name": "_chlo.so",
+      "sha256": "b45ae0ea65dcbaa8bb4942371746d2eb192d663c350297905fb10c49b2491b7e"
+    },
+    {
+      "name": "_jax_mlir_ext.so",
+      "sha256": "3faceccdafb4c9ccc1cef2a389514c51b262e876cc1042f2d391b3feae404c11"
+    },
+    {
+      "name": "_mlir.so",
+      "sha256": "1848fc206571069622e2e60276dd9d2925eec464e382d8bc2d35cdf3d0fd7a3e"
+    },
+    {
+      "name": "_mlirHlo.so",
+      "sha256": "f9e3c418d7f8f973aaee39890568804a9bb31d880f84b67366470fe36f90e2f2"
+    },
+    {
+      "name": "_mosaic_gpu_ext.so",
+      "sha256": "ea8668a8db694ce2eb177ba840fdecd5e65f026e2761ef385817a2182bb27af8"
+    },
+    {
+      "name": "_sdy.so",
+      "sha256": "64aefc94462b77c289bc9876994178d3a296776747647071d362c589d94187ea"
+    },
+    {
+      "name": "_sdyMpmd.so",
+      "sha256": "61abc8ab286098fd57983bef1adbc1321422b100346fe3a36f6d38ec05ebc152"
+    },
+    {
+      "name": "_stablehlo.so",
+      "sha256": "4e442434d9853e738cf3ea3a02f1c5f71078de94e9e2283c9b9fdf70878daaed"
+    },
+    {
+      "name": "_tpu_ext.so",
+      "sha256": "bd6c712e0ac782595ed0700bead9ac15cd931a2c3171e86b027595acb8956863"
+    },
+    {
+      "name": "_triton_ext.so",
+      "sha256": "d417a255316edbbc8dbde46fe423d471b899e4a608e0a76213c053d92185c766"
+    },
+    {
+      "name": "utils.so",
+      "sha256": "f65cc48f2a2a9a128d15f8736d38f93169faffc8fb70216c2952c620de74c3d9"
+    },
+    {
+      "name": "weakref_lru_cache.so",
+      "sha256": "b66bdd345f96602dd2ccd9a87339c523baa4d1507918ea951dc4e41e20a677e1"
+    },
+    {
+      "name": "libcublas.so.13",
+      "sha256": "f7e672d9ee04cf9d9ad20d901d204ec5a020e9e9a1c940771dfcc019a281f539"
+    },
+    {
+      "name": "libcublasLt.so.13",
+      "sha256": "bf8a49bd6dd9d8e07c6e361ea44967079e68ea3485e0e412ed801745da605fb6"
+    },
+    {
+      "name": "libcudart.so.13",
+      "sha256": "9f92e4c3f7e14d0fed69ef876a45d4255a2dc88cb552a673a90ce881c26282fe"
+    },
+    {
+      "name": "libcusolver.so.12",
+      "sha256": "b0825c65a735cc2eba019194103043b7db05e4e54ef79b788071c20b5582864f"
+    },
+    {
+      "name": "libcudnn.so.9",
+      "sha256": "0f43113ec6b171f93236560541f3b95104fed2516b19000a0e7047a5cc12f8ee"
+    },
+    {
+      "name": "libcudnn_graph.so.9",
+      "sha256": "2e8a0e4e66c0c8f9dc273c486698614c0561832626fadf76a8a37b94d0e2f895"
+    },
+    {
+      "name": "libcuda.so.595.84",
+      "sha256": "c147185c80a0270d635db626537fc9223b2ad1764f86cb12fd116d26e08b175d"
+    }
+  ],
+  "cache_inventories": {
+    "/home/kammonaa/.nv/ComputeCache": {
+      "exists": true,
+      "files": 35,
+      "inventory_sha256": "524a2c2e7cff47dea47f5cfcca9fbbd0d64562368db07097aa60d58a795b60b6"
+    },
+    "/home/kammonaa/.cache/jax": {
+      "exists": false,
+      "files": 0,
+      "inventory_sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "scientific_calls": {
+    "native_steps": 1,
+    "amplitude_calls": 3
+  },
+  "vs_archived_amp_exact": true,
+  "vs_first_current_amp_exact": false
+}

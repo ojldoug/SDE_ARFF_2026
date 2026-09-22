@@ -1,0 +1,7 @@
+# process 0
+
+  %custom-call.4 = (f32[57600,128]{1,0}, s8[4194304]{0}) custom-call(%x.1, %loop_select_fusion.2), custom_call_target="__cublas$lt$matmul", metadata={op_name="jit(compiled_step)/dot_general" stack_frame_id=47}, backend_config={"device_type":"DEVICE_TYPE_INVALID","force_earliest_schedule":false,"gemm_backend_config":{"alpha_imag":0,"alpha_real":1,"autotune_workspace_size":"4194304","beta":0,"damax_output":false,"dot_dimension_numbers":{"lhs_batch_dimensions":[],"lhs_contracting_dimensions":["1"],"rhs_batch_dimensions":[],"rhs_contracting_dimensions":["0"]},"epilogue":"DEFAULT","grad_x":false,"grad_y":false,"lhs_stride":"115200","precision_config":{"algorithm":"ALG_UNSET","operand_precision":["DEFAULT","DEFAULT"]},"rhs_stride":"256","scale_mode":0,"selected_algorithm":"4"},"operation_queue_id":"0","reification_cost":[]}
+
+# process 1
+
+  %gemm_fusion_dot_general.9 = f32[57600,128]{1,0} fusion(%x.1, %loop_select_fusion.2), kind=kCustom, calls=%gemm_fusion_dot_general.9_computation, metadata={op_name="jit(compiled_step)/dot_general" stack_frame_id=13}, backend_config={"device_type":"DEVICE_TYPE_INVALID","force_earliest_schedule":false,"fusion_backend_config":{"block_level_fusion_config":{"is_tma_allowed":false,"is_warp_specialization_allowed":false,"num_ctas":1,"num_stages":1,"num_warps":"2","output_tiles":[{"sizes":["64","64"]}],"waves_per_eu":0},"kind":"__triton_nested_gemm_fusion"},"operation_queue_id":"0","reification_cost":[]}
