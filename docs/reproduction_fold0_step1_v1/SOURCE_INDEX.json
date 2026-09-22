@@ -1,0 +1,11 @@
+{
+  "scripts/check_reproduction_fold0_step1.py": "da1b48e7180492a82a42842fe99c05f82d106dd117846fb24862539dbdd18046",
+  "docs/reproduction_fold0_step1_v1/PROTOCOL.md": "4a053dbc618115375732f1c0d0523293121eaf16770e4efd17cb492730490093",
+  "../reproduction_fold0_step1_v1/capture.npz": "62f6eed92a9c3c63a0388359185a23fb6dcb64fc9d4777cc715cc9c990d5d502",
+  "../reproduction_fold0_step1_v1/native_lowered.txt": "15cf4d8dcfefdc0c7037865f8d15a5c8575e4dd289bb2fce2cb3367b13849157",
+  "../fold0_step1_console.log": "6181c8d80151f7616b8f39259734a24d4626842be8305b0d8ab2f10f7b1ed102",
+  "docs/bounded_reproduction_verification_v1/COMPARISON.json": "800fdb4f7d0b8e840857cbc6ae48de52b522b2e503e3d338d6672723fcb3d960",
+  "docs/bounded_reproduction_verification_v1/REPORT.md": "35c1c8e0039bebea8dd702399b5c70dbf0f1ab5ec9c3877906a592890b2c89db",
+  "../bounded_reproduction_verification_v1/checkout/results/controlled_study_2026/float64_v2/production/baseline/K_128_N_80000/arff/seed_0/artifact.npz": "87106b927ab6d3e1bb58329543796c8495b50ac50dbae83ca6eb16feba69f629",
+  "../bounded_reproduction_verification_v1/run/artifact.npz": "695f84bec964249130c164af93c6b84c7e4d1ab776a0498c58b0af10dc4c3ab2"
+}

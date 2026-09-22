@@ -1,0 +1,125 @@
+{
+  "frequency_gate": {
+    "proposal_matches_archived": true,
+    "native_frequencies_match_archived": true,
+    "archived_new_frequencies_match": true
+  },
+  "comparisons": {
+    "amp_native_vs_standalone": {
+      "exact": true,
+      "within_original_tolerance": true,
+      "max_abs": 0.0,
+      "rms": 0.0
+    },
+    "pred_native_vs_standalone": {
+      "exact": true,
+      "within_original_tolerance": true,
+      "max_abs": 0.0,
+      "rms": 0.0
+    },
+    "amp_native_vs_archived": {
+      "exact": false,
+      "within_original_tolerance": false,
+      "max_abs": 0.00012221932411193848,
+      "rms": 2.2597527082690425e-05
+    },
+    "pred_native_vs_archived": {
+      "exact": false,
+      "within_original_tolerance": false,
+      "max_abs": 0.0007476806640625,
+      "rms": 0.000358081113702073
+    },
+    "amp_native_vs_new": {
+      "exact": true,
+      "within_original_tolerance": true,
+      "max_abs": 0.0,
+      "rms": 0.0
+    },
+    "pred_native_vs_new": {
+      "exact": true,
+      "within_original_tolerance": true,
+      "max_abs": 0.0,
+      "rms": 0.0
+    }
+  },
+  "residuals": {
+    "native": {
+      "absolute": 0.31274478656129395,
+      "relative_rhs": 9.060459323529541e-07,
+      "backward_error": 4.882038982525264e-09
+    },
+    "standalone": {
+      "absolute": 0.31274478656129395,
+      "relative_rhs": 9.060459323529541e-07,
+      "backward_error": 4.882038982525264e-09
+    },
+    "archived": {
+      "absolute": 0.36837645562054944,
+      "relative_rhs": 1.0672151976038888e-06,
+      "backward_error": 5.7504724669457265e-09
+    },
+    "new": {
+      "absolute": 0.31274478656129395,
+      "relative_rhs": 9.060459323529541e-07,
+      "backward_error": 4.882038982525264e-09
+    }
+  },
+  "conditioning": {
+    "min_eigenvalue": 57.47668918330375,
+    "max_eigenvalue": 6635457.465564679,
+    "spectral_condition": 115446.06274037434,
+    "float32_epsilon_times_condition": 0.013762243120714944
+  },
+  "ridge_shift_static": 57.599998474121094,
+  "ridge_shift_dynamic": 57.60000228881836,
+  "native_validation_loss": 5191.619140625,
+  "archived_validation_loss": 5191.619140625,
+  "new_validation_loss": 5191.619140625,
+  "hashes": {
+    "x": "f2fc739c0fa1c794a9259b54f506e5bcbb3992d7c41e90cf29e15ebaccc0f84a",
+    "y": "1f6f268580d11308f1cf3dc661b167a1efbd2104c391f52b67cc417f8e7a1d5c",
+    "fit_positions": "ab45c60f37a7b820f2a5c13ab002fc2fa3c431efc382d435837cddac6034d638",
+    "validation_positions": "b7e3dec063e8ba22b20084a0ad00b105eb7d12b19037458c3a59e5450811d3f7",
+    "initial_key": "af5570f5a1810b7af78caf4bc70a660f0df51e42baf91d4de5b2328de0e83dfc",
+    "next_key": "c0750de6338caa90536fcc59044df84f2160cd73944569964f891669412726d1",
+    "initial_omega": "5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef",
+    "initial_amp": "7081c3e97823d5b6f905accfe586ec03d8f415077f91520b996f61078a22a205",
+    "proposal": "5cb23796d010a22f6af0b132c7911be382ce740138a14a1d8e6218e235839f14",
+    "omega": "5cb23796d010a22f6af0b132c7911be382ce740138a14a1d8e6218e235839f14",
+    "features": "6d82e4dfbd76367633f8ac1e494c4ed859c687a431654180c911810ca9dd21c5",
+    "gram": "441cd519270d707a32be768e0572a4be2df6a940ceeecfccab0735e2e0fbd4d1",
+    "rhs": "37b96aa5c0ef73b792f885479debee3ae35dda9ea2adcbd820188635b936657f",
+    "ridge_shift_static": "b98303d96ac159f0238501fd6118541c37156bd0a050ba0db0f47f3cbc1cdf3a",
+    "ridge_shift_dynamic": "ac034792a48b84d29dcda2d566f56fdfca397f68e64df27f7965ecc3ec90bcee",
+    "regularized_gram": "6937d2e817c1b8c6ac4802dd5d06e7903d4eb2faf417a01f63f90522c1c5dcdc",
+    "amp_native": "09934378a41c7f6bfb46abb8d460fda3d4f8fb05107802d7748a543e23fc0cba",
+    "amp_standalone": "09934378a41c7f6bfb46abb8d460fda3d4f8fb05107802d7748a543e23fc0cba",
+    "amp_archived": "846d97bb68c019a216fda334e0a6ba82f4fc925e26ea23942a8d8e3145aa28c5",
+    "amp_new": "09934378a41c7f6bfb46abb8d460fda3d4f8fb05107802d7748a543e23fc0cba",
+    "pred_native": "7a5dcf3653980b2c19a91498335452aad1b326515db10b8cb294dc97f3da717e",
+    "pred_standalone": "7a5dcf3653980b2c19a91498335452aad1b326515db10b8cb294dc97f3da717e",
+    "pred_archived": "408ce48a995b2441e3fb472a1cb76c99b12dcfa4af2d0855b79db86862f6d008",
+    "pred_new": "7a5dcf3653980b2c19a91498335452aad1b326515db10b8cb294dc97f3da717e"
+  },
+  "rtol": 1e-05,
+  "atol": 1e-06,
+  "solve_calls": 4,
+  "native_steps": 1,
+  "source_sha256": "e48d15e3701468255d1307467b864e94c672836fde17843a0f5f5827ccc759e7",
+  "dataset_sha256": "6fb009e3d6fa5f241cb1a15f9a9815cbd16ea19c3a9e4ca546ae99bdae091a72",
+  "python": "3.11.15 (main, Jun 11 2026, 15:20:16) [GCC 14.3.0]",
+  "jax": "0.10.2",
+  "numpy": "2.4.6",
+  "devices": [
+    "cuda:0"
+  ],
+  "environment": {
+    "CUDA_VISIBLE_DEVICES": "0",
+    "JAX_PLATFORMS": "cuda",
+    "JAX_ENABLE_X64": "false",
+    "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "1"
+  },
+  "elapsed_seconds": 29.8678952450864
+}

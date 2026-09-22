@@ -1,0 +1,7 @@
+# Single fold-0 / iteration-1 comparison
+
+Use pinned 4c5dc6b source, corrected packaged data, archived seed-0 fold IDs/internal fit indices and PRNGKey(0), zero-frequency initialization. One native initialization solve, one unchanged compiled adaptation step (proposal solve plus required mixed-population refit), one standalone native amplitude solve at its resulting frequencies: four amplitude solves total. No whole-path warm-up, second adaptation, later folds, selection, test evaluation or sweeps. The single native step is necessary to obtain the iteration-1 selected model; the adaptation loop is not run.
+
+Run in the existing isolated verification venv, same float32/default precision and operational settings, one idle A6000 with cooperative lock. Verify reconstructed fold/internal indices and proposal/returned frequencies against archived fold-0 checkpoint. If identity fails, report and stop. Keep original rtol=1e-5, atol=1e-6.
+
+Preserve native compiled function unchanged. Capture its lowered computation text; reconstruct features, Gram, RHS and shift separately without another amplitude solve. These are not observations of its hidden internal buffers. Record standalone predictions, saved/native amplitude comparisons, residuals against reconstructed systems and float64 CPU conditioning diagnostics; float64 diagnostic arithmetic does not change solve precision. No instrumented native rerun or follow-up is authorized in this script. Stop after this comparison regardless of whether it reproduces the discrepancy.
