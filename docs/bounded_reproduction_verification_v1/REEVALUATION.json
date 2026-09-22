@@ -1,0 +1,45 @@
+{
+  "artifact_sha256": "695f84bec964249130c164af93c6b84c7e4d1ab776a0498c58b0af10dc4c3ab2",
+  "dataset_sha256": "6fb009e3d6fa5f241cb1a15f9a9815cbd16ea19c3a9e4ca546ae99bdae091a72",
+  "seed": 0,
+  "method": "arff",
+  "protocol": "modern",
+  "split": "test",
+  "metrics": {
+    "drift_rmse": 0.912845253944397,
+    "covariance_rmse": 0.11303279548883438,
+    "nll": -8.922027587890625,
+    "raw_spd_violation_rate": 0.45979997515678406,
+    "min_raw_eigenvalue": -0.1478453129529953
+  },
+  "backend": "gpu",
+  "jax": "0.10.2",
+  "comparison": {
+    "drift_rmse": {
+      "archived": 0.9128451347351074,
+      "difference": 1.1920928955078125e-07,
+      "within_predeclared_tolerance": true
+    },
+    "covariance_rmse": {
+      "archived": 0.11303279548883438,
+      "difference": 0.0,
+      "within_predeclared_tolerance": true
+    },
+    "nll": {
+      "archived": -8.922027587890625,
+      "difference": 0.0,
+      "within_predeclared_tolerance": true
+    },
+    "raw_spd_violation_rate": {
+      "archived": 0.45979997515678406,
+      "difference": 0.0,
+      "within_predeclared_tolerance": true
+    },
+    "min_raw_eigenvalue": {
+      "archived": -0.1478453129529953,
+      "difference": 0.0,
+      "within_predeclared_tolerance": true
+    }
+  },
+  "comparison_scope": "Same-source/backend target rtol=1e-5 atol=1e-6; a cross-backend failure is reported, never silently accepted or refitted."
+}

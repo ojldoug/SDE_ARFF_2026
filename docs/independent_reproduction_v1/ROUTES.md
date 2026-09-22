@@ -1,6 +1,6 @@
 # Independent reproduction routes (v1)
 
-Scope: the conservative review at `results/conservative_manuscript_revision_v1/`, based on commit `4e62557e5f9074e63843af9ef2d4bdd43549baab`. This package enables access and inspection; **fresh training has not been independently verified**. Ex4, withdrawn trajectory/speed claims and the unauthenticated modified-Ex7 scaling fit are not reproduction targets.
+Scope: the conservative review at `results/conservative_manuscript_revision_v1/`, based on commit `4e62557e5f9074e63843af9ef2d4bdd43549baab`. This package enables access and inspection. A subsequent [bounded full-fit verification](../bounded_reproduction_verification_v1/REPORT.md) passed execution and self-reconstruction but failed archived-reference numerical agreement; broader independent reproduction is not established. Ex4, withdrawn trajectory/speed claims and the unauthenticated modified-Ex7 scaling fit are not reproduction targets.
 
 ## Availability and exact dependency identity
 
@@ -28,7 +28,7 @@ The original Ex8 normals were regenerated from PRNG key 0 with shape `(1000,1000
 
 ## Install and restore
 
-Use a full Git clone (not a shallow export) for historical `git show` generator checks. Python 3.11, `requirements-dev.txt`, CUDA/JAX and compatible NVIDIA drivers are needed for numerical routes. Archive-only plots need NumPy/Matplotlib and TeX Live/latexmk. This release tested the existing environment, not a new network installation.
+Use a full Git clone (not a shallow export) for historical `git show` generator checks. Python 3.11, `requirements-dev.txt`, CUDA/JAX and compatible NVIDIA drivers are needed for numerical routes. Archive-only plots need NumPy/Matplotlib and TeX Live/latexmk. The initial packaging tested the existing environment. The subsequent bounded verification installed these exact requirements in a new venv successfully.
 
 ```sh
 python3.11 -m venv .venv
@@ -122,9 +122,9 @@ Fresh ZIP/metadata bytes may differ because of serialization, paths or Git prove
 
 No learned normalization statistics are missing. Historical tuning/search budgets are unavailable: this prevents recovering original tuning/selection history, **not** repeating the chosen compatible configurations. The withdrawn modified-Ex7 NLL-infinity and old trajectory/timing evidence remain unauthenticated; they are not needed to reproduce currently reported results.
 
-## Resources and proposed bounded end-to-end verification (not executed)
+## Resources and original bounded end-to-end verification proposal
 
-Use one otherwise idle RTX A6000 (49 GB) and the locked source/environment. Proposed configuration: **corrected Ex8 baseline ARFF, K128, N80000, seed 0**, with λ=.001, 300 adaptations, five-fold cross-fitting and all accepted settings. Restore and hash-check the original/corrected datasets, registered N80000 view and sources; no new stochastic data are needed. Run:
+The following proposal was subsequently executed once; see the [actual outcome](../bounded_reproduction_verification_v1/REPORT.md). Its tolerances were unchanged. Use one otherwise idle RTX A6000 (49 GB) and the locked source/environment. Proposed configuration: **corrected Ex8 baseline ARFF, K128, N80000, seed 0**, with λ=.001, 300 adaptations, five-fold cross-fitting and all accepted settings. Restore and hash-check the original/corrected datasets, registered N80000 view and sources; no new stochastic data are needed. Run:
 
 ```sh
 CUDA_VISIBLE_DEVICES=0 "$PY" scripts/reproduction_route.py baseline --method arff --seed 0 \
@@ -157,3 +157,5 @@ python scripts/package_independent_reproduction.py verify-tar --archive /new/pat
 ```
 
 Both commands verify hashes; bundle creation refuses existing output. `verify-tar` streams every unique payload, checks all internal hardlinks and refuses unexpected/missing members without extraction. The release tar's complete payload was verified this way. Do not run `inventory` to verify a release: it deliberately creates a new file list from the current tree, so changes would define a different version. Manifest and tar checksums are in BUNDLE.json. Future versions should use new names.
+
+The original packaging verification record is preserved as historical evidence. Actual subsequent run results are in `../bounded_reproduction_verification_v1/OUTCOME.json`; self-reconstruction passed, archived-reference agreement failed. The off-server backup procedure is in [BACKUP.md](BACKUP.md).

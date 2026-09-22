@@ -110,3 +110,9 @@ The [ordered route guide](docs/independent_reproduction_v1/ROUTES.md) separates 
 Private manuscript/feedback preservation dependencies in old diagnostic audit guards are not computational inputs and are excluded from distribution. The portable adapter explicitly omits only those private-document checks; numerical source/data hashes remain mandatory. Restored historical metadata may contain old local path strings; adapters resolve the recorded repository prefix without editing source or manifest bytes. No private document is needed for training/evaluation.
 
 All prior scientific qualifications and unrecovered historical search/selection records remain in force. No fresh training, new model predictions or stochastic data generation were performed for this package. A matching input hash and a successful metadata inspection are not evidence of numerical training reproduction.
+
+## Executed bounded full-estimator verification
+
+The [single-run report](docs/bounded_reproduction_verification_v1/REPORT.md) supersedes the earlier statement that no fresh training path has been executed: only the specified Ex8 ARFF seed-0 route has now been exercised. The new environment installed the pinned requirements successfully, all 29,009 restored inputs verified, and the complete seven-fit estimator/serialization path and self-reconstruction checks passed. Archived-reference numerical agreement **did not pass** the unchanged tolerance; detailed comparisons and selected indices are retained. No manuscript metrics were replaced. Dataset generation and every other fresh-training route remain unexecuted in this verification.
+
+Use [BACKUP.md](docs/independent_reproduction_v1/BACKUP.md) to transfer the 6.50 GiB bundle to separate storage and verify its destination checksum. Neither a destination nor a verified independent copy is claimed. Do not rerun this single verification automatically because its reference comparison failed.

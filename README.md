@@ -13,7 +13,7 @@ mkdir -p /tmp/sde-review-output
 .venv/bin/python scripts/rebuild_review_snapshot.py --output /tmp/sde-review-output/review
 ```
 
-The resulting PDF is `/tmp/sde-review-output/review/manuscript.pdf`; `REBUILD_CHECKS.json` records input-hash, numerical-table and figure checks. The output path must be new, so the command cannot replace an accepted result. On the project server the same rebuild was tested with the existing `arff-sde` Python environment. A fresh package installation is not claimed as tested here.
+The resulting PDF is `/tmp/sde-review-output/review/manuscript.pdf`; `REBUILD_CHECKS.json` records input-hash, numerical-table and figure checks. The output path must be new, so the command cannot replace an accepted result. On the project server the same rebuild was tested with the existing `arff-sde` Python environment. A fresh pinned package installation and one complete Ex8 ARFF fit were subsequently tested; see the bounded verification below.
 
 The compact archive inputs and prevalidated seed-0 coefficient maps needed for the review rebuild are in Git. Full datasets and per-seed model checkpoints are not. For saved-checkpoint reevaluation or training, place authenticated files under the expected `data/` and `results/` layouts, or pass their roots to `scripts/verify_review_external.py`. Their hashes and the missing distribution route are documented in [REPRODUCING.md](REPRODUCING.md). No download link is asserted.
 
@@ -35,3 +35,9 @@ See [the ordered route guide](docs/independent_reproduction_v1/ROUTES.md), [file
 ```
 
 The latter inspects; it does not train. The bundle is prepared locally for durable hosting, **not publicly downloadable yet**. No off-server backup is verified. Original historical search budgets remain incomplete. These limitations do not prevent archive-only rebuilding, but full independent numerical reproduction is not claimed.
+
+## Bounded numerical verification (22 September 2026)
+
+At commit `4c5dc6b54af216ebba49477874c955d259d4140f`, a clean restored checkout and new venv completed **one corrected Ex8 ARFF K128/N80000/seed-0 full fit** on an idle A6000. Input/source/config hashes and native validation passed; reloading the new checkpoint reproduced its own metrics. **Agreement with the archived seed-0 fit failed rtol=1e-5/atol=1e-6**, including covariance selection 299→294. No retry or tolerance change was made. This used packaged data, not fresh data generation, and does not verify the full experiments.
+
+[Outcome, numerical differences and execution records](docs/bounded_reproduction_verification_v1/REPORT.md). [Off-server transfer and checksum procedure](docs/independent_reproduction_v1/BACKUP.md); no independent backup is yet verified.
