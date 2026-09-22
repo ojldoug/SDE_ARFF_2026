@@ -98,3 +98,7 @@ These commands are **examples of the accepted runners**, not commands executed f
 Archived lag/ridge full-estimator fits each took about 1,140–1,160 seconds including warm-up on the study hardware, with seven regressions; 18 new arms ran over roughly two hours on four exclusive GPUs. A full 30-seed five-method corrected Ex8 baseline or 800-record N/h/K study is a multi-hour to multi-day GPU campaign, depending on concurrency and data generation. Concurrent four-GPU algorithm times are marked non-isolated and do not establish publication-quality runtime advantages. No full training was launched for this snapshot.
 
 The remaining scientific decisions are Experiment 4 sign/conditioning, unaccounted historical numerical differences, lack of authenticated corrected trajectory/isolated-runtime evidence, and a durable public data/model archive. Archive-based numerical agreement and a successful TeX build do **not** prove that fresh training reproduces the reported distributions.
+
+## Bounded review-source correction (22 September 2026)
+
+The local mathematical, bibliographic and protocol-documentation corrections are recorded in `results/conservative_manuscript_revision_v1/CORRECTION_RECORD_20260922.md`; archive-only checks are in `CORRECTION_BUILD_CHECKS_20260922.json`. No numerical result, checkpoint, training setting or coefficient grid changed. Appendix B.5 now states preprocessing, dense solver, historical stopping and seed conventions. The large-artifact release and historical search-history limitations above remain.

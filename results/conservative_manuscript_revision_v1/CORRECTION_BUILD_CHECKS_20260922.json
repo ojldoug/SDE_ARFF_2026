@@ -1,0 +1,55 @@
+{
+  "archive_files_sha256_checked": 24,
+  "historical_table_method_counts": {
+    "ex1": 4,
+    "ex2": 4,
+    "ex3": 2,
+    "ex5": 4,
+    "ex6": 4,
+    "ex7": 4
+  },
+  "numeric_tables": {
+    "ex1.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "ex2.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "ex3.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "ex5.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "ex6.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "ex7.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "ex8.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "N_full.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "h_full.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "capacity_full.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "lag_ridge_arms.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "lag_ridge_paired.tex": "archive-derived; reported precision agrees; reviewed display retained",
+    "spd.tex": "archived scalar source and displayed precision checked",
+    "sensitivity_spd.tex": "archived scalar source and displayed precision checked",
+    "swaps.tex": "archived scalar source and displayed precision checked",
+    "floors.tex": "archived scalar source and displayed precision checked",
+    "tab:drift_diagnostic": "archived scalar source and displayed precision checked"
+  },
+  "figures_regenerated": [
+    "N.pdf",
+    "baseline.pdf",
+    "capacity.pdf",
+    "ex1_seed0_recovery.pdf",
+    "ex8_seed0_drift.pdf",
+    "ex8_seed0_projection.pdf",
+    "ex8_seed0_raw_covariance.pdf",
+    "h.pdf",
+    "lag_ridge_paired_nll.pdf",
+    "mechanism.pdf"
+  ],
+  "manuscript_compiled": true,
+  "scope": "archived scalar metrics and saved coefficient maps; no checkpoint inference or training",
+  "final_tex_check": "No warnings, undefined references or overfull boxes; one underfull paragraph",
+  "visual_pages_checked": [
+    3,
+    4,
+    5,
+    9,
+    18,
+    23
+  ],
+  "final_pdf_sha256": "978da5df8ca65280d85e4cf0004bf7672bb3b11e5c97333de8b16b5c55c3651c",
+  "fresh_training_verified": false
+}
