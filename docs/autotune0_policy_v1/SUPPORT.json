@@ -1,0 +1,1 @@
+{"jax": "0.10.2", "devices": ["cuda:0"], "result": 2, "flag": "--xla_gpu_autotune_level=0"}

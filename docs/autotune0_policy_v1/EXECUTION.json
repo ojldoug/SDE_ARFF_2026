@@ -1,0 +1,15 @@
+{
+  "status": "complete",
+  "minimal_completed": 3,
+  "full_completed": 2,
+  "active": "full_comparison",
+  "support_wall_seconds": 1.2760350704193115,
+  "support_passed": true,
+  "minimal_0_wall_seconds": 15.722139358520508,
+  "minimal_1_wall_seconds": 15.336101531982422,
+  "minimal_2_wall_seconds": 16.06991147994995,
+  "minimal_gate_passed": true,
+  "full_0_wall_seconds": 49.91885805130005,
+  "full_1_wall_seconds": 49.75126624107361,
+  "full_comparison_wall_seconds": 5.526398658752441
+}

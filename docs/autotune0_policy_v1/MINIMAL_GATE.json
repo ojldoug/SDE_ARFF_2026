@@ -1,0 +1,44 @@
+{
+  "0": {
+    "within": {
+      "key": true,
+      "omega": true,
+      "amp": true,
+      "predictions": true,
+      "validation_predictions": true,
+      "validation_loss": true
+    },
+    "all_numerical_hashes_match_first": true,
+    "program_hashes_match_first": true,
+    "runtime_fingerprint_matches_first": true,
+    "library_hashes_match_first": true
+  },
+  "1": {
+    "within": {
+      "key": true,
+      "omega": true,
+      "amp": true,
+      "predictions": true,
+      "validation_predictions": true,
+      "validation_loss": true
+    },
+    "all_numerical_hashes_match_first": true,
+    "program_hashes_match_first": true,
+    "runtime_fingerprint_matches_first": true,
+    "library_hashes_match_first": true
+  },
+  "2": {
+    "within": {
+      "key": true,
+      "omega": true,
+      "amp": true,
+      "predictions": true,
+      "validation_predictions": true,
+      "validation_loss": true
+    },
+    "all_numerical_hashes_match_first": true,
+    "program_hashes_match_first": true,
+    "runtime_fingerprint_matches_first": true,
+    "library_hashes_match_first": true
+  }
+}

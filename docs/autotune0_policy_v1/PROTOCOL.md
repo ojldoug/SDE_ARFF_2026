@@ -1,0 +1,9 @@
+# Single prospective policy, frozen before dispatch
+
+Only candidate compiler flag: XLA_FLAGS=--xla_gpu_autotune_level=0, set before importing JAX. Official guidance: https://openxla.org/xla/determinism (consulted 2026-09-22); disabling autotuning addresses compilation choices, not a general execution-determinism guarantee. No other XLA flag, solver, precision, seed, penalty, selection or dependency change.
+
+Same isolated venv, pinned 4c5dc6b checkout, packaged data and GPU UUID GPU-d2cfc73c-186a-6651-e9f1-c6d93a00f0b2. Same CUDA/JAX/thread settings as previous verification. Each child receives a new empty JAX_COMPILATION_CACHE_DIR and CUDA_CACHE_PATH; defaults otherwise unchanged. No old executable/cache is admitted. Cache isolation is intentional verification hygiene, not an alternative compiler policy. Existing caches are preserved.
+
+First test backend initialization/one trivial compiled operation for flag support. On rejection or any runtime failure: stop. Then exactly three fresh minimal processes, each invoking the native compiled first step twice on identical initial model/key/inputs, synchronizing each output and corresponding prediction/loss. Use existing authenticated fold-0 fixture; internal-validation rows from packaged data and archived indices. All native outputs, fitting/validation predictions and loss must be bit-identical within and across processes. Record reconstructed matrices distinctly; no native intermediate-output instrumentation.
+
+Only if all three pass, execute exactly two full seven-fit ARFF K128/N80000/seed0 cases under the same policy in fresh processes. Compare native artifacts and predictions with rtol=1e-5, atol=1e-6; report bitwise equality separately. Compare history separately without revising any old comparison. New exclusive paths, same cooperative lock for the sequential protocol. No retries, alternative flags, campaigns, default-policy or manuscript changes.

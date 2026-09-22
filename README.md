@@ -41,3 +41,7 @@ The latter inspects; it does not train. The bundle is prepared locally for durab
 At commit `4c5dc6b54af216ebba49477874c955d259d4140f`, a clean restored checkout and new venv completed **one corrected Ex8 ARFF K128/N80000/seed-0 full fit** on an idle A6000. Input/source/config hashes and native validation passed; reloading the new checkpoint reproduced its own metrics. **Agreement with the archived seed-0 fit failed rtol=1e-5/atol=1e-6**, including covariance selection 299→294. No retry or tolerance change was made. This used packaged data, not fresh data generation, and does not verify the full experiments.
 
 [Outcome, numerical differences and execution records](docs/bounded_reproduction_verification_v1/REPORT.md). [Off-server transfer and checksum procedure](docs/independent_reproduction_v1/BACKUP.md); no independent backup is yet verified.
+
+## Optional prospective repeatability policy
+
+A bounded [autotuning-disabled verification](docs/autotune0_policy_v1/REPORT.md) passed three minimal fresh-process checks and two complete Ex8 ARFF K128/N80000/seed-0 fits with bit-identical scientific outputs. This uses `--xla_gpu_autotune_level=0` and fresh per-process compilation caches on the recorded A6000/software stack. Neither fit agrees with the historical archive at the original tolerance. The report provides an opt-in command; production defaults and manuscript results are unchanged. This does not establish general determinism or whole-study reproduction.

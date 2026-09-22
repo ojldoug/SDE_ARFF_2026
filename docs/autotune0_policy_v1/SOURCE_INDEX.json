@@ -1,0 +1,10 @@
+{
+  "docs/bounded_reproduction_verification_v1/COMPARISON.json": "800fdb4f7d0b8e840857cbc6ae48de52b522b2e503e3d338d6672723fcb3d960",
+  "docs/current_pipeline_repeat_v1/COMPARISON.json": "1b508fcd8f4f3ce6faa6f004d4de64375e3213307c9a1d17c5f71df6a051dfd9",
+  "docs/minimal_fold0_repeatability_v1/REPORT.md": "2f4796450396dd137614244baedb17f57dfffb20d1d185921c8cb352b38a4df3",
+  "scripts/check_autotune0_minimal.py": "2e3dd5e8bbadc92aa4d4a3264bfacedce164b2780446a768c5f2b3f8df77ca4a",
+  "scripts/verify_autotune0_policy.py": "f54ac62acfb9659da6c7b82639f68e09c7b155a16a4e6c675973ca1848a0ce89",
+  "docs/autotune0_policy_v1/PROTOCOL.md": "944de6d3bfb369e48af24f76111ea8a75c145e35924646b9777c29f36b1ff9f1",
+  "../autotune0_policy_v1/execution/full_0/run/artifact.npz": "bfee82625f23ad7a6f8c024c0571d32a869d7ad064bb73fcce84bbb393a7b0a6",
+  "../autotune0_policy_v1/execution/full_1/run/artifact.npz": "ec02851422ac5bc3957beb7f69e928803c65443cf797c1882fe029197ce0fced"
+}
