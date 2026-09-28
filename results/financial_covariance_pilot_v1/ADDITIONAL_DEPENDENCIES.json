@@ -1,0 +1,25 @@
+{
+  "explanation": "Transitive package imports beyond frozen ARFF/Adam modules. Checked after launch against the exact pre-run HEAD; tracked sources unchanged. No numerical source edit.",
+  "files": [
+    {
+      "path": "src/experiments/model_size.py",
+      "sha256": "21cef5222f8c64e424f763a5dd2f7a98de41d1771f891210e29b2639f982f54a",
+      "unchanged_from_prerun_HEAD": true
+    },
+    {
+      "path": "src/experiments/config.py",
+      "sha256": "8f8ce3eafa6118df5b32a7b0463895f775a1119360d3f31a9fbfeaa5de629966",
+      "unchanged_from_prerun_HEAD": true
+    },
+    {
+      "path": "src/experiments/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unchanged_from_prerun_HEAD": true
+    },
+    {
+      "path": "src/__init__.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "unchanged_from_prerun_HEAD": true
+    }
+  ]
+}

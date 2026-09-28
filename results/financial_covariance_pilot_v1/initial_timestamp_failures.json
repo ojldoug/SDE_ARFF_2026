@@ -1,0 +1,14 @@
+[
+  {
+    "archive": "BTCUSDT-1h-2021-12.zip",
+    "open": 1640318400000,
+    "close": 1640321994362,
+    "duration_seconds": 3594.363
+  },
+  {
+    "archive": "BTCUSDT-1h-2023-03.zip",
+    "open": 1679659200000,
+    "close": 1679661581646,
+    "duration_seconds": 2381.647
+  }
+]

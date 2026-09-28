@@ -1,0 +1,29 @@
+{
+  "python": "3.11.15 (main, Jun 11 2026, 15:20:16) [GCC 14.3.0]",
+  "executable": "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1/venv/bin/python",
+  "platform": "Linux-5.15.0-190-generic-x86_64-with-glibc2.35",
+  "packages": {
+    "jax": "0.10.2",
+    "jaxlib": "0.10.2",
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "optax": "0.2.8",
+    "matplotlib": "3.11.1"
+  },
+  "devices": [
+    "cuda:0"
+  ],
+  "jax_enable_x64": false,
+  "default_matmul_precision": "None",
+  "settings": {
+    "CUDA_VISIBLE_DEVICES": "0",
+    "JAX_PLATFORMS": "cuda",
+    "JAX_ENABLE_X64": "false",
+    "XLA_FLAGS": "--xla_gpu_autotune_level=0",
+    "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "1",
+    "JAX_COMPILATION_CACHE_DIR": "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/results/financial_covariance_pilot_v1/cache_1790608509/jax",
+    "CUDA_CACHE_PATH": "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/results/financial_covariance_pilot_v1/cache_1790608509/cuda"
+  }
+}

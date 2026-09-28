@@ -1,0 +1,267 @@
+{
+  "valid": true,
+  "margins": [
+    [
+      0.03242369625220624,
+      0.16772869475985322,
+      0.8298473789411417
+    ],
+    [
+      0.01196227059943323,
+      0.09328112558037376,
+      0.9057000977277408
+    ],
+    [
+      0.018637310395705268,
+      0.10317671693959826,
+      0.8871591749741327
+    ]
+  ],
+  "initial": [
+    1.0000000000000093,
+    1.000000000000004,
+    1.0000000000000118
+  ],
+  "qbar": [
+    [
+      1.0000152782271463,
+      0.8787565749488444,
+      0.7571318656115801
+    ],
+    [
+      0.8787565749488444,
+      0.9938571078215067,
+      0.7693122325259322
+    ],
+    [
+      0.7571318656115801,
+      0.7693122325259322,
+      0.9997525344227444
+    ]
+  ],
+  "dcc": [
+    0.02396678199832837,
+    0.9516468852396903
+  ],
+  "optimizer_records": [
+    {
+      "stage": "margin",
+      "asset": 0,
+      "start": [
+        0.020000000000000188,
+        0.04,
+        0.94
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.03242369625220624,
+        0.16772869475985322,
+        0.8298473789411417
+      ],
+      "objective": 0.3443529146575091,
+      "iterations": 15,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "margin",
+      "asset": 0,
+      "start": [
+        0.040000000000000376,
+        0.08,
+        0.88
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.03237435316061907,
+        0.17030718489000882,
+        0.8286657786715158
+      ],
+      "objective": 0.3443561237506539,
+      "iterations": 9,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "margin",
+      "asset": 0,
+      "start": [
+        0.10000000000000094,
+        0.15,
+        0.75
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.03238406804821873,
+        0.17021597215492645,
+        0.8286959866633975
+      ],
+      "objective": 0.34435585389983514,
+      "iterations": 11,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "margin",
+      "asset": 1,
+      "start": [
+        0.02000000000000008,
+        0.04,
+        0.94
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.01196227059943323,
+        0.09328112558037376,
+        0.9057000977277408
+      ],
+      "objective": 0.3106188903978385,
+      "iterations": 11,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "margin",
+      "asset": 1,
+      "start": [
+        0.04000000000000016,
+        0.08,
+        0.88
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.01196331596293963,
+        0.09331368667196652,
+        0.9056790471621244
+      ],
+      "objective": 0.3106192551930148,
+      "iterations": 14,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "margin",
+      "asset": 1,
+      "start": [
+        0.10000000000000041,
+        0.15,
+        0.75
+      ],
+      "success": false,
+      "valid": false,
+      "parameters": [
+        0.0429878626364386,
+        0.2555599177368102,
+        0.7434400822631898
+      ],
+      "objective": 0.31884813707604664,
+      "iterations": 5,
+      "message": "Inequality constraints incompatible"
+    },
+    {
+      "stage": "margin",
+      "asset": 2,
+      "start": [
+        0.020000000000000236,
+        0.04,
+        0.94
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.01863548482767887,
+        0.10318191740244986,
+        0.8871584785837722
+      ],
+      "objective": 0.308900096051337,
+      "iterations": 11,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "margin",
+      "asset": 2,
+      "start": [
+        0.04000000000000047,
+        0.08,
+        0.88
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.018637310395705268,
+        0.10317671693959826,
+        0.8871591749741327
+      ],
+      "objective": 0.30890009574487615,
+      "iterations": 11,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "margin",
+      "asset": 2,
+      "start": [
+        0.10000000000000119,
+        0.15,
+        0.75
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.017434467504279356,
+        0.11558439451680498,
+        0.8833169171639133
+      ],
+      "objective": 0.3093152101949551,
+      "iterations": 16,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "dcc",
+      "start": [
+        0.02,
+        0.95
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.023969033808986972,
+        0.9516401860421482
+      ],
+      "objective": 0.21679523449573398,
+      "iterations": 5,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "dcc",
+      "start": [
+        0.05,
+        0.9
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.0239694985275603,
+        0.951641449605693
+      ],
+      "objective": 0.21679523446030224,
+      "iterations": 11,
+      "message": "Optimization terminated successfully"
+    },
+    {
+      "stage": "dcc",
+      "start": [
+        0.1,
+        0.8
+      ],
+      "success": true,
+      "valid": true,
+      "parameters": [
+        0.02396678199832837,
+        0.9516468852396903
+      ],
+      "objective": 0.2167952343506962,
+      "iterations": 16,
+      "message": "Optimization terminated successfully"
+    }
+  ]
+}

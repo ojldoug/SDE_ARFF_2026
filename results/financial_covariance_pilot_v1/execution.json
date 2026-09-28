@@ -1,0 +1,30 @@
+{
+  "supervisor_start": 1790608509.7388802,
+  "start": 1790608509.9531343,
+  "gpu_index": "0",
+  "gpu_uuid": "GPU-d2cfc73c-186a-6651-e9f1-c6d93a00f0b2",
+  "gpu_info": "0, GPU-d2cfc73c-186a-6651-e9f1-c6d93a00f0b2, NVIDIA RTX A6000, 1, 0, 595.84\n1, GPU-86bece01-926d-3541-08a3-c254560c583a, NVIDIA RTX A6000, 1, 0, 595.84\n2, GPU-3e3fbdee-4030-5266-6b8e-150df67540e6, NVIDIA RTX A6000, 1, 0, 595.84\n3, GPU-172ccdc1-5306-af0e-83eb-5c99b55f2f3f, NVIDIA RTX A6000, 1, 0, 595.84\n",
+  "command": [
+    "/home/kammonaa/projects/SDE_ARFF/bounded_reproduction_verification_v1/venv/bin/python",
+    "-B",
+    "-m",
+    "scripts.financial_pilot.pipeline"
+  ],
+  "settings": {
+    "JAX_ENABLE_X64": "false",
+    "XLA_FLAGS": "--xla_gpu_autotune_level=0",
+    "JAX_COMPILATION_CACHE_DIR": "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/results/financial_covariance_pilot_v1/cache_1790608509/jax",
+    "CUDA_CACHE_PATH": "/home/kammonaa/projects/SDE_ARFF/SDE_ARFF_2026/results/financial_covariance_pilot_v1/cache_1790608509/cuda",
+    "OMP_NUM_THREADS": "2",
+    "OPENBLAS_NUM_THREADS": "1",
+    "CUDA_VISIBLE_DEVICES": "0"
+  },
+  "allocated_seconds": 330.63985085487366,
+  "peak_device_memory_MiB": 442.0,
+  "supervisor_sha256": "afd97dfa0ccd3a06bfeaed72440ac0927fd60353a3be4c8404f8ca7aab16833c",
+  "frozen_sha256": "19ce8eabea24bb6dbf99e6e5f51d0addaffa5e78d08082bfd70b720b87a4d0eb",
+  "pid": 1773217,
+  "returncode": 0,
+  "end": 1790608840.5929837,
+  "supervisor_wall_seconds": 330.8541078567505
+}

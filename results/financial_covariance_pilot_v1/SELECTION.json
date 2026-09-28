@@ -1,0 +1,36 @@
+{
+  "arff": {
+    "grid_index": 2,
+    "mean_validation_nll": [
+      1193.4207187859458,
+      612.089129833856,
+      171.26635341590767
+    ]
+  },
+  "neural": {
+    "grid_index": 1,
+    "mean_validation_nll": [
+      -12.173996211873892,
+      -12.187068648008903,
+      -12.18157507053351
+    ]
+  },
+  "ewma": {
+    "decay": 0.97,
+    "candidates": [
+      {
+        "decay": 0.94,
+        "validation_nll": -12.044299128150486
+      },
+      {
+        "decay": 0.97,
+        "validation_nll": -12.10277348131975
+      },
+      {
+        "decay": 0.99,
+        "validation_nll": -12.072522353551477
+      }
+    ]
+  },
+  "dcc_valid": true
+}

@@ -1,0 +1,10 @@
+COMPLETE: both bounded tasks; no further work dispatched.
+Colloidal: all8 original1e-10 algebra checks pass after common float64 reevaluation; neural NLL change~1.05e-8, conclusions unchanged; no new inference/fitting.
+Financial:18/18candidate fits and valid DCC; final identity/causality/checkpoint/likelihood checks passed. Test8760 hourly targets in2025.
+Selected by2024 only: ARFF lambda=.064; neural LR=.001; EWMA=.97. All3 fitting seeds retained.
+Test NLL: constant-11.805733; EWMA-12.389138; DCC-12.419359; ARFF seeds[136.7891985413226, 224.60719891237042, 194.50894437936958]; neural seeds[-12.422167768960467, -12.379840719991574, -12.412547433074964].
+ARFF loses to all3domain baselines in all12months for all3seeds. Off-diagonals worsen scores; raw SPD violations21.5–30.8%; fixed-floor score and calibration poor. No floor/parameter retuning.
+DCC: 1 failed predetermined optimizer start(s) retained; other starts converged validly, comparator complete.
+Resources:0.091844 allocatedGPU-hours;330.854s wall; sampled peak442MiB; zero recovery.
+Recommendation: financial archival negative diagnostic, optional supplementary scope discussion; not a successful main-text ARFF application. Colloidal archived supplementary candidate with unresolved schema/cell/phase limitations.
+All accepted results/manuscripts preserved. No test-based dataset/seed/configuration choice. Shared-market fitting seeds and descriptive months are not independent-market replications. Raw data/model files local, not publicly hosted.

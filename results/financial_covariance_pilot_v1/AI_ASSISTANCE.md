@@ -1,0 +1,5 @@
+# AI-assistance record
+
+The user specified the two bounded tasks, assets, dates, methods, finite parameter grids, seeds, test seal, metrics and resource ceilings. Codex inspected primary documentation and repository implementations, wrote the isolated data/evaluation/DCC/adapter/supervision/reporting code, performed automated source/numerical checks, and launched the authorized finite queue. It used existing ARFF and neural numerical functions without editing production implementations. It also reevaluated the colloidal pilot from saved raw predictions without inference or fitting.
+
+This is automated implementation, checking and interpretation—not independent human scientific review. No dataset authors were contacted, no trading actions taken and no model or parameter was chosen from test outcomes. Local private instructions/correspondence are excluded from the repository snapshot. Source/configuration hashes and executed commands are retained so collaborators can inspect the claims. Remaining limitations and any failures are reported rather than hidden by successful execution.

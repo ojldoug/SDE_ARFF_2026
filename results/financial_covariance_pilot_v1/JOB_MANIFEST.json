@@ -1,0 +1,132 @@
+{
+  "jobs": [
+    {
+      "method": "arff",
+      "configuration": 0.001,
+      "grid_index": 0,
+      "seed": 0,
+      "budget": 300
+    },
+    {
+      "method": "arff",
+      "configuration": 0.001,
+      "grid_index": 0,
+      "seed": 1,
+      "budget": 300
+    },
+    {
+      "method": "arff",
+      "configuration": 0.001,
+      "grid_index": 0,
+      "seed": 2,
+      "budget": 300
+    },
+    {
+      "method": "arff",
+      "configuration": 0.008,
+      "grid_index": 1,
+      "seed": 0,
+      "budget": 300
+    },
+    {
+      "method": "arff",
+      "configuration": 0.008,
+      "grid_index": 1,
+      "seed": 1,
+      "budget": 300
+    },
+    {
+      "method": "arff",
+      "configuration": 0.008,
+      "grid_index": 1,
+      "seed": 2,
+      "budget": 300
+    },
+    {
+      "method": "arff",
+      "configuration": 0.064,
+      "grid_index": 2,
+      "seed": 0,
+      "budget": 300
+    },
+    {
+      "method": "arff",
+      "configuration": 0.064,
+      "grid_index": 2,
+      "seed": 1,
+      "budget": 300
+    },
+    {
+      "method": "arff",
+      "configuration": 0.064,
+      "grid_index": 2,
+      "seed": 2,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.0003,
+      "grid_index": 0,
+      "seed": 0,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.0003,
+      "grid_index": 0,
+      "seed": 1,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.0003,
+      "grid_index": 0,
+      "seed": 2,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.001,
+      "grid_index": 1,
+      "seed": 0,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.001,
+      "grid_index": 1,
+      "seed": 1,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.001,
+      "grid_index": 1,
+      "seed": 2,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.003,
+      "grid_index": 2,
+      "seed": 0,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.003,
+      "grid_index": 2,
+      "seed": 1,
+      "budget": 300
+    },
+    {
+      "method": "neural",
+      "configuration": 0.003,
+      "grid_index": 2,
+      "seed": 2,
+      "budget": 300
+    }
+  ],
+  "auxiliary": "constant; EWMA3decays; DCC <=3deterministic starts per fitting objective",
+  "no_test_selection": true
+}

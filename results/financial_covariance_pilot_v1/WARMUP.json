@@ -1,0 +1,7 @@
+{
+  "seconds": 9.141103249974549,
+  "rows": 256,
+  "discarded_initializations": true,
+  "real_jobs_reset_to_frozen_seed": true,
+  "device": "[CudaDevice(id=0)]"
+}

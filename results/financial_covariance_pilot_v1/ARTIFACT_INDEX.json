@@ -1,0 +1,503 @@
+{
+  "description": "Completed pilot output identities; market archives separately indexed by DATA_MANIFEST.json. Local large files are not claimed publicly available.",
+  "files": [
+    {
+      "path": "results/financial_covariance_pilot_v1/ADDITIONAL_DEPENDENCIES.json",
+      "bytes": 926,
+      "sha256": "2415d141bf4dba4668e96cc2decd99e0be816521376620d0e01d14617a27372f",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/AI_ASSISTANCE.md",
+      "bytes": 1097,
+      "sha256": "8c484a94f34a43e6d0c811487d5d6aca467a469b6ff2ede021ce14bcc93ef1e7",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/COMPLETE.json",
+      "bytes": 310,
+      "sha256": "946f22c82fa19ab263ecb2a5477a5e9797e21849bfa5e29dc151e5d588d6856a",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/DATA_MANIFEST.json",
+      "bytes": 112591,
+      "sha256": "39293ea283793aa25091b966380800b20c37dbd606eb5995d306c38e5bd352fb",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/DATA_PREFLIGHT_NOTE.md",
+      "bytes": 605,
+      "sha256": "8f1dc2da187558f6d5d6af7a429b6d29f220999247c8d198739a5dc4b30880ea",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/DCC_REPORT.json",
+      "bytes": 5553,
+      "sha256": "39d021d8792433cb0191b40613e0474b67b27b188b4616424dfbaa57e50086c0",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/ENVIRONMENT.txt",
+      "bytes": 2594,
+      "sha256": "cfbd990f871f87bbe372d1609f9f49d13dc7bd513114fef0c51e07c2b08bf744",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/FINAL_SUMMARY.txt",
+      "bytes": 1521,
+      "sha256": "285ad0ef184edaf4893a4550a8c316163018dac9297f47a94865dfa7638a3e8f",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/FROZEN.json",
+      "bytes": 3136,
+      "sha256": "19ce8eabea24bb6dbf99e6e5f51d0addaffa5e78d08082bfd70b720b87a4d0eb",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/JOB_MANIFEST.json",
+      "bytes": 2446,
+      "sha256": "dad4b0026de87d9d0ca968a4e8ecb1405df6fd5144d4f3abcbcb0eed6d57aa7d",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/OUTPUT_INDEX.md",
+      "bytes": 3247,
+      "sha256": "e513cbf6006a9a490e70965e8f48af306988badb2b6244f9bdff634f85ea909d",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/OUTPUT_VALIDATION.json",
+      "bytes": 3818,
+      "sha256": "740e4ae8d273baff68b59dd7cf86a12e6d7e8635e6509bd15c85e8a7a5696941",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/PERSISTENCE_CHECK.json",
+      "bytes": 408,
+      "sha256": "230d3f71c1688a481f560e745a17fcd2ffdb440a2b551d418a6d9ca9c55e3a3e",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/PREFIT_CHECKS.json",
+      "bytes": 763,
+      "sha256": "e29cc6bbb6ce1f31cf831762f608cc67741f1dd3669b60a2c90c4be48a883820",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/PRETEST_GATE.json",
+      "bytes": 2083,
+      "sha256": "bc5f65651046400f84c54273404f82dc42d54544341d14c8eb13661dacdfce5b",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/PROTOCOL.md",
+      "bytes": 8929,
+      "sha256": "da9be47c695dbf4780b35f1e4f1dca193b9b1755d8eb9c4b144190ad08b93458",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/REPORT.md",
+      "bytes": 10805,
+      "sha256": "faa15af8d652d5ca6c7b0e629f8afeef96d233ae9e3d674d4eea1f0b02a06629",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/REPRODUCING.md",
+      "bytes": 7605,
+      "sha256": "82530e8238ac7b0ed4ff9340e8ab12b41c7cac2cb9c24cb81df747aef07324b3",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/RIGHTS_AND_SOURCES.md",
+      "bytes": 1634,
+      "sha256": "127eed0a8cd82feec8236fe247090dca57f81941e0f7971a4e7f9d372aabddab",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/RUNTIME.json",
+      "bytes": 1038,
+      "sha256": "aa64b8e3b0e2d45fbfb8323cf8353c6fc7a276b1fef9c6277b95b2df4ae96cfb",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/SELECTION.json",
+      "bytes": 644,
+      "sha256": "ec5fbe24ffbd289949dddd71fe22e078fbe38bffae5363a97f772af6ca1bf87f",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/SPLIT_MANIFEST.json",
+      "bytes": 1442,
+      "sha256": "f091ff7d60e5e3e3f4419e1e29bcd64ba9a106e250f05d1ac406e8d466248218",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/STRUCTURAL_TIMESTAMPS.json",
+      "bytes": 1388665,
+      "sha256": "96a5f5bcdc61f5ad9c87b4006f1ae4ad8d78aa386a527dd758ead7743ca07a49",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/WARMUP.json",
+      "bytes": 163,
+      "sha256": "0af4a936bebddaa58a34313ee1b688f56ca4e070b7b105379cbc6f15ac9638bf",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/candidate_validation.csv",
+      "bytes": 1002,
+      "sha256": "b023b9066baac3113da73c020dcb8e9dc0ba6abb053600149d535a0c4c39359a",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/candidate_validation.json",
+      "bytes": 3619,
+      "sha256": "4745c5d3bc76a66cafbaa674b5181b58a0823766aa0515964fd6b2b3fa319486",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/checkpoint_summary.csv",
+      "bytes": 1376,
+      "sha256": "6119cb61cfcc60db0f352d6c9cd979ffabbfef70c2153a097459becf6bb7e73d",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/comparison.pdf",
+      "bytes": 23143,
+      "sha256": "4567be4b249c20375b30f7f5e1c8b060838196ae57f108cd5a9c5f611de9975f",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/comparison.png",
+      "bytes": 148455,
+      "sha256": "593932fbf0a2c1c0fdc6f3f25d190bfcfee7bace0bf57750eebfb521ced94ef0",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/development.npz",
+      "bytes": 2974573,
+      "sha256": "4d262c3d50bfef5c610a774073d80cca828114d746f8939c45d3604e4b0c8666",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/execution.json",
+      "bytes": 1489,
+      "sha256": "feca00f3a1d32e805d8e918aef69bb76240b16bcb2a6a45eba3cc16d867ce945",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/forecast_timestamps_development.csv",
+      "bytes": 1512079,
+      "sha256": "10c8992848d8f2078f606492c78d250a48a44455c587502bb50f625e4d03cc1d",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/forecast_timestamps_test.csv",
+      "bytes": 394258,
+      "sha256": "b3d65f2279fff9e64d77f4bd44708a550d5e763c36c1044c47987bf0069532cf",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/initial_timestamp_failures.json",
+      "bytes": 279,
+      "sha256": "58b1a788be22b2a6b1bd710712be65d99be09fa37921c9a0a99c783f1f6333a1",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/interpretation.json",
+      "bytes": 753,
+      "sha256": "b81ff38a03473027a7a28a97fb880a9d4cf98e9a08df1eea9be4d05f311a556a",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g0_s0.json",
+      "bytes": 226,
+      "sha256": "2a7a2bf94c09dba7f9245e39d1441e20ff420f36dd75a730b8d3c2149c4b991f",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g0_s0.pkl",
+      "bytes": 334299,
+      "sha256": "9a7a1dc2158588c181faffa067d13c8a9fb9f0e597a59f2d0564ab362fe1743a",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g0_s1.json",
+      "bytes": 227,
+      "sha256": "876ad0218e00e01443bad78fc77d3c545a6fe3a8721b54cb054fdce3e8830559",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g0_s1.pkl",
+      "bytes": 334299,
+      "sha256": "37ef38704e75bcd0f54df6e9c8c43a6aca1520b364265ba04dbe59a7c9ac4245",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g0_s2.json",
+      "bytes": 227,
+      "sha256": "391940a69be16379b1dc4300a0933cbdf3752f7d707cc902795143ae3defaa51",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g0_s2.pkl",
+      "bytes": 334299,
+      "sha256": "e32aedd95da216014cd6573120d7e8592536d408e563545e5efcac8ecbe04a1a",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g1_s0.json",
+      "bytes": 226,
+      "sha256": "350ec879075bf61ccd0f655e15d4c2eb3016eaec20fcc87f27a027c125e837de",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g1_s0.pkl",
+      "bytes": 334299,
+      "sha256": "c1921ee3937aad3858f99c2a17cab62389753ced24a18dbad05776d4b12310aa",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g1_s1.json",
+      "bytes": 227,
+      "sha256": "8c8e5e7795312da1bc4abe837b93b2172bc59c05815ecc76e6e47bbb04843c85",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g1_s1.pkl",
+      "bytes": 334299,
+      "sha256": "3620f173773785c97d48ac393599582e0c46e1be6d768e1ef97ce92c69622474",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g1_s2.json",
+      "bytes": 227,
+      "sha256": "69be4558b55bd7dc4a3a5960fb61f07fbe3c19f03ec4dcfb04add2725df8bd90",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g1_s2.pkl",
+      "bytes": 334299,
+      "sha256": "8c4ee1cbecd5738be9b067fbdff0edb63246f91a1b8901be67cd609122fbf33b",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g2_s0.json",
+      "bytes": 227,
+      "sha256": "3c8a50c101e8394358336d67f615e93537505a66823c3cc5779e2900b9f1ea75",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g2_s0.pkl",
+      "bytes": 334299,
+      "sha256": "24e8f326804a828d5df39064a21672eae336ed0337dea3664e638d5d76d06415",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g2_s1.json",
+      "bytes": 227,
+      "sha256": "dadbb556be39d51505c889fb10b16ad553ca30c7409716908f9d049c0a703f63",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g2_s1.pkl",
+      "bytes": 334299,
+      "sha256": "21ea2bc1c7455e39c6e0f5674961279b4bce53195a963c844a74549b865689a5",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g2_s2.json",
+      "bytes": 227,
+      "sha256": "c17df9a6c996e6b12bd8a1060818df28ee82b1338ee9e2327ff60c9286e256d6",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/arff_g2_s2.pkl",
+      "bytes": 334299,
+      "sha256": "0f1a504571a36a168f5fc80919a513f7c932c870a1f55344e2f77cfad5f96186",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/dcc.json",
+      "bytes": 219,
+      "sha256": "3d382f8a2404b66de88b37eb189ec88d4ecb72e08a545fec4f445824caabc326",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/dcc.pkl",
+      "bytes": 1821,
+      "sha256": "6dce528fedf5d380cdbf0cce349505ae8a8154ff792ab1f5126b9d3d6ca2bafe",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g0_s0.json",
+      "bytes": 228,
+      "sha256": "7f7e0c3dcf355f0e0f7098cd6aa63b0c584b22ad5a567fd2cbef535add79be40",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g0_s0.pkl",
+      "bytes": 329338,
+      "sha256": "983bb49e1aa5cb49c35b9a25f09a6e2836dc4b80443c7356f5e8d0c015918f69",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g0_s1.json",
+      "bytes": 229,
+      "sha256": "e93acf1171caf3c89e3a43800c2ab3e680698720572b7d3370545cf28535d3e7",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g0_s1.pkl",
+      "bytes": 329338,
+      "sha256": "8b8d57a5dc0d59b4faaa622c53ebb7b517627491a6c509d4240c6b0293e62def",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g0_s2.json",
+      "bytes": 229,
+      "sha256": "1b8e41c13037cfdfb41fc6f8c3945399c9e8adecbe8cdcb5d692a62ab0bedbaa",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g0_s2.pkl",
+      "bytes": 329338,
+      "sha256": "db1be94d1ed444ed34205f18677dc9d4269090d78288479592306bfcb01d1f31",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g1_s0.json",
+      "bytes": 229,
+      "sha256": "8fb84d29ca249fd88a771c18c66fef13d9c9ef476b1fc897700ae942705c5d68",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g1_s0.pkl",
+      "bytes": 329338,
+      "sha256": "dc79f617528925244ceb8085dc97b0a08dc2475a99617409b784c5cd067e485e",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g1_s1.json",
+      "bytes": 229,
+      "sha256": "bde20403f3b940b5586fdbc1027ad6157f4c1ed339dbaa35d2d3b7895614a5c3",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g1_s1.pkl",
+      "bytes": 329338,
+      "sha256": "d5bc11e55452ec7d8ba1d3342048454d34964d82480b6ae8accd71d2e9cf263a",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g1_s2.json",
+      "bytes": 228,
+      "sha256": "9cf16dc7a8a70b9ec74c47a99928d27e1c8093f74738891739399e835bc139df",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g1_s2.pkl",
+      "bytes": 329338,
+      "sha256": "9a3250efa2b9ccd3511e1dbd904343ef75988205d52598f323a593f1afb2cadb",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g2_s0.json",
+      "bytes": 228,
+      "sha256": "96bfbb4210eadc140b441ab59267dd6148c3429a9871485b780ba78b3c29f527",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g2_s0.pkl",
+      "bytes": 329338,
+      "sha256": "d892502e14c2d5f01ede76dbffeb61736c71adc11e0000190d7b0ed443f7dc5a",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g2_s1.json",
+      "bytes": 228,
+      "sha256": "6b973df7abc39cf56ee555eafbc35997d5dc73319072f339473a106600495c28",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g2_s1.pkl",
+      "bytes": 329338,
+      "sha256": "b1aa5b4942604a5a3ed7d2fcf4faadfa9f5f8871a9831708d5b4cf026044244c",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g2_s2.json",
+      "bytes": 229,
+      "sha256": "4f81d73f265c6e0337a81f01724b77183f383c1d6534027d85d92b99db5ac7b6",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/models/neural_g2_s2.pkl",
+      "bytes": 329338,
+      "sha256": "5b6596bad1a52478d3599df69a5391ddaadb08190e2cb0140a8ec769de178963",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/paired_differences.csv",
+      "bytes": 59988,
+      "sha256": "597d67a78dcf2eb667b5fde1ebb8de15dde77f8bc5be6b8eacae0637d1713db4",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/per_month.csv",
+      "bytes": 36866,
+      "sha256": "f2b1c113af62c04adf3242d1938a5b6868f50bbeaa90382ed27f188362982cc3",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/per_run.csv",
+      "bytes": 4660,
+      "sha256": "eca60dfc251bf06f256cf0947dc81a0649f652d6fb3afcca27e54f9eb17fc1fc",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/portfolio_scores.csv",
+      "bytes": 91638,
+      "sha256": "f50922330487d80de7c6b4dfbf58e00e72ed0378dcc2313a98ba0e238469b5be",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/selected_test_predictions.npz",
+      "bytes": 2706635,
+      "sha256": "9a391e4dcae21f1ef451f02c94d8c4165c499e613bdae6f8f5b1dbb55d36220d",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/selected_validation_predictions.npz",
+      "bytes": 2708520,
+      "sha256": "31fe95c8287169b9fb1128435947da2e82307f09bc6108066e6925f6ad6add07",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/status.json",
+      "bytes": 57,
+      "sha256": "1949193f3b3fb644fcf46738e186657a70eab1b1c842d6918e30a012099f4ab8",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/summary.json",
+      "bytes": 29570,
+      "sha256": "7aa407816f58ec15bd3ebac1feb38298862048799192ba3dca600f8c2b5eac77",
+      "public_snapshot_candidate": true
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/test_score_arrays.npz",
+      "bytes": 810362,
+      "sha256": "7245a37fcacfaab6f1f32db5a849cd7d68ba9784c4d284a35d341a56da5105b3",
+      "public_snapshot_candidate": false
+    },
+    {
+      "path": "results/financial_covariance_pilot_v1/validation_score_arrays.npz",
+      "bytes": 810993,
+      "sha256": "8ddc746ee2b99d638814accd5af2416df5160c9076c6fd6ae8300b335d5f2524",
+      "public_snapshot_candidate": false
+    }
+  ]
+}

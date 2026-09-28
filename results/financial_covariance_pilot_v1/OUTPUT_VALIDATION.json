@@ -1,0 +1,115 @@
+{
+  "passed": true,
+  "time": 1790608862.3536344,
+  "model_count": 19,
+  "candidate_count": 18,
+  "archive_checksums_verified": 147,
+  "checks": [
+    "frozen source/data/protocol",
+    "all19stage envelopes and pre-test model identities",
+    "all18finite histories and earliest minimum native checkpoint",
+    "mean3seed validation configuration rule",
+    "serialized validation arrays identical",
+    "common score arrays and summary means",
+    "8760test forecast timestamp ordering",
+    "colloidal original input hashes preserved"
+  ],
+  "models": [
+    {
+      "name": "arff_g0_s0.pkl",
+      "sha256": "9a7a1dc2158588c181faffa067d13c8a9fb9f0e597a59f2d0564ab362fe1743a",
+      "seconds": 5.497139781014994
+    },
+    {
+      "name": "arff_g0_s1.pkl",
+      "sha256": "37ef38704e75bcd0f54df6e9c8c43a6aca1520b364265ba04dbe59a7c9ac4245",
+      "seconds": 1.2331559439189732
+    },
+    {
+      "name": "arff_g0_s2.pkl",
+      "sha256": "e32aedd95da216014cd6573120d7e8592536d408e563545e5efcac8ecbe04a1a",
+      "seconds": 1.2285411008633673
+    },
+    {
+      "name": "arff_g1_s0.pkl",
+      "sha256": "c1921ee3937aad3858f99c2a17cab62389753ced24a18dbad05776d4b12310aa",
+      "seconds": 3.074135565198958
+    },
+    {
+      "name": "arff_g1_s1.pkl",
+      "sha256": "3620f173773785c97d48ac393599582e0c46e1be6d768e1ef97ce92c69622474",
+      "seconds": 1.2274811980314553
+    },
+    {
+      "name": "arff_g1_s2.pkl",
+      "sha256": "8c4ee1cbecd5738be9b067fbdff0edb63246f91a1b8901be67cd609122fbf33b",
+      "seconds": 1.2545721919741482
+    },
+    {
+      "name": "arff_g2_s0.pkl",
+      "sha256": "24e8f326804a828d5df39064a21672eae336ed0337dea3664e638d5d76d06415",
+      "seconds": 3.0921193710528314
+    },
+    {
+      "name": "arff_g2_s1.pkl",
+      "sha256": "21ea2bc1c7455e39c6e0f5674961279b4bce53195a963c844a74549b865689a5",
+      "seconds": 1.2571667940355837
+    },
+    {
+      "name": "arff_g2_s2.pkl",
+      "sha256": "0f1a504571a36a168f5fc80919a513f7c932c870a1f55344e2f77cfad5f96186",
+      "seconds": 1.2580366630572826
+    },
+    {
+      "name": "dcc.pkl",
+      "sha256": "6dce528fedf5d380cdbf0cce349505ae8a8154ff792ab1f5126b9d3d6ca2bafe",
+      "seconds": 37.96246449206956
+    },
+    {
+      "name": "neural_g0_s0.pkl",
+      "sha256": "983bb49e1aa5cb49c35b9a25f09a6e2836dc4b80443c7356f5e8d0c015918f69",
+      "seconds": 34.98393879807554
+    },
+    {
+      "name": "neural_g0_s1.pkl",
+      "sha256": "8b8d57a5dc0d59b4faaa622c53ebb7b517627491a6c509d4240c6b0293e62def",
+      "seconds": 25.403765159193426
+    },
+    {
+      "name": "neural_g0_s2.pkl",
+      "sha256": "db1be94d1ed444ed34205f18677dc9d4269090d78288479592306bfcb01d1f31",
+      "seconds": 25.565083798021078
+    },
+    {
+      "name": "neural_g1_s0.pkl",
+      "sha256": "dc79f617528925244ceb8085dc97b0a08dc2475a99617409b784c5cd067e485e",
+      "seconds": 26.946080076973885
+    },
+    {
+      "name": "neural_g1_s1.pkl",
+      "sha256": "d5bc11e55452ec7d8ba1d3342048454d34964d82480b6ae8accd71d2e9cf263a",
+      "seconds": 25.557372705079615
+    },
+    {
+      "name": "neural_g1_s2.pkl",
+      "sha256": "9a3250efa2b9ccd3511e1dbd904343ef75988205d52598f323a593f1afb2cadb",
+      "seconds": 25.30523752910085
+    },
+    {
+      "name": "neural_g2_s0.pkl",
+      "sha256": "d892502e14c2d5f01ede76dbffeb61736c71adc11e0000190d7b0ed443f7dc5a",
+      "seconds": 28.46373970899731
+    },
+    {
+      "name": "neural_g2_s1.pkl",
+      "sha256": "b1aa5b4942604a5a3ed7d2fcf4faadfa9f5f8871a9831708d5b4cf026044244c",
+      "seconds": 28.12153075193055
+    },
+    {
+      "name": "neural_g2_s2.pkl",
+      "sha256": "5b6596bad1a52478d3599df69a5391ddaadb08190e2cb0140a8ec769de178963",
+      "seconds": 27.494822007836774
+    }
+  ],
+  "scope": "Artifact audit only; no additional model inference/fitting; parameter counts checked from saved arrays"
+}

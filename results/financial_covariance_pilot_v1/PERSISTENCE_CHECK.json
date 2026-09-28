@@ -1,0 +1,9 @@
+{
+  "verified": true,
+  "verification": "Fresh server exec session after tmux launch command exited; tmux has-session succeeded and child status running",
+  "session": "financial_covariance_pilot_v1",
+  "gpu_uuid": "GPU-d2cfc73c-186a-6651-e9f1-c6d93a00f0b2",
+  "observed_pid": 1773217,
+  "supervisor_sha256": "afd97dfa0ccd3a06bfeaed72440ac0927fd60353a3be4c8404f8ca7aab16833c",
+  "time": 1790608643.5793426
+}

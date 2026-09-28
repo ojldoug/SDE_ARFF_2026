@@ -1,0 +1,330 @@
+{
+  "results": {
+    "affine": {
+      "end_to_end": {
+        "nll": -1.0777875934420829,
+        "raw_spd_violation_rate": 0.0,
+        "min_raw_eigenvalue": 0.1011409551524369,
+        "projection_frequency": 0.0,
+        "floored_eigenvalue_fraction": 0.0,
+        "mean_projection_frobenius": 0.0,
+        "max_projection_frobenius": 0.0,
+        "mean_mahalanobis_squared": 1.946832555301084,
+        "whitened_mean": [
+          0.005739130753912942,
+          -0.0003984877520446028
+        ],
+        "whitened_second_moment": [
+          [
+            0.9750602815645125,
+            -0.009992868792335664
+          ],
+          [
+            -0.009992868792335664,
+            0.9717722737365718
+          ]
+        ],
+        "coverage": {
+          "0.5": 0.5054,
+          "0.9": 0.90755,
+          "0.95": 0.95375
+        },
+        "algebra_max_absolute_difference": 8.881784197001252e-15,
+        "count": 20000,
+        "increment_mse": 0.019919847972587036,
+        "coverage_delta": {
+          "0.5": 0.0,
+          "0.9": 0.0,
+          "0.95": 0.0
+        },
+        "nll_delta": -4.440892098500626e-16
+      },
+      "shared_affine_drift": {
+        "nll": -1.0777875934420829,
+        "raw_spd_violation_rate": 0.0,
+        "min_raw_eigenvalue": 0.1011409551524369,
+        "projection_frequency": 0.0,
+        "floored_eigenvalue_fraction": 0.0,
+        "mean_projection_frobenius": 0.0,
+        "max_projection_frobenius": 0.0,
+        "mean_mahalanobis_squared": 1.946832555301084,
+        "whitened_mean": [
+          0.005739130753912942,
+          -0.0003984877520446028
+        ],
+        "whitened_second_moment": [
+          [
+            0.9750602815645125,
+            -0.009992868792335664
+          ],
+          [
+            -0.009992868792335664,
+            0.9717722737365718
+          ]
+        ],
+        "coverage": {
+          "0.5": 0.5054,
+          "0.9": 0.90755,
+          "0.95": 0.95375
+        },
+        "algebra_max_absolute_difference": 8.881784197001252e-15,
+        "count": 20000,
+        "increment_mse": 0.019919847972587036,
+        "coverage_delta": {
+          "0.5": 0.0,
+          "0.9": 0.0,
+          "0.95": 0.0
+        },
+        "nll_delta": -4.440892098500626e-16
+      }
+    },
+    "kernel": {
+      "end_to_end": {
+        "nll": -1.0740576690993406,
+        "raw_spd_violation_rate": 0.0,
+        "min_raw_eigenvalue": 0.08060206879290258,
+        "projection_frequency": 0.0,
+        "floored_eigenvalue_fraction": 0.0,
+        "mean_projection_frobenius": 0.0,
+        "max_projection_frobenius": 0.0,
+        "mean_mahalanobis_squared": 1.9460183765476025,
+        "whitened_mean": [
+          0.004245389008305208,
+          0.00022228445737276355
+        ],
+        "whitened_second_moment": [
+          [
+            0.9744018906328178,
+            -0.00783999690498391
+          ],
+          [
+            -0.00783999690498391,
+            0.9716164859147841
+          ]
+        ],
+        "coverage": {
+          "0.5": 0.5075,
+          "0.9": 0.90765,
+          "0.95": 0.9529
+        },
+        "algebra_max_absolute_difference": 7.105427357601002e-15,
+        "count": 20000,
+        "increment_mse": 0.01995571597086153,
+        "coverage_delta": {
+          "0.5": 0.0,
+          "0.9": 0.0,
+          "0.95": 0.0
+        },
+        "nll_delta": 0.0
+      },
+      "shared_affine_drift": {
+        "nll": -1.0757414883447982,
+        "raw_spd_violation_rate": 0.0,
+        "min_raw_eigenvalue": 0.08060206879290258,
+        "projection_frequency": 0.0,
+        "floored_eigenvalue_fraction": 0.0,
+        "mean_projection_frobenius": 0.0,
+        "max_projection_frobenius": 0.0,
+        "mean_mahalanobis_squared": 1.9426507380566873,
+        "whitened_mean": [
+          0.0059565764366052406,
+          -0.0005561935473007113
+        ],
+        "whitened_second_moment": [
+          [
+            0.9730397888636116,
+            -0.008423883966484105
+          ],
+          [
+            -0.008423883966484105,
+            0.969610949193076
+          ]
+        ],
+        "coverage": {
+          "0.5": 0.50745,
+          "0.9": 0.90725,
+          "0.95": 0.9537
+        },
+        "algebra_max_absolute_difference": 7.105427357601002e-15,
+        "count": 20000,
+        "increment_mse": 0.019919847972587036,
+        "coverage_delta": {
+          "0.5": 0.0,
+          "0.9": 0.0,
+          "0.95": 0.0
+        },
+        "nll_delta": 0.0
+      }
+    },
+    "arff": {
+      "end_to_end": {
+        "nll": -1.0766040427833554,
+        "raw_spd_violation_rate": 0.0,
+        "min_raw_eigenvalue": 0.08724623903378509,
+        "projection_frequency": 0.0,
+        "floored_eigenvalue_fraction": 0.0,
+        "mean_projection_frobenius": 0.0,
+        "max_projection_frobenius": 0.0,
+        "mean_mahalanobis_squared": 1.9464365400215604,
+        "whitened_mean": [
+          0.007699367400785353,
+          0.0007396131632905799
+        ],
+        "whitened_second_moment": [
+          [
+            0.9756090853823869,
+            -0.010295237651767734
+          ],
+          [
+            -0.010295237651767734,
+            0.9708274546391739
+          ]
+        ],
+        "coverage": {
+          "0.5": 0.50615,
+          "0.9": 0.90745,
+          "0.95": 0.9532
+        },
+        "algebra_max_absolute_difference": 6.217248937900877e-15,
+        "count": 20000,
+        "increment_mse": 0.019928607679906,
+        "coverage_delta": {
+          "0.5": 0.0,
+          "0.9": 0.0,
+          "0.95": 0.0
+        },
+        "nll_delta": 0.0
+      },
+      "shared_affine_drift": {
+        "nll": -1.077028228091402,
+        "raw_spd_violation_rate": 0.0,
+        "min_raw_eigenvalue": 0.08724623903378509,
+        "projection_frequency": 0.0,
+        "floored_eigenvalue_fraction": 0.0,
+        "mean_projection_frobenius": 0.0,
+        "max_projection_frobenius": 0.0,
+        "mean_mahalanobis_squared": 1.9455881694054675,
+        "whitened_mean": [
+          0.00576635336741495,
+          -0.00041281669599278645
+        ],
+        "whitened_second_moment": [
+          [
+            0.9752386976270185,
+            -0.010532260588974711
+          ],
+          [
+            -0.010532260588974711,
+            0.9703494717784491
+          ]
+        ],
+        "coverage": {
+          "0.5": 0.50585,
+          "0.9": 0.9074,
+          "0.95": 0.9534
+        },
+        "algebra_max_absolute_difference": 6.217248937900877e-15,
+        "count": 20000,
+        "increment_mse": 0.019919847972587036,
+        "coverage_delta": {
+          "0.5": 0.0,
+          "0.9": 0.0,
+          "0.95": 0.0
+        },
+        "nll_delta": 0.0
+      }
+    },
+    "neural": {
+      "end_to_end": {
+        "nll": -1.0769330193412803,
+        "raw_spd_violation_rate": 0.0,
+        "min_raw_eigenvalue": 0.09904902416489399,
+        "projection_frequency": 0.0,
+        "floored_eigenvalue_fraction": 0.0,
+        "mean_projection_frobenius": 0.0,
+        "max_projection_frobenius": 0.0,
+        "mean_mahalanobis_squared": 1.9183187523937408,
+        "whitened_mean": [
+          0.0018196725935823537,
+          0.008819293595377368
+        ],
+        "whitened_second_moment": [
+          [
+            0.9659269608413046,
+            -0.014458353551768032
+          ],
+          [
+            -0.014458353551768032,
+            0.9523917915524361
+          ]
+        ],
+        "coverage": {
+          "0.5": 0.51095,
+          "0.9": 0.91035,
+          "0.95": 0.95565
+        },
+        "algebra_max_absolute_difference": 1.0658141036401503e-14,
+        "count": 20000,
+        "increment_mse": 0.01991977684808935,
+        "coverage_delta": {
+          "0.5": 0.0,
+          "0.9": 0.0,
+          "0.95": 0.0
+        },
+        "nll_delta": 1.0541834960520191e-08
+      },
+      "shared_affine_drift": {
+        "nll": -1.0769296234234196,
+        "raw_spd_violation_rate": 0.0,
+        "min_raw_eigenvalue": 0.09904902416489399,
+        "projection_frequency": 0.0,
+        "floored_eigenvalue_fraction": 0.0,
+        "mean_projection_frobenius": 0.0,
+        "max_projection_frobenius": 0.0,
+        "mean_mahalanobis_squared": 1.9183255442294622,
+        "whitened_mean": [
+          0.0056227878527140215,
+          -0.0004424361762072314
+        ],
+        "whitened_second_moment": [
+          [
+            0.9659691688518335,
+            -0.01443720100213157
+          ],
+          [
+            -0.01443720100213157,
+            0.9523563753776291
+          ]
+        ],
+        "coverage": {
+          "0.5": 0.51055,
+          "0.9": 0.9103,
+          "0.95": 0.9554
+        },
+        "algebra_max_absolute_difference": 8.881784197001252e-15,
+        "count": 20000,
+        "increment_mse": 0.019919847972587036,
+        "coverage_delta": {
+          "0.5": 0.0,
+          "0.9": 0.0,
+          "0.95": 0.0
+        },
+        "nll_delta": 1.05477910850027e-08
+      }
+    }
+  },
+  "input_hashes": {
+    "test_predictions.npz": "5bb21e74c9bd1db048a451bd255704c0d3f4c319b72c36d20364be7315393588",
+    "test_evaluation_inputs.npz": "1f5df03bae9f56350b7bd03f6ea6c233aa450372ee7dbeaee7903751d1e422ee",
+    "summary.json": "af384f11527d8a9b3dd5a3a5e6c186e542686d0dbf3afcf5adbd0915e557c7aa",
+    "VALIDATION.json": "b34834e2818a272bd77cb71de201b85a5fc02ab77a096034df226f3635e38867",
+    "PROTOCOL.md": "1206f24e74ab6bc9c076748a2141a052c6152779fa08edaad66c6d93aed1d2de"
+  },
+  "evaluator_sha256": "09f18a1a3900daf4f5a847b6a72f3374181cd6d9f56fbbb42ece4d65f1ae1457",
+  "script_sha256": "7bde722560b4717d040db1aabd0d0e48518cc4779ecdfb73ff3d3dc72a756a0d",
+  "rtol": 1e-10,
+  "atol": 1e-10,
+  "all_algebra_checks_pass": true,
+  "original_outputs_preserved": true,
+  "no_new_predictions_or_fitting": true
+}

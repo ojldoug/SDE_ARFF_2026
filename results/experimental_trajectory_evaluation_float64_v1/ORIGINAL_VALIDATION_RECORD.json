@@ -1,0 +1,83 @@
+{
+  "integrity_checks_passed": true,
+  "independent_nll_comparisons": [
+    {
+      "method": "affine",
+      "mode": "end_to_end",
+      "raw_covariance_dtype": "float64",
+      "max_absolute_difference": 7.105427357601002e-15,
+      "mean_difference": 0.0,
+      "strict_1e_10_pass": true
+    },
+    {
+      "method": "affine",
+      "mode": "shared_affine_drift",
+      "raw_covariance_dtype": "float64",
+      "max_absolute_difference": 7.105427357601002e-15,
+      "mean_difference": 0.0,
+      "strict_1e_10_pass": true
+    },
+    {
+      "method": "kernel",
+      "mode": "end_to_end",
+      "raw_covariance_dtype": "float64",
+      "max_absolute_difference": 5.329070518200751e-15,
+      "mean_difference": 0.0,
+      "strict_1e_10_pass": true
+    },
+    {
+      "method": "kernel",
+      "mode": "shared_affine_drift",
+      "raw_covariance_dtype": "float64",
+      "max_absolute_difference": 5.329070518200751e-15,
+      "mean_difference": 0.0,
+      "strict_1e_10_pass": true
+    },
+    {
+      "method": "arff",
+      "mode": "end_to_end",
+      "raw_covariance_dtype": "float64",
+      "max_absolute_difference": 4.440892098500626e-15,
+      "mean_difference": 0.0,
+      "strict_1e_10_pass": true
+    },
+    {
+      "method": "arff",
+      "mode": "shared_affine_drift",
+      "raw_covariance_dtype": "float64",
+      "max_absolute_difference": 5.329070518200751e-15,
+      "mean_difference": 0.0,
+      "strict_1e_10_pass": true
+    },
+    {
+      "method": "neural",
+      "mode": "end_to_end",
+      "raw_covariance_dtype": "float32",
+      "max_absolute_difference": 2.311099288831997e-06,
+      "mean_difference": 1.1269210675735053e-08,
+      "strict_1e_10_pass": false
+    },
+    {
+      "method": "neural",
+      "mode": "shared_affine_drift",
+      "raw_covariance_dtype": "float32",
+      "max_absolute_difference": 2.3053673618989023e-06,
+      "mean_difference": 1.1261970023213053e-08,
+      "strict_1e_10_pass": false
+    }
+  ],
+  "all_independent_checks_pass": false,
+  "precision_note": "Neural covariance/eigendecomposition remain float32 in the existing host evaluation; reconstructing and solving the projected matrix differs by float32 roundoff. The original 1e-10 check is retained as failed for these rows. No results or tolerance were replaced.",
+  "checks": [
+    "original numerical source and protocol hashes unchanged",
+    "all downloaded source movie hashes unchanged",
+    "whole test movie43 absent from development46/48/49",
+    "five-frame increments and blocked60second endpoint gaps",
+    "no shared endpoints among retained per-particle increments",
+    "all22 saved stages intact",
+    "earliest-minimum selected histories checked",
+    "all8 stored NLL means reproduce summaries; independent reconstructed-matrix comparisons recorded separately"
+  ],
+  "comparison_tolerance": "1e-10 absolute/relative for algebraic NLL serialization check; not a fitting tolerance",
+  "summary_sha256": "af384f11527d8a9b3dd5a3a5e6c186e542686d0dbf3afcf5adbd0915e557c7aa"
+}

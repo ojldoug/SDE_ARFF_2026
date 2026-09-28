@@ -1,0 +1,22 @@
+{
+  "passed": true,
+  "fixtures": "deterministic trigonometric arrays; not extra experimental observations",
+  "checks": [
+    "feature direct-window equality,168past only",
+    "future-target perturbation leaves current feature unchanged",
+    "zero-variance correlation rule",
+    "double eigen vs Cholesky NLL",
+    "scale Jacobian sum(log D)",
+    "negative eigenvalue flooring only in evaluation",
+    "DCC/GARCH against independent scalar-time reference, including missing observations",
+    "EWMA against independent update loop",
+    "EWMA/DCC forecast-before-observe future perturbation invariance"
+  ],
+  "tolerances": {
+    "gaussian": 1e-09,
+    "recursion": 1e-11,
+    "features": 1e-10,
+    "causality": "exact"
+  },
+  "test_prices_opened": false
+}

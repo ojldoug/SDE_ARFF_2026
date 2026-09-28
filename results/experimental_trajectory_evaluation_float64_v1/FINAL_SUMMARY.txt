@@ -1,0 +1,1 @@
+Common float64 reevaluation complete; all eight algebra checks pass1e-10; original failures preserved. Conclusions unchanged. No inference/fitting; schema/cell/optical-phase limitations unresolved.
