@@ -1,0 +1,24 @@
+# Author-review handoff — conservative manuscript and closed pilots
+
+The current review draft is [conservative_manuscript_revision_v1/manuscript.pdf](../results/conservative_manuscript_revision_v1/manuscript.pdf). Its editable main source is [sources/RaulCom_ARFFSDELearning.tex](../results/conservative_manuscript_revision_v1/sources/RaulCom_ARFFSDELearning.tex), with active appendices and supplementary material identified in the [review README](../results/conservative_manuscript_revision_v1/README.md). This is an isolated **review draft with unresolved author decisions**, not the authoritative Overleaf manuscript. Preserve the original authorship and method → applications → results → sensitivity structure. The alternative `manuscript_complete_review_v1` remains an alternative, not the template.
+
+## Substantive author decisions
+
+The existing [AUTHOR_DECISIONS.md](../results/conservative_manuscript_revision_v1/AUTHOR_DECISIONS.md) remains the decision record:
+
+1. **Experiment 4:** decide the final disposition of its visible author-review description. Its numerical comparison remains withheld because the intended drift sign and conditioning are unresolved; do not present it as verified.
+2. **Historical discrepancies:** approve the explicit limits on attribution and reproduction, or identify particular historical claims that should be removed or further qualified. Ex1/2/3/6/7 discrepancy causes are not all established. Retain the distinction between validation-selected evidence and independent-test comparisons.
+3. **Trajectory and speed claims:** approve withholding claims without authenticated corrected trajectory or isolated-timing evidence. Coefficient and sensitivity figures do not replace that evidence. No new experiments are proposed here.
+4. **Submission and release:** approve final title/presentation and the Ex4 note's disposition; choose durable artifact hosting and access/license terms. The latest [REPRODUCTION_STATUS.md](../REPRODUCTION_STATUS.md) records public hosting and an independently verified off-server backup as outstanding. Use its existing bundle/checksum/transfer records; this handoff does not claim an upload or verified backup.
+
+## Optional real-data additions
+
+- **Colloidal pilot:** the [float64 correction report](../results/experimental_trajectory_evaluation_float64_v1/REPORT.md) is the current evaluation record; the original pilot and failed checks remain preserved. It did not demonstrate an ARFF predictive advantage. Treat it, at most, as an explicitly exploratory supplementary candidate with unresolved schema, experimental-cell and optical-phase limitations.
+- **Financial pilot:** retain as an archival negative application diagnostic, optionally cited in a limitations discussion—not as a successful real-data demonstration. The [pilot report](../results/financial_covariance_pilot_v1/REPORT.md) and [closure decomposition](../results/financial_covariance_pilot_closure_v1/REPORT.md) preserve all outcomes. Floor-active forecasts dominate the quadratic score contribution. **All nine ARFF candidates selected iteration 1**, so prolonged adaptation is not an established explanation for selected-model failure; neither the cause of raw covariance errors nor an alternative-floor remedy is established.
+- **Proposed wording:** [PROPOSED_LIMITATIONS.md](../results/financial_covariance_pilot_closure_v1/PROPOSED_LIMITATIONS.md) is optional author-review text for the existing applications discussion or limitations passage. It has not been inserted into the manuscript. Authors may retain both pilots outside the paper; neither is required to reorganize its scientific purpose.
+
+## Closed technical work and preservation
+
+Consult the existing [reproduction status](../REPRODUCTION_STATUS.md), [reproduction instructions](../REPRODUCING.md), [bounded source-correction record](../results/conservative_manuscript_revision_v1/CORRECTION_RECORD_20260922.md) and pilot validation records for completed checks and their scope. This handoff does not reopen numerical validation, treat historical fresh-training agreement as resolved, or request further runs. Bibliographic verification already recorded is not a new pending decision.
+
+This preservation commit includes the closure report, compact CSV/JSON, analysis/reporting scripts, proposed text and this handoff. Raw observations, model checkpoints, prediction arrays, private attachments and unrelated work are excluded. Closure files are retained verbatim: the report's statement that no commit occurred refers to the preceding analysis stage, before this separately authorized preservation commit. No manuscript, accepted numerical result, original failed check or production default was changed. Both pilots are closed; no application search or follow-up experiment is authorized by this handoff.
